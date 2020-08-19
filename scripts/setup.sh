@@ -25,41 +25,41 @@ function install_docker() {
 
 function install() {
   echo "Install....."
-  exit 0
+  # exit 0
   
-  # Update & Upgrade to latest
-  sudo apt-get update && sudo apt-get upgrade
+  # # Update & Upgrade to latest
+  # sudo apt-get update && sudo apt-get upgrade
 
-  # Install independent packages
-  install_package vim
-  install_package git-all
-  install_package prometheus
-  install_package prometheus-node-exporter
-  install_package golang
-  install_package zip
-  install_package unzip
-  install_package build-essential
-  install_package python3-venv
-  install_package python3-pip
+  # # Install independent packages
+  # install_package vim
+  # install_package git-all
+  # install_package prometheus
+  # install_package prometheus-node-exporter
+  # install_package golang
+  # install_package zip
+  # install_package unzip
+  # install_package build-essential
+  # install_package python3-venv
+  # install_package python3-pip
   
-  # Define setup directories
-  mkdir -p $HOME/{.eth2,.eth2stats,.eth2validators,.ethereum,.password,logs,prysm/configs}
-  mkdir -p /etc/ethereum
-  mkdir -p /home/prometheus/node-exporter
+  # # Define setup directories
+  # mkdir -p $HOME/{.eth2,.eth2stats,.eth2validators,.ethereum,.password,logs,prysm/configs}
+  # mkdir -p /etc/ethereum
+  # mkdir -p /home/prometheus/node-exporter
   
-  # Create files
-  touch $HOME/.password/password.txt
-  touch $HOME/logs/{beacon,validator,slasher}.log
+  # # Create files
+  # touch $HOME/.password/password.txt
+  # touch $HOME/logs/{beacon,validator,slasher}.log
   
-  # Clone configs repo
-  if [! -d $HOME/SetupUI ]
-  then
-    git clone https://github.com/xuyenvuong/pi4-pos-setup.git $HOME/SetupUI
-  else
-    cd $HOME/SetupUI
-    git pull origin master
-    cd $HOME
-  fi
+  # # Clone configs repo
+  # if [! -d $HOME/SetupUI ]
+  # then
+    # git clone https://github.com/xuyenvuong/pi4-pos-setup.git $HOME/SetupUI
+  # else
+    # cd $HOME/SetupUI
+    # git pull origin master
+    # cd $HOME
+  # fi
   
   install_docker
 }
@@ -84,25 +84,12 @@ function help() {
   echo "Help..."
 }
 
-
 case $1 in
-install)
-    install
-    ;;
-
-setup)
-    setup
-    ;;
-
-uninstall)
-    uninstall
-    ;;
-
-help)
-    help
-    ;;
-
-*)
+  install) install;;
+  setup) setup;;
+  uninstall)uninstall;;
+  help) help;;
+  *)
     echo "Task '$1' is not found!"
     echo "Please use 'setup.sh help' for more info."
     exit 1
