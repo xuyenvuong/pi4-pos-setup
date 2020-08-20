@@ -16,7 +16,7 @@ function install_docker() {
 
 # Uninstall Docker
 function uninstall_docker() { 
-  sudo apt-get purge docker-ce docker-ce-cli containerd.io
+  sudo apt-get -y purge docker-ce docker-ce-cli containerd.io
   sudo rm -rf /var/lib/docker
 }
 
