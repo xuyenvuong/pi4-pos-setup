@@ -42,10 +42,10 @@ function uninstall_package() {
   fi
 }
 
-# Run backup for all
-function backup_all() {
+# # Run backup for all
+# function backup_all() {
   
-}
+# }
 
 # Main function to install all necessary package to support the node
 function install_all() {
