@@ -86,7 +86,7 @@ function help() {
 case $1 in
   install) install;;
   # setup) setup;;
-  uninstall)uninstall;;
+  uninstall) uninstall;;
   help) help;;
   *)
     echo "Task '$1' is not found!"
