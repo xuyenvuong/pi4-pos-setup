@@ -27,6 +27,7 @@ function install_docker() {
   sudo sh /tmp/get-docker.sh
   
   sudo usermod -aG docker $USER
+  newgrp docker
 }
 
 function install() {
