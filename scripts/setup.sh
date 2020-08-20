@@ -1,7 +1,7 @@
 #!/bin/bash
 
-echo "******** File setupMyEth2Node.sh - A script to quickly setup ETH2.0"
-echo "************************* Author: MAX VUONG ***********************"
+# File setupMyEth2Node.sh - A script to quickly setup ETH2.0
+# Author: MAX VUONG
 
 set -eu
 
@@ -12,6 +12,12 @@ function install_docker() {
   
   sudo usermod -aG docker $USER
   newgrp docker
+}
+
+# Uninstall Docker
+function install_docker() { 
+  sudo apt-get purge docker-ce docker-ce-cli containerd.io
+  sudo rm -rf /var/lib/docker
 }
 
 function install() {
