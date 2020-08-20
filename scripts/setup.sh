@@ -1,15 +1,18 @@
 #!/bin/bash
-
-# File setupMyEth2Node.sh - A script to quickly setup ETH2.0
-# Author: MAX VUONG
+# setup.sh - A script to quickly setup ETH2.0 Prysm node
+# Author: Max Vuong
 
 set -eu
 
 # Install Docker
-function install_docker() { 
-  curl -fsSL https://get.docker.com -o /tmp/get-docker.sh
-  sudo sh /tmp/get-docker.sh
+function install_docker() {
+  sudo apt-get install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common
+  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
   
+  sudo add-apt-repository "deb [arch=arm64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+  sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+  
+  sudo groupadd docker
   sudo usermod -aG docker $USER
   newgrp docker
   
@@ -18,7 +21,8 @@ function install_docker() {
 
 # Uninstall Docker
 function uninstall_docker() { 
-  sudo apt-get purge -y docker-ce docker-ce-cli containerd.io
+  sudo apt-get purge -y docker-ce docker-ce-cli containerd.io 
+  sudo apt-get purge -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common
   sudo rm -rf /var/lib/docker
 }
 
@@ -53,9 +57,6 @@ function uninstall_package() {
 function install_all() {
   # Update & Upgrade to latest
   sudo apt-get update && sudo apt-get upgrade
-  
-  # Install docker
-  install_docker
 
   # Install independent packages
   install_package vim
@@ -88,6 +89,7 @@ function install_all() {
     # cd $HOME
   # fi
   
+  # Install docker
   install_docker
 }
 
