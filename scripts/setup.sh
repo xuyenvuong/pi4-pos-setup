@@ -28,6 +28,7 @@ function install_package() {
 
   if [ $(dpkg-query -W -f='${Status}' $dpkg_name 2>/dev/null | grep -c "ok installed") -eq 0 ]
   then
+    echo "Installing: $dpkg_name"
     sudo apt install -y $dpkg_name
   fi
 }
@@ -38,6 +39,7 @@ function uninstall_package() {
 
   if [ $(dpkg-query -W -f='${Status}' $dpkg_name 2>/dev/null | grep -c "ok installed") -eq 1 ]
   then
+    echo "Uninstalling: $dpkg_name"
 	sudo apt purge -y $dpkg_name
   fi
 }
