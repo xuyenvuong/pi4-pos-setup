@@ -12,6 +12,8 @@ function install_docker() {
   
   sudo usermod -aG docker $USER
   newgrp docker
+  
+  sudo systemctl enable docker
 }
 
 # Uninstall Docker
@@ -20,24 +22,50 @@ function uninstall_docker() {
   sudo rm -rf /var/lib/docker
 }
 
-function install() {
-  echo "Install....."
-  # exit 0
-  
-  # # Update & Upgrade to latest
-  # sudo apt-get update && sudo apt-get upgrade
+# Install package
+function install_package() {
+  local dpkg_name=$1
 
-  # # Install independent packages
-  # install_package vim
-  # install_package git-all
-  # install_package prometheus
-  # install_package prometheus-node-exporter
-  # install_package golang
-  # install_package zip
-  # install_package unzip
-  # install_package build-essential
-  # install_package python3-venv
-  # install_package python3-pip
+  if [ $(dpkg-query -W -f='${Status}' $dpkg_name 2>/dev/null | grep -c "ok installed") -eq 0 ]
+  then
+    sudo apt install -y $dpkg_name
+  fi
+}
+
+# Uninstall package
+function uninstall_package() {
+  local dpkg_name=$1
+
+  if [ $(dpkg-query -W -f='${Status}' $dpkg_name 2>/dev/null | grep -c "ok installed") -eq 1 ]
+  then
+	sudo apt purge -y $dpkg_name
+  fi
+}
+
+# Run backup for all
+function backup_all() {
+  
+}
+
+# Main function to install all necessary package to support the node
+function install_all() {
+  # Update & Upgrade to latest
+  sudo apt-get update && sudo apt-get upgrade
+  
+  # Install docker
+  install_docker
+
+  # Install independent packages
+  install_package vim
+  install_package git-all
+  install_package prometheus
+  install_package prometheus-node-exporter
+  install_package golang
+  install_package zip
+  install_package unzip
+  install_package build-essential
+  install_package python3-venv
+  install_package python3-pip
   
   # # Define setup directories
   # mkdir -p $HOME/{.eth2,.eth2stats,.eth2validators,.ethereum,.password,logs,prysm/configs}
@@ -61,22 +89,33 @@ function install() {
   install_docker
 }
 
-function setup() {
-  echo "Install....."
-  exit 0
+function uninstall_all() {
+  # TODO: backup_all
+  # backup_all
+
+  # Uninstall docker
+  uninstall_docker
   
-  # Run docker
-  sudo systemctl daemon-reload
-  sudo systemctl enable docker
-  sudo systemctl restart docker.service
-  
-  
+  # Uninstall independent packages
+  uninstall_package vim
+  uninstall_package git-all
+  uninstall_package prometheus
+  uninstall_package prometheus-node-exporter
+  uninstall_package golang
+  uninstall_package zip
+  uninstall_package unzip
+  uninstall_package build-essential
+  uninstall_package python3-venv
+  uninstall_package python3-pip 
 }
 
-function uninstall() {
-  echo "Uninstall....."
-  uninstall_docker
-}
+# function setup() {
+  # echo "Installing....."
+  
+  # exit 0
+  
+  # # Run docker  
+# }
 
 function help() {
   echo "Help..."
@@ -84,9 +123,9 @@ function help() {
 
 
 case $1 in
-  install) install;;
+  install) install_all;;
+  uninstall) uninstall_all;;
   # setup) setup;;
-  uninstall) uninstall;;
   help) help;;
   *)
     echo "Task '$1' is not found!"
