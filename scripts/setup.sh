@@ -109,8 +109,8 @@ function upgrade_all() {
   fi  
 }
 
-# Setup important files/directories in order to run the PoS node
-function setup() {   
+# Initialize pos setup: important files/directories in order to run the PoS node
+function initialize_pos() {   
   # Define setup directories
   mkdir -p $HOME/{.eth2,.eth2stats,.eth2validators,.ethereum,.password,logs,prysm/configs}
   mkdir -p /etc/ethereum
@@ -161,7 +161,7 @@ case $1 in
   install) install_all;;
   uninstall) uninstall_all;;
   upgrade) upgrade_all;;
-  setup) setup;;
+  init) initialize_pos;;
   teardown) teardown;; # Dev mode: Must remove when go live
   backup) backup_all;;
   verify) verify;;
