@@ -24,6 +24,7 @@ function uninstall_docker() {
   sudo apt-get purge -y docker-ce docker-ce-cli containerd.io 
   sudo apt-get purge -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common
   sudo rm -rf /var/lib/docker
+  
 }
 
 # Install package
@@ -48,15 +49,13 @@ function uninstall_package() {
   fi
 }
 
-# # Run backup for all
-# function backup_all() {
-  
-# }
-
 # Main function to install all necessary package to support the node
 function install_all() {
   # Update & Upgrade to latest
   sudo apt-get update && sudo apt-get upgrade
+  
+  # Install docker
+  install_docker
 
   # Install independent packages
   install_package vim
@@ -69,34 +68,10 @@ function install_all() {
   install_package build-essential
   install_package python3-venv
   install_package python3-pip
-  
-  # # Define setup directories
-  # mkdir -p $HOME/{.eth2,.eth2stats,.eth2validators,.ethereum,.password,logs,prysm/configs}
-  # mkdir -p /etc/ethereum
-  # mkdir -p /home/prometheus/node-exporter
-  
-  # # Create files
-  # touch $HOME/.password/password.txt
-  # touch $HOME/logs/{beacon,validator,slasher}.log
-  
-  # # Clone configs repo
-  # if [! -d $HOME/SetupUI ]
-  # then
-    # git clone https://github.com/xuyenvuong/pi4-pos-setup.git $HOME/SetupUI
-  # else
-    # cd $HOME/SetupUI
-    # git pull origin master
-    # cd $HOME
-  # fi
-  
-  # Install docker
-  install_docker
 }
 
+# Purge all installed packages and their dependencies
 function uninstall_all() {
-  # TODO: backup_all
-  # backup_all
-
   # Uninstall docker
   uninstall_docker
   
@@ -110,26 +85,86 @@ function uninstall_all() {
   uninstall_package unzip
   uninstall_package build-essential
   uninstall_package python3-venv
-  uninstall_package python3-pip 
+  uninstall_package python3-pip
+
+  # Remove the rest
+  sudo apt autoremove -y 
 }
 
-# function setup() {
-  # echo "Installing....."
+# Upgrade all
+function upgrade_all() {
+  echo "Upgrading...."
   
-  # exit 0
+  # Update & Upgrade to latest
+  sudo apt-get update && sudo apt-get upgrade
   
-  # # Run docker  
-# }
+  # Pull latest pi4-pos-setup.git repo
+  if [ -d $HOME/pos-setup ]
+  then
+    git clone https://github.com/xuyenvuong/pi4-pos-setup.git $HOME/pos-setup
+  else
+    cd $HOME/pos-setup
+    git pull origin master
+    cd $HOME
+  fi  
+}
 
+# Setup important files/directories in order to run the PoS node
+function setup() {   
+  # Define setup directories
+  mkdir -p $HOME/{.eth2,.eth2stats,.eth2validators,.ethereum,.password,logs,prysm/configs}
+  mkdir -p /etc/ethereum
+  mkdir -p /home/prometheus/node-exporter
+  
+  # Create files
+  touch $HOME/.password/password.txt
+  touch $HOME/logs/{beacon,validator,slasher}.log
+  
+  # Clone pi4-pos-setup.git repo
+  if [! -d $HOME/pos-setup ]
+  then
+    git clone https://github.com/xuyenvuong/pi4-pos-setup.git $HOME/pos-setup
+  fi
+  
+  # Setup prysm script
+  curl https://raw.githubusercontent.com/prysmaticlabs/prysm/master/prysm.sh --output $HOME/prysm/prysm.sh && chmod +x $HOME/prysm/prysm.sh
+}
+
+# Tear down files/directories used for PoS
+function teardown() {
+  echo "Tearing down now..."
+  # Remove setup directories
+  rm -r $HOME/{.eth2,.eth2stats,.eth2validators,.ethereum,.password,logs,prysm/configs}
+  rm -r /etc/ethereum
+  rm -r /home/prometheus
+  
+  # Clone pos-setup repo
+  rm -rf $HOME/pos-setup
+}
+
+# Run backup for all
+function backup_all() {
+  echo "Backing up...."
+}
+
+# Verify setup 
+function verify() {
+  echo "Verifying...."
+}
+
+# Display help
 function help() {
   echo "Help..."
 }
 
-
 case $1 in
   install) install_all;;
   uninstall) uninstall_all;;
-  # setup) setup;;
+  upgrade) upgrade_all;;
+  setup) setup;;
+  teardown) teardown;; # Dev mode: Must remove when go live
+  backup) backup_all;;
+  verify) verify;;
   help) help;;
   *)
     echo "Task '$1' is not found!"
