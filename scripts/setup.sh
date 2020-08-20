@@ -6,23 +6,7 @@ echo "************************* Author: MAX VUONG ***********************"
 set -eu
 
 # Install Docker
-function install_docker() {
-  # sudo apt-get update
-  # sudo apt-get install docker-ce docker-ce-cli containerd.io
-
-  # sudo groupadd docker
-  # sudo usermod -aG docker $USER
-
-  # newgrp docker
-
-  # sudo chown "$USER":"$USER" /home/"$USER"/.docker -R
-  # sudo chmod g+rwx "$HOME/.docker" -R
-
-  # # Reboot to make sure the owner is correctly set
-  # echo "Install docker... DONE. System is rebooting"
-  # sudo shutdown -r now
-  
-  
+function install_docker() { 
   curl -fsSL https://get.docker.com -o /tmp/get-docker.sh
   sudo sh /tmp/get-docker.sh
   
