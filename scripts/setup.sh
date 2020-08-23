@@ -80,9 +80,10 @@ function install_docker() {
   then
     sudo apt-get install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-  
-    # TODO: support other options beside arm64
-    sudo add-apt-repository "deb [arch=arm64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+
+	# arch = amd64|amd64|armhf
+    sudo add-apt-repository "deb [arch=$(dpkg --print-architecture)] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+	
     sudo apt-get install -y docker-ce docker-ce-cli containerd.io
   
     sudo groupadd docker
@@ -260,7 +261,7 @@ EOF
   fi
   
   # YAML
-  if [! -e $HOME/prysm/configs/beacon.yaml ]
+  if [ ! -e $HOME/prysm/configs/beacon.yaml ]
   then
     sudo cat << EOF > $HOME/prysm/configs/beacon.yaml
 datadir: "$HOME/.eth2"
@@ -317,7 +318,7 @@ EOF
   fi
   
   # YAML
-  if [! -e $HOME/prysm/configs/validator.yaml ]
+  if [ ! -e $HOME/prysm/configs/validator.yaml ]
   then
     sudo cat << EOF > $HOME/prysm/configs/validator.yaml
 datadir: "$HOME/.eth2"
@@ -367,7 +368,7 @@ EOF
   fi
   
   # YAML
-  if [! -e $HOME/prysm/configs/slasher.yaml ]
+  if [ ! -e $HOME/prysm/configs/slasher.yaml ]
   then
     sudo cat << EOF > $HOME/prysm/configs/slasher.yaml
 datadir: "$HOME/.eth2"
