@@ -4,29 +4,6 @@
 
 set -eu
 
-# Install Docker
-function install_docker() {
-  sudo apt-get install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common
-  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-  
-  sudo add-apt-repository "deb [arch=arm64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-  sudo apt-get install -y docker-ce docker-ce-cli containerd.io
-  
-  sudo groupadd docker
-  sudo usermod -aG docker $USER
-  newgrp docker
-  
-  sudo systemctl enable docker
-}
-
-# Uninstall Docker
-function uninstall_docker() { 
-  sudo apt-get purge -y docker-ce docker-ce-cli containerd.io 
-  sudo apt-get purge -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common
-  sudo rm -rf /var/lib/docker
-  
-}
-
 # Install package
 function install_package() {
   local dpkg_name=$1
@@ -78,6 +55,21 @@ function install_essential() {
   
   # Install GETH
   install_geth
+}
+
+# Install Docker
+function install_docker() {
+  sudo apt-get install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common
+  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+  
+  sudo add-apt-repository "deb [arch=arm64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+  sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+  
+  sudo groupadd docker
+  sudo usermod -aG docker $USER
+  newgrp docker
+  
+  sudo systemctl enable docker
 }
 
 # Install Prometheus
