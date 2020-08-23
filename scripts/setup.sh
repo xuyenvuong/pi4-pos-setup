@@ -224,30 +224,6 @@ function help() {
 
 
 #-------------------------------------------------------------------------------------------#
-case $1 in
-  -i|--install)    
-    install_essential 
-	;;  
-  -u|--upgrade)
-    upgrade_all
-	;;
-  -b|--build)
-    build_pos
-	;;  
-  -s|--save)
-    backup_all
-	;;  
-  -h|--help)
-    help
-	;;
-  *)
-    echo "Task '$1' is not found!"
-    echo "Please use 'setup.sh help' for more info."
-    exit 1
-    ;;
-esac
-
-#-------------------------------------------------------------------------------------------#
 # Config Files
 #-------------------------------------------------------------------------------------------#
 
@@ -625,4 +601,28 @@ EOF
 	sudo logrotate /etc/logrotate.conf --debug
   fi
 }
-  
+
+
+#-------------------------------------------------------------------------------------------#
+case $1 in
+  -i|--install)    
+    install_essential 
+	;;  
+  -u|--upgrade)
+    upgrade_all
+	;;
+  -b|--build)
+    build_pos
+	;;  
+  -s|--save)
+    backup_all
+	;;  
+  -h|--help)
+    help
+	;;
+  *)
+    echo "Task '$1' is not found!"
+    echo "Please use 'setup.sh help' for more info."
+    exit 1
+    ;;
+esac  
