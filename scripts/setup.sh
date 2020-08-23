@@ -31,30 +31,33 @@ function install_essential() {
   # Update & Upgrade to latest
   sudo apt-get update && sudo apt-get upgrade
   
-  # Install docker
+  # Docker
   install_docker
 
-  # Install independent packages
+  # Independent packages
   install_package vim
   install_package git-all
   install_package zip
   install_package unzip
   install_package build-essential
   
-  # Install Prometheus
+  # Prometheus
   install_prometheus
   
-  # Install Golang
+  # Golang
   install_package golang
   
-  # Install Python
+  # Python
   install_python
   
-  # Install Grafana
+  # Grafana
   install_grafana
   
-  # Install GETH
+  # GETH
   install_geth
+  
+  # Cryptowatch
+  install_cryptowatch
 }
 
 # Install Docker
@@ -93,18 +96,18 @@ function install_python() {
   if [ $(dpkg-query -W -f='${Status}' python3 2>/dev/null | grep -c "ok installed") -eq 0 ]
   then
     echo "Installing: Python"
-    install_package software-properties-common
-    sudo add-apt-repository ppa:deadsnakes/ppa
-    sudo apt-get update
-    install_package python3.8
-    install_package python3-venv
-    install_package python3-pip
+	install_package software-properties-common
+	sudo add-apt-repository ppa:deadsnakes/ppa
+	sudo apt-get update
+	install_package python3.8
+	install_package python3-venv
+	install_package python3-pip
   fi 
 }
 
 # Install Grafana
 function install_grafana() {
-  if [ $(dpkg-query -W -f='${Status}' grafana 2>/dev/null | grep -c "ok installed") -eq 0 ]
+  if [ $(dpkg-query -W -f='${Status}' grafana-enterprise 2>/dev/null | grep -c "ok installed") -eq 0 ]
   then
     echo "Installing: Grafana"
     install_package apt-transport-https
@@ -117,14 +120,28 @@ function install_grafana() {
 }
 
 # Install GETH
-function install_geth() {
-  if [ $(dpkg-query -W -f='${Status}' geth 2>/dev/null | grep -c "ok installed") -eq 0 ]
+function install_geth() {  
+  if [ ! -e /usr/local/bin/geth ]
   then
-    echo "Installing: GETH"
-    sudo add-apt-repository -y ppa:ethereum/ethereum
-    sudo apt-get update
-    install_package ethereum
-  fi 
+    # Installing version 1.9.19
+    wget -P /tmp https://gethstore.blob.core.windows.net/builds/geth-linux-arm64-1.9.19-3e064192.tar.gz
+    mkdir -p /tmp/geth-linux-arm64-1.9.19-3e064192
+    tar -C /tmp/geth-linux-arm64-1.9.19-3e064192 --strip-components 1 -xvf /tmp/geth-linux-arm64-1.9.19-3e064192.tar.gz
+    sudo cp -a /tmp/geth-linux-arm64-1.9.19-3e064192/geth /usr/local/bin
+  fi
+}
+
+# Install Cryptowatch
+function install_cryptowatch() {
+  if [ ! -e /usr/local/bin/cryptowat_exporter ]
+  then
+    wget -P /tmp https://github.com/nbarrientos/cryptowat_exporter/archive/e4bcf6e16dd2e04c4edc699e795d9450dee486ab.zip
+    unzip /tmp/e4bcf6e16dd2e04c4edc699e795d9450dee486ab.zip -d /tmp
+	cd /tmp/cryptowat_exporter-e4bcf6e16dd2e04c4edc699e795d9450dee486ab
+	go build
+	cd
+	sudo cp /tmp/cryptowat_exporter-e4bcf6e16dd2e04c4edc699e795d9450dee486ab /usr/local/bin
+  fi
 }
 
 #-------------------------------------------------------------------------------------------#
