@@ -59,17 +59,21 @@ function install_essential() {
 
 # Install Docker
 function install_docker() {
-  sudo apt-get install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common
-  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+  if [ $(dpkg-query -W -f='${Status}' docker-ce 2>/dev/null | grep -c "ok installed") -eq 0 ]
+  then
+    sudo apt-get install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
   
-  sudo add-apt-repository "deb [arch=arm64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-  sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+    # TODO: support other options beside arm64
+    sudo add-apt-repository "deb [arch=arm64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+    sudo apt-get install -y docker-ce docker-ce-cli containerd.io
   
-  sudo groupadd docker
-  sudo usermod -aG docker $USER
-  newgrp docker
+    sudo groupadd docker
+    sudo usermod -aG docker $USER
+    newgrp docker
   
-  sudo systemctl enable docker
+    sudo systemctl enable docker
+  fi
 }
 
 # Install Prometheus
