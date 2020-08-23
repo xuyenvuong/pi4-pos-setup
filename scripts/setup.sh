@@ -60,75 +60,75 @@ function install_essential() {
   # Install independent packages
   install_package vim
   install_package git-all
-  install_package prometheus
-  install_package prometheus-node-exporter
-  install_package golang
   install_package zip
   install_package unzip
   install_package build-essential
-  install_package python3-venv
-  install_package python3-pip
+  
+  # Install Prometheus
+  install_prometheus
+  
+  # Install Golang
+  install_package golang
+  
+  # Install Python
+  install_python
+  
+  # Install Grafana
+  install_grafana
+  
+  # Install GETH
+  install_geth
+}
+
+# Install Prometheus
+function install_prometheus() {
+  if [ $(dpkg-query -W -f='${Status}' prometheus 2>/dev/null | grep -c "ok installed") -eq 0 ]
+  then
+    echo "Installing: Prometheus"
+	sudo useradd -m prometheus
+	sudo chown -R prometheus:prometheus /home/prometheus/
+    install_package prometheus
+    install_package prometheus-node-exporter
+  fi
 }
 
 # Install Python
-function install_python() { 
+function install_python() {
   if [ $(dpkg-query -W -f='${Status}' python3 2>/dev/null | grep -c "ok installed") -eq 0 ]
   then
-    wget -O /tmp/python.tgz https://www.python.org/ftp/python/3.8.5/Python-3.8.5.tgz
-    mkdir -p /tmp/Python
-    tar -C /tmp/Python --strip-components 1 -xvf /tmp/python.tgz
-	
-	cd /tmp/Python
-	
-	./configure --enable-optimizations
-	sudo make altinstall
-	
-	python3 --version
-	cd
-  fi
+    echo "Installing: Python"
+    install_package software-properties-common
+    sudo add-apt-repository ppa:deadsnakes/ppa
+    sudo apt-get update
+    install_package python3.8
+    install_package python3-venv
+    install_package python3-pip
+  fi 
 }
 
 # Install Grafana
 function install_grafana() {
   if [ $(dpkg-query -W -f='${Status}' grafana 2>/dev/null | grep -c "ok installed") -eq 0 ]
   then
-    wget -O /tmp/grafana.deb https://dl.grafana.com/oss/release/grafana_7.0.3_arm64.deb
-	sudo dpkg --force-all -i /tmp/grafana.deb
-	rm /tmp/grafana.deb
+    echo "Installing: Grafana"
+    install_package apt-transport-https
+    install_package software-properties-common
+	wget -q -O - https://packages.grafana.com/gpg.key | sudo apt-key add -
+    echo "deb https://packages.grafana.com/enterprise/deb stable main" | sudo tee -a /etc/apt/sources.list.d/grafana.list
+    sudo apt-get update
+    install_package grafana-enterprise
   fi 
 }
 
-#-------------------------------------------------------------------------------------------#
-# Purge all installed packages and their dependencies
-function uninstall_all() {
-  # Uninstall docker
-  uninstall_docker
-  
-  # Uninstall independent packages
-  uninstall_package vim
-  uninstall_package git-all
-  uninstall_package prometheus
-  uninstall_package prometheus-node-exporter
-  uninstall_package golang
-  uninstall_package zip
-  uninstall_package unzip
-  uninstall_package build-essential
-  uninstall_package python3-venv
-  uninstall_package python3-pip
-
-  # Remove the rest
-  sudo apt autoremove -y 
-}
-
-# Uninstall Python
-function uninstall_python() {
-  # TODO
-  echo "TODO: Uninstalling Python..."
-}
-
-# Uninstall Grafana
-function uninstall_grafana() {
-  sudo dpkg –-remove grafana
+# Install GETH
+function install_geth() {
+  if [ $(dpkg-query -W -f='${Status}' geth 2>/dev/null | grep -c "ok installed") -eq 0 ]
+  then
+    echo "Installing: GETH"
+    sudo add-apt-repository -y ppa:ethereum/ethereum
+    sudo apt-get update
+    install_package ethereum
+  fi 
 }
 
 #-------------------------------------------------------------------------------------------#
@@ -173,19 +173,6 @@ function build_pos() {
 }
 
 #-------------------------------------------------------------------------------------------#
-# Tear down files/directories used for PoS
-function teardown() {
-  echo "Tearing down now..."
-  # Remove setup directories
-  rm -rf $HOME/{.eth2,.eth2stats,.eth2validators,.ethereum,.password,logs,prysm/configs,prysm}
-  sudo rm -rf /etc/ethereum
-  sudo rm -rf /home/prometheus
-  
-  # Clone pos-setup repo
-  rm -rf $HOME/pos-setup
-}
-
-#-------------------------------------------------------------------------------------------#
 # Run backup for all
 function backup_all() {
   echo "Backing up...."
@@ -203,54 +190,22 @@ function help() {
   echo "Help..."
 }
 
-#-------------------------------------------------------------------------------------------#
-function install_route() {
-  local opt=$1
-  
-  case $opt in
-    essential)
-	  echo "Essential ...."
-	  ;; #install_essential;;
-	python3)
-	  echo "Python3 ...."
-	  ;; #install_python;;
-	grafana)
-	  echo "Grafana ...."
-	  ;; #install_python;;
-	*)
-	  echo "Option '$1' is not found!"
-      echo "Please use 'setup.sh help' for more info."
-	  exit 1;;
-  esac
-}
-
 
 #-------------------------------------------------------------------------------------------#
 case $1 in
-  -i|--install) 
-    install_route $2
+  -i|--install)    
+    install_essential 
 	;;  
-  uninstall)
-    uninstall_all
-	;;
-  upgrade)
+  -u|--upgrade)
     upgrade_all
 	;;
-  build)
+  -b|--build)
     build_pos
-	;; 
-  teardown)
-    teardown
-	;; # Dev mode: Must remove when go live
-  
-  backup)
+	;;  
+  -s|--save)
     backup_all
-	;;
-  verify)
-    verify
-	;;
-  
-  help)
+	;;  
+  -h|--help)
     help
 	;;
   *)
