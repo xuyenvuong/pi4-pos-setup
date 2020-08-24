@@ -1,5 +1,5 @@
 FROM node:12-alpine
-WORKDIR /pi4-pos-setup
+WORKDIR /pos-setup
 COPY package.json yarn.lock ./
 RUN yarn install --production
 COPY . .

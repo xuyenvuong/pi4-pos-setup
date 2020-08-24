@@ -6,9 +6,9 @@ services:
     command: sh -c "yarn install && yarn run dev"
     ports:
       - 42069:42069
-    working_dir: /pi4-pos-setup
+    working_dir: /pos-setup
     volumes:
-      - ./:/pi4-pos-setup
+      - ./:/pos-setup
     environment:
       MYSQL_HOST: mysql
       MYSQL_USER: root
