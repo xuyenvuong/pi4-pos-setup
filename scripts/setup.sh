@@ -43,15 +43,15 @@ function install_essential() {
   # Docker
   install_docker
   
-  # Docker-Compose
-  install_docker_compose
-
   # Independent packages
   install_package vim
   install_package git-all
   install_package zip
   install_package unzip
   install_package build-essential
+  install_package libssl-dev
+  install_package libffi-dev
+  install_package python3-dev
   
   # Prometheus
   install_prometheus
@@ -73,6 +73,9 @@ function install_essential() {
   
   # Prysm
   install_prysm
+
+  # Docker-Compose
+  install_docker_compose
   
   # Configs
   systemd_beacon
@@ -88,7 +91,7 @@ function install_essential() {
 
 # Install Docker
 function install_docker() {
-  if [ $(dpkg-query -W -f='${Status}' docker-ce 2>/dev/null | grep -c "ok installed") -eq 0 ]
+  if [ ! -e /usr/bin/docker ]
   then
     sudo apt-get install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
@@ -104,20 +107,6 @@ function install_docker() {
   
     sudo systemctl enable docker
   fi
-}
-
-# Install Docker-Compose
-function install_docker_compose() {
-  if [ $(is_installed docker-compose) -eq 0 ]
-  then
-    sudo curl -L "https://github.com/docker/compose/releases/download/1.26.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-	sudo chmod +x /usr/local/bin/docker-compose
-	
-	if [ ! -e /usr/bin/docker-compose ]
-    then
-      sudo ls -s /usr/local/bin/docker-compose /usr/bin/docker-compose
-    fi
-  fi  
 }
 
 # Install Prometheus
@@ -191,6 +180,15 @@ function install_prysm() {
   then
     curl https://raw.githubusercontent.com/prysmaticlabs/prysm/master/prysm.sh --output $HOME/prysm/prysm.sh && chmod +x $HOME/prysm/prysm.sh
   fi
+}
+
+# Install Docker-Compose
+function install_docker_compose() {
+  if [ ! -e /usr/local/bin/docker-compose ]
+  then
+    sudo pip3 install cryptography
+    sudo pip3 install docker-compose
+  fi  
 }
 
 #-------------------------------------------------------------------------------------------#
