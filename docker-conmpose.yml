@@ -1,0 +1,27 @@
+version: "3.7"
+
+services:
+  app:
+    image: node:12-alpine
+    command: sh -c "yarn install && yarn run dev"
+    ports:
+      - 42069:42069
+    working_dir: /pi4-pos-setup
+    volumes:
+      - ./:/pi4-pos-setup
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_USER: root
+      MYSQL_PASSWORD: P@ssw0rd
+      MYSQL_DB: params
+
+  mysql:
+    image: mysql:5.7
+    volumes:
+      - param-mysql-data:/var/lib/mysql
+    environment: 
+      MYSQL_ROOT_PASSWORD: P@ssw0rd
+      MYSQL_DATABASE: params
+
+volumes:
+  param-mysql-data:
