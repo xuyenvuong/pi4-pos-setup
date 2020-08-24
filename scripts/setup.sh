@@ -26,14 +26,6 @@ function uninstall_package() {
   fi
 }
 
-# Check package installed
-function is_installed() {
-  local dpkg_name=$1
-  local installed=$(dpkg-query -W -f='${Status}' $dpkg_name 2>/dev/null | grep -c "ok installed")
-  echo $installed
-}
-
-
 #-------------------------------------------------------------------------------------------#
 # Main function to install all necessary package to support the node
 function install_essential() {
