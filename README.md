@@ -1,5 +1,4 @@
 # pi4-pos-setup
-
 # Download installation script
 > wget -NS --content-disposition --no-check-certificate https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/setup.sh && chmod +x setup.sh
 or
@@ -7,6 +6,5 @@ or
 > ./setup.sh install
 
 
-
-References:
-https://docs.python-guide.org/starting/install3/linux/
+# References:
+# https://docs.python-guide.org/starting/install3/linux/
