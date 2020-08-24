@@ -53,14 +53,14 @@ async function teardown() {
     });
 }
 
-async function getConfigParams() {
+async function getParams() {
     return new Promise((acc, rej) => {
         pool.query('SELECT * FROM pryms_config_params', (err, rows) => {
             if (err) return rej(err);
             acc(
-                rows.map(item =>
-                    Object.assign({}, item, {
-                        locked: item.locked === 1,
+                rows.map(param =>
+                    Object.assign({}, param, {
+                        locked: param.locked === 1,
                     }),
                 ),
             );
@@ -68,14 +68,14 @@ async function getConfigParams() {
     });
 }
 
-async function getConfigParam(id) {
+async function getParam(id) {
     return new Promise((acc, rej) => {
         pool.query('SELECT * FROM pryms_config_params WHERE id=?', [id], (err, rows) => {
             if (err) return rej(err);
             acc(
-                rows.map(item =>
-                    Object.assign({}, item, {
-                        locked: item.locked === 1,
+                rows.map(param =>
+                    Object.assign({}, param, {
+                        locked: param.locked === 1,
                     }),
                 )[0],
             );
@@ -83,7 +83,7 @@ async function getConfigParam(id) {
     });
 }
 
-async function storeConfigParam(param) {
+async function storeParam(param) {
     return new Promise((acc, rej) => {
         pool.query(
             'INSERT INTO pryms_config_params (id, name, type, description, default_value, value, locked) VALUES (?, ?, ?, ?, ?, ?, ?)',
@@ -96,7 +96,7 @@ async function storeConfigParam(param) {
     });
 }
 
-async function updateConfigParam(id, param) {
+async function updateParam(id, param) {
     return new Promise((acc, rej) => {
         pool.query(
             'UPDATE pryms_config_params SET name=?, description=?, type=?, default_value=?, value=?, locked=? WHERE id=?',            
@@ -109,9 +109,9 @@ async function updateConfigParam(id, param) {
     });
 }
 
-async function removeConfigParam(id) {
+async function removeParam(id) {
     return new Promise((acc, rej) => {
-        pool.query('DELETE FROM todo_items WHERE id = ?', [id], err => {
+        pool.query('DELETE FROM pryms_config_params WHERE id = ?', [id], err => {
             if (err) return rej(err);
             acc();
         });
@@ -121,9 +121,9 @@ async function removeConfigParam(id) {
 module.exports = {
     init,
     teardown,
-    getItems,
-    getItem,
-    storeItem,
-    updateItem,
-    removeItem,
+    getParams,
+    getParam,
+    storeParam,
+    updateParam,
+    removeParam,
 };

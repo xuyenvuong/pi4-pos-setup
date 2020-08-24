@@ -1,7 +1,7 @@
 const db = require('../persistence');
 
 module.exports = async (req, res) => {
-    await db.updateConfigParam(req.params.id, {
+    await db.updateParam(req.params.id, {
         name: req.body.name,
 		type: req.body.type,
 		description: req.body.description,
@@ -9,6 +9,6 @@ module.exports = async (req, res) => {
 		value: req.body.value,
         locked: false		
     });
-    const item = await db.getConfigParam(req.params.id);
+    const item = await db.getParam(req.params.id);
     res.send(item);
 };

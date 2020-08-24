@@ -1,7 +1,7 @@
 version: "3.7"
 
 services:
-  app:
+  pos-setup:
     image: node:12-alpine
     command: sh -c "yarn install && yarn run dev"
     ports:
@@ -16,7 +16,8 @@ services:
       MYSQL_DB: params
 
   mysql:
-    image: mysql:5.7
+    #image: mysql:5.7
+    image: magpern/zwave2mqtt:arm64-v8-3.0.2
     volumes:
       - param-mysql-data:/var/lib/mysql
     environment: 

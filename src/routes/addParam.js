@@ -12,6 +12,6 @@ module.exports = async (req, res) => {
         locked: false
     };
 
-    await db.storeConfigParam(item);
+    await db.storeParam(item);
     res.send(item);
 };

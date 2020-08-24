@@ -1,18 +1,18 @@
 const express = require('express');
 const app = express();
 const db = require('./persistence');
-const getConfigParams = require('./routes/getConfigParams');
-const addConfigParam = require('./routes/addConfigParam');
-const updateConfigParam = require('./routes/updateConfigParam');
-const deleteConfigParam = require('./routes/deleteConfigParam');
+const getParams = require('./routes/getParams');
+const addParam = require('./routes/addParam');
+const updateParam = require('./routes/updateParam');
+const deleteParam = require('./routes/deleteParam');
 
 app.use(require('body-parser').json());
 app.use(express.static(__dirname + '/static'));
 
-app.get('/params', getConfigParams);
-app.post('/params', addConfigParam);
-app.put('/params/:id', updateConfigParam);
-app.delete('/params/:id', deleteConfigParam);
+app.get('/params', getParams);
+app.post('/params', addParam);
+app.put('/params/:id', updateParam);
+app.delete('/params/:id', deleteParam);
 
 db.init().then(() => {
     app.listen(42069, () => console.log('Listening on port 42069'));
