@@ -11,13 +11,12 @@ services:
       - ./:/pos-setup
     environment:
       MYSQL_HOST: mysql
-      MYSQL_USER: root
+      MYSQL_USER: posuser
       MYSQL_PASSWORD: P@ssw0rd
       MYSQL_DB: params
 
   mysql:
-    #image: mysql:5.7
-    image: magpern/zwave2mqtt:arm64-v8-3.0.2
+    image: mysql/mysql-server:lastest
     volumes:
       - param-mysql-data:/var/lib/mysql
     environment: 

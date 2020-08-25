@@ -6,5 +6,21 @@ or
 > ./setup.sh install
 
 
+
+shell> docker exec -it mysql mysql -uroot -p
+mysql> ALTER USER 'root'@'localhost' IDENTIFIED BY 'P@ssw0rd';
+
+mysql> CREATE USER 'posuser'@'localhost' IDENTIFIED BY 'P@ssw0rd';
+mysql> GRANT ALL PRIVILEGES ON *.* TO 'posuser'@'localhost' WITH GRANT OPTION;
+mysql> CREATE USER 'posuser'@'%' IDENTIFIED BY 'P@ssw0rd';
+mysql> GRANT ALL PRIVILEGES ON *.* TO 'posuser'@'%' WITH GRANT OPTION;
+
+mysql> ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'P@ssw0rd';
+mysql> ALTER USER 'posuser'@'%' IDENTIFIED WITH mysql_native_password BY 'P@ssw0rd';
+
+mysql> flush privileges;
+
+mysql> CREATE DATABASE IF NOT EXISTS params;
+
 # References:
 # https://docs.python-guide.org/starting/install3/linux/
