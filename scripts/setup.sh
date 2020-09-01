@@ -88,7 +88,7 @@ function install_docker() {
     sudo apt-get install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 
-	# arch = amd64|amd64|armhf
+	# arch = amd64|arm64|armhf
     sudo add-apt-repository "deb [arch=$(dpkg --print-architecture)] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 	
     sudo apt-get install -y docker-ce docker-ce-cli containerd.io
@@ -259,6 +259,9 @@ EnvironmentFile=/etc/ethereum/prysm-beacon.conf
 ExecStart=$HOME/prysm/prysm.sh \$ARGS
 Restart=always
 User=$USER
+RemainAfterExit=no
+Restart=on-failure
+RestartSec=5s
 
 [Install]
 WantedBy=multi-user.target
@@ -316,6 +319,9 @@ EnvironmentFile=/etc/ethereum/prysm-validator.conf
 ExecStart=$HOME/prysm/prysm.sh \$ARGS
 Restart=always
 User=$USER
+RemainAfterExit=no
+Restart=on-failure
+RestartSec=5s
 
 [Install]
 WantedBy=multi-user.target
@@ -366,6 +372,9 @@ EnvironmentFile=/etc/ethereum/prysm-slasher.conf
 ExecStart=$HOME/prysm/prysm.sh \$ARGS
 Restart=always
 User=$USER
+RemainAfterExit=no
+Restart=on-failure
+RestartSec=5s
 
 [Install]
 WantedBy=multi-user.target
@@ -412,6 +421,9 @@ EnvironmentFile=/etc/ethereum/geth.conf
 ExecStart=/usr/local/bin/geth \$ARGS
 Restart=always
 User=$USER
+RemainAfterExit=no
+Restart=on-failure
+RestartSec=5s
 
 [Install]
 WantedBy=multi-user.target
@@ -445,6 +457,9 @@ EnvironmentFile=/etc/ethereum/cryptowatch.conf
 ExecStart=/usr/local/bin/cryptowat_exporter \$ARGS
 Restart=always
 User=$USER
+RemainAfterExit=no
+Restart=on-failure
+RestartSec=5s
 
 [Install]
 WantedBy=multi-user.target
@@ -477,6 +492,9 @@ EnvironmentFile=/etc/ethereum/prysm-eth2stats.conf
 ExecStart=/usr/bin/docker \$ARGS
 Restart=always
 User=$USER
+RemainAfterExit=no
+Restart=on-failure
+RestartSec=5s
 
 [Install]
 WantedBy=multi-user.target
