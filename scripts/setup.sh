@@ -293,6 +293,7 @@ http-web3provider: "http://localhost:8545"
 p2p-host-ip: $(curl -s v4.ident.me)
 
 p2p-tcp-port: 13000
+p2p-udp-port: 12000
 p2p-max-peers: 30
 min-sync-peers: 3
 
