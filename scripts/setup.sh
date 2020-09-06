@@ -44,6 +44,7 @@ function install_essential() {
   install_package libssl-dev
   install_package libffi-dev
   install_package python3-dev
+  install_package chrony
   
   # Prometheus
   install_prometheus
@@ -79,6 +80,7 @@ function install_essential() {
   config_prometheus
   config_grafana
   config_logrotate
+  config_chrony
 }
 
 # Install Docker
@@ -620,6 +622,11 @@ EOF
   fi
 }
 
+# Config Chrony
+function config_chrony() {
+  sudo chronyd -Q
+  sudo chronyd -q
+}
 
 #-------------------------------------------------------------------------------------------#
 case $1 in
