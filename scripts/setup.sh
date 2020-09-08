@@ -427,7 +427,6 @@ EOF
   if [ ! -e /etc/ethereum/geth.conf ]
   then
     sudo cat << EOF > /tmp/geth.conf
-ARGS="--goerli --port 30303 --rpcport 8545 --syncmode fast --cache 1024 --datadir $HOME/.ethereum --metrics --metrics.expensive --pprof --maxpeers 100"
 EOF
     sudo mv /tmp/geth.conf /etc/ethereum
   fi  
