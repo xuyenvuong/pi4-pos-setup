@@ -427,6 +427,7 @@ EOF
   if [ ! -e /etc/ethereum/geth.conf ]
   then
     sudo cat << EOF > /tmp/geth.conf
+ARGS="--goerli --port 30303 --http --http.port 8545 --http.addr 0.0.0.0 --syncmode fast --cache 1024 --datadir $HOME/.ethereum --metrics --metrics.expensive --pprof --maxpeers 100"
 EOF
     sudo mv /tmp/geth.conf /etc/ethereum
   fi  
@@ -515,6 +516,7 @@ EOF
     sudo mv /tmp/prometheus-node-exporter /etc/default
   fi
 
+  # TODO: the file may exists, need to concat at the end.
   if [ ! -e /etc/prometheus/prometheus.yml ]
   then
     sudo cat << EOF > /tmp/prometheus.yml
@@ -578,6 +580,10 @@ scrape_configs:
   - job_name: 'beacon node'
     static_configs:
       - targets: ['localhost:8080']
+
+  - job_name: 'slasher'
+    static_configs:
+      - targets: ['localhost:8082']	  
 
   - job_name: 'cryptowat'
     static_configs:
