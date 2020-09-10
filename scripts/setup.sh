@@ -260,7 +260,6 @@ Requires=network.target
 EnvironmentFile=/etc/ethereum/prysm-beacon.conf
 ExecStart=$HOME/prysm/prysm.sh \$ARGS
 Restart=always
-StartLimitIntervalSec=0
 RestartSec=3
 User=$USER
 
@@ -331,7 +330,6 @@ Requires=network.target
 EnvironmentFile=/etc/ethereum/prysm-validator.conf
 ExecStart=$HOME/prysm/prysm.sh \$ARGS
 Restart=always
-StartLimitIntervalSec=0
 RestartSec=3
 User=$USER
 
@@ -383,7 +381,6 @@ Requires=network.target
 EnvironmentFile=/etc/ethereum/prysm-slasher.conf
 ExecStart=$HOME/prysm/prysm.sh \$ARGS
 Restart=always
-StartLimitIntervalSec=0
 RestartSec=3
 User=$USER
 
@@ -431,7 +428,6 @@ Wants=network.target
 EnvironmentFile=/etc/ethereum/geth.conf
 ExecStart=/usr/local/bin/geth \$ARGS
 Restart=always
-StartLimitIntervalSec=0
 RestartSec=3
 User=$USER
 
@@ -466,7 +462,6 @@ Requires=prometheus.service
 EnvironmentFile=/etc/ethereum/cryptowatch.conf
 ExecStart=/usr/local/bin/cryptowat_exporter \$ARGS
 Restart=always
-StartLimitIntervalSec=0
 RestartSec=3
 User=$USER
 
@@ -500,7 +495,6 @@ Requires=prysm-beacon.service
 EnvironmentFile=/etc/ethereum/prysm-eth2stats.conf
 ExecStart=/usr/bin/docker \$ARGS
 Restart=always
-StartLimitIntervalSec=0
 RestartSec=3
 User=$USER
 
