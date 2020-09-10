@@ -324,7 +324,7 @@ function systemd_validator() {
     sudo cat << EOF > /tmp/prysm-validator.service
 [Unit]
 Description=Prysm Validator Daemon
-After=network.target auditd.service prysm-beacon.service
+After=network.target auditd.service
 Requires=network.target
 
 [Service]
@@ -376,7 +376,7 @@ function systemd_slasher() {
     sudo cat << EOF > /tmp/prysm-slasher.service
 [Unit]
 Description=Prysm Validator Daemon
-After=network.target auditd.service prysm-beacon.service
+After=network.target auditd.service
 Requires=network.target
 
 [Service]
