@@ -260,6 +260,8 @@ Requires=network.target
 EnvironmentFile=/etc/ethereum/prysm-beacon.conf
 ExecStart=$HOME/prysm/prysm.sh \$ARGS
 Restart=always
+StartLimitIntervalSec=0
+RestartSec=3
 User=$USER
 
 [Install]
@@ -296,10 +298,21 @@ p2p-host-ip: $(curl -s v4.ident.me)
 
 p2p-tcp-port: 13000
 p2p-udp-port: 12000
+
 p2p-max-peers: 30
 min-sync-peers: 3
 
 slasher-provider: localhost:5000
+
+graffiti: "Mr.X"
+
+rpc-port: 4000
+rpc-host: 0.0.0.0
+
+monitoring-port: 8080
+monitoring-host: 0.0.0.0
+
+slots-per-archived-point: 32
 EOF
   fi
 }
@@ -318,6 +331,8 @@ Requires=network.target
 EnvironmentFile=/etc/ethereum/prysm-validator.conf
 ExecStart=$HOME/prysm/prysm.sh \$ARGS
 Restart=always
+StartLimitIntervalSec=0
+RestartSec=3
 User=$USER
 
 [Install]
@@ -368,6 +383,8 @@ Requires=network.target
 EnvironmentFile=/etc/ethereum/prysm-slasher.conf
 ExecStart=$HOME/prysm/prysm.sh \$ARGS
 Restart=always
+StartLimitIntervalSec=0
+RestartSec=3
 User=$USER
 
 [Install]
@@ -414,6 +431,8 @@ Wants=network.target
 EnvironmentFile=/etc/ethereum/geth.conf
 ExecStart=/usr/local/bin/geth \$ARGS
 Restart=always
+StartLimitIntervalSec=0
+RestartSec=3
 User=$USER
 
 [Install]
@@ -447,6 +466,8 @@ Requires=prometheus.service
 EnvironmentFile=/etc/ethereum/cryptowatch.conf
 ExecStart=/usr/local/bin/cryptowat_exporter \$ARGS
 Restart=always
+StartLimitIntervalSec=0
+RestartSec=3
 User=$USER
 
 [Install]
@@ -479,6 +500,8 @@ Requires=prysm-beacon.service
 EnvironmentFile=/etc/ethereum/prysm-eth2stats.conf
 ExecStart=/usr/bin/docker \$ARGS
 Restart=always
+StartLimitIntervalSec=0
+RestartSec=3
 User=$USER
 
 [Install]
