@@ -489,7 +489,7 @@ function systemd_eth2stats() {
 [Unit]
 Description=Prysm Eth2stats Daemon
 After=network.target
-Requires=prysm-beacon.service
+Requires=network.target
 
 [Service]
 EnvironmentFile=/etc/ethereum/prysm-eth2stats.conf
