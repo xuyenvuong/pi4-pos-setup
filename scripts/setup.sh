@@ -363,6 +363,11 @@ passwords-dir: "$HOME/.eth2validators/prysm-wallet-v2-passwords"
 wallet-password-file: "$HOME/.password/password.txt"
 
 beacon-rpc-provider: localhost:4000
+
+monitoring-port: 8081
+monitoring-host: 0.0.0.0
+
+graffiti: "poapFWVdvmahdj+VKn3Lq5gpO0dFDQoA"
 EOF
   fi
 }
@@ -410,6 +415,9 @@ log-file: "$HOME/logs/slasher.log"
 verbosity: info
 
 beacon-rpc-provider: localhost:4000
+
+monitoring-port: 8082
+monitoring-host: 0.0.0.0
 EOF
   fi
 }
