@@ -450,7 +450,7 @@ EOF
   if [ ! -e /etc/ethereum/geth.conf ]
   then
     sudo cat << EOF > /tmp/geth.conf
-ARGS="--goerli --port 30303 --http --http.port 8545 --http.addr 0.0.0.0 --syncmode fast --cache 1024 --datadir $HOME/.ethereum --metrics --metrics.expensive --pprof --maxpeers 100"
+ARGS="--goerli --port 30303 --http --http.port 8545 --http.addr 0.0.0.0 --syncmode fast --cache 1024 --datadir $HOME/.ethereum --metrics --metrics.expensive --pprof --pprof.port 6060 --pprof.addr 0.0.0.0 --maxpeers 100 --identity Maximus --ethstats Maximus:a38e1e50b1b82fa@ethstats.net"
 EOF
     sudo mv /tmp/geth.conf /etc/ethereum
   fi  
@@ -536,7 +536,7 @@ EOF
   if [ ! -e /etc/default/prometheus-node-exporter ]
   then
     sudo cat << EOF > /tmp/prometheus-node-exporter
-ARGS="--collector.textfile.directory="/home/prometheus/node-exporter"
+ARGS="--collector.textfile.directory="/home/prometheus/node-exporter""
 EOF
     sudo mv /tmp/prometheus-node-exporter /etc/default
   fi
