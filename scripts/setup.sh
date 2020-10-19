@@ -274,7 +274,7 @@ EOF
   if [ ! -e /etc/ethereum/prysm-beacon.conf ]
   then
     sudo cat << EOF > /tmp/prysm-beacon.conf
-ARGS="beacon-chain --config-file=$HOME/prysm/configs/beacon.yaml"
+ARGS="beacon-chain --medalla --config-file=$HOME/prysm/configs/beacon.yaml"
 EOF
     sudo mv /tmp/prysm-beacon.conf /etc/ethereum
   fi
@@ -301,7 +301,7 @@ p2p-udp-port: 12000
 p2p-max-peers: 30
 min-sync-peers: 3
 
-slasher-provider: localhost:5000
+#slasher-provider: localhost:5000
 
 graffiti: "Mr.X"
 
@@ -311,7 +311,7 @@ rpc-host: 0.0.0.0
 monitoring-port: 8080
 monitoring-host: 0.0.0.0
 
-slots-per-archived-point: 32
+#slots-per-archived-point: 32
 EOF
   fi
 }
@@ -344,7 +344,7 @@ EOF
   if [ ! -e /etc/ethereum/prysm-validator.conf ]
   then
     sudo cat << EOF > /tmp/prysm-validator.conf
-ARGS="validator --config-file=$HOME/prysm/configs/validator.yaml"
+ARGS="validator --medalla --config-file=$HOME/prysm/configs/validator.yaml"
 EOF
     sudo mv /tmp/prysm-validator.conf /etc/ethereum
   fi
@@ -359,7 +359,7 @@ log-file: "$HOME/logs/validator.log"
 verbosity: info
 
 wallet-dir: "$HOME/.eth2validators/prysm-wallet-v2"
-passwords-dir: "$HOME/.eth2validators/prysm-wallet-v2-passwords"
+#passwords-dir: "$HOME/.eth2validators/prysm-wallet-v2-passwords"
 wallet-password-file: "$HOME/.password/password.txt"
 
 beacon-rpc-provider: localhost:4000
