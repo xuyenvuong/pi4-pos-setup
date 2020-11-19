@@ -274,7 +274,7 @@ EOF
   if [ ! -e /etc/ethereum/prysm-beacon.conf ]
   then
     sudo cat << EOF > /tmp/prysm-beacon.conf
-ARGS="beacon-chain --medalla --config-file=$HOME/prysm/configs/beacon.yaml"
+ARGS="beacon-chain --mainnet --accept-terms-of-use --config-file=$HOME/prysm/configs/beacon.yaml"
 EOF
     sudo mv /tmp/prysm-beacon.conf /etc/ethereum
   fi
@@ -286,19 +286,20 @@ EOF
 datadir: "$HOME/.eth2"
 log-file: "$HOME/logs/beacon.log"
 
-# Medalla Testnet Contract
-deposit-contract: 0x07b39F4fDE4A38bACe212b546dAc87C58DfE3fDC
-contract-deployment-block: 3085928
+# Mainnet Contract
+deposit-contract: 0x00000000219ab540356cbb839cbe05303d7705fa
+contract-deployment-block: 11052984
 
 verbosity: info
 http-web3provider: "http://localhost:8545"
 
 p2p-host-ip: $(curl -s v4.ident.me)
+#p2p-host-dns: "maxvuong.stytes.net"
 
 p2p-tcp-port: 13000
 p2p-udp-port: 12000
 
-p2p-max-peers: 30
+p2p-max-peers: 100
 min-sync-peers: 3
 
 #slasher-provider: localhost:5000
@@ -344,7 +345,7 @@ EOF
   if [ ! -e /etc/ethereum/prysm-validator.conf ]
   then
     sudo cat << EOF > /tmp/prysm-validator.conf
-ARGS="validator --medalla --config-file=$HOME/prysm/configs/validator.yaml"
+ARGS="validator --mainnet --accept-terms-of-use --config-file=$HOME/prysm/configs/validator.yaml"
 EOF
     sudo mv /tmp/prysm-validator.conf /etc/ethereum
   fi
@@ -359,7 +360,6 @@ log-file: "$HOME/logs/validator.log"
 verbosity: info
 
 wallet-dir: "$HOME/.eth2validators/prysm-wallet-v2"
-#passwords-dir: "$HOME/.eth2validators/prysm-wallet-v2-passwords"
 wallet-password-file: "$HOME/.password/password.txt"
 
 beacon-rpc-provider: localhost:4000
@@ -367,7 +367,8 @@ beacon-rpc-provider: localhost:4000
 monitoring-port: 8081
 monitoring-host: 0.0.0.0
 
-graffiti: "poapFWVdvmahdj+VKn3Lq5gpO0dFDQoA"
+# Mainnet
+graffiti: "poapaa2VsI8722DeHPPwjXbJooGadtMA"
 EOF
   fi
 }
@@ -400,7 +401,7 @@ EOF
   if [ ! -e /etc/ethereum/prysm-slasher.conf ]
   then
     sudo cat << EOF > /tmp/prysm-slasher.conf
-ARGS="slasher --config-file=$HOME/prysm/configs/slasher.yaml"
+ARGS="slasher --mainnet --accept-terms-of-use --config-file=$HOME/prysm/configs/slasher.yaml"
 EOF
     sudo mv /tmp/prysm-slasher.conf /etc/ethereum
   fi
@@ -450,8 +451,10 @@ EOF
   if [ ! -e /etc/ethereum/geth.conf ]
   then
     sudo cat << EOF > /tmp/geth.conf
-ARGS="--goerli --port 30303 --http --http.port 8545 --http.addr 0.0.0.0 --syncmode fast --cache 1024 --datadir $HOME/.ethereum --metrics --metrics.expensive --pprof --pprof.port 6060 --pprof.addr 0.0.0.0 --maxpeers 100 --identity Maximus --ethstats Maximus:a38e1e50b1b82fa@ethstats.net"
+ARGS="--port 30303 --http --http.port 8545 --http.addr 0.0.0.0 --syncmode fast --cache 1024 --datadir $HOME/.ethereum --metrics --metrics.expensive --pprof --pprof.port 6060 --pprof.addr 0.0.0.0 --maxpeers 100 --identity Maximus --ethstats Maximus:a38e1e50b1b82fa@ethstats.net"
 EOF
+
+	#ARGS="--goerli --port 30305 --http --http.port 8545 --http.addr 0.0.0.0 --syncmode fast --cache 1024 --datadir /home/ubuntu/.ethereum --metrics --metrics.expensive --pprof --pprof.port 6060 --pprof.addr 0.0.0.0 --maxpeers 100 --ethstats Maximus2:Gooph0Ey@ws://stats.goerli.net:3000"
     sudo mv /tmp/geth.conf /etc/ethereum
   fi  
 }  
@@ -528,7 +531,7 @@ function config_prometheus() {
   if [ ! -e /etc/default/prometheus ]
   then
     sudo cat << EOF > /tmp/prometheus
-ARGS="--web.enable-lifecycle --storage.tsdb.retention.time=31d --storage.tsdb.path="/home/prometheus/metrics2/""
+ARGS="--web.enable-lifecycle --storage.tsdb.retention.time=31d --storage.tsdb.path=/home/prometheus/metrics2/"
 EOF
     sudo mv /tmp/prometheus /etc/default
   fi
@@ -536,7 +539,7 @@ EOF
   if [ ! -e /etc/default/prometheus-node-exporter ]
   then
     sudo cat << EOF > /tmp/prometheus-node-exporter
-ARGS="--collector.textfile.directory="/home/prometheus/node-exporter""
+ARGS="--collector.textfile.directory=/home/prometheus/node-exporter"
 EOF
     sudo mv /tmp/prometheus-node-exporter /etc/default
   fi
@@ -648,6 +651,8 @@ $HOME/logs/*.log
 }
 EOF
     sudo mv /tmp/prysm-logs /etc/logrotate.d
+	sudo chmod 644 /etc/logrotate.d/prysm-logs
+	sudo chown -R root:root /etc/logrotate.d/prysm-logs
 	sudo logrotate /etc/logrotate.conf --debug
   fi
 }
