@@ -45,6 +45,8 @@ function install_essential() {
   install_package libffi-dev
   install_package python3-dev
   install_package chrony
+  install_package jq
+  install_package tmux
   
   # Prometheus
   install_prometheus
@@ -60,6 +62,9 @@ function install_essential() {
   
   # GETH
   install_geth
+  
+  # GETH upgrade to the latest version script  
+  install_geth_upgrade
   
   # Cryptowatch
   install_cryptowatch
@@ -157,6 +162,17 @@ function install_geth() {
     tar -C /tmp/geth-linux-arm64-1.9.19-3e064192 --strip-components 1 -xvf /tmp/geth-linux-arm64-1.9.19-3e064192.tar.gz
     sudo cp -a /tmp/geth-linux-arm64-1.9.19-3e064192/geth /usr/local/bin
   fi
+}
+
+function install_geth_upgrade() {
+  if [ ! -e $HOME/geth_upgrade.sh ]
+  then
+    wget https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/geth_upgrade.sh
+    chmod +x geth_upgrade.sh
+  fi
+  
+  # To run:
+  # > ./geth_upgrade.sh
 }
 
 # Install Cryptowatch
@@ -337,9 +353,9 @@ contract-deployment-block: 11052984
 verbosity: info
 http-web3provider: "http://localhost:8545"
 fallback-web3provider: 
-- http://192.168.0.234:8545
-- https://mainnet.infura.io/v3/58983431844f4e42b17917865804f981
-- https://eth-mainnet.alchemyapi.io/v2/EUtJqCEWQcsOS1XSIavXcxSTe5WkscvY
+- http://192.168.0.XXX:8545
+- https://mainnet.infura.io/v3/INFURA_API_KEY
+- https://eth-mainnet.alchemyapi.io/v2/ALCHEMY_API_KEY
 
 attest-timely: true
 
@@ -366,7 +382,7 @@ monitoring-host: 0.0.0.0
 
 client-stats: true
 beacon-node-metrics-url: "http://localhost:8080/metrics"
-clientstats-api-url: "https://beaconcha.in/api/v1/stats/BEACONCHAI_API_KEY/NAME"
+clientstats-api-url: "https://beaconcha.in/api/v1/stats/BEACONCHAIN_API_KEY/NAME"
 
 update-head-timely: true
 EOF
@@ -430,7 +446,7 @@ monitoring-host: 0.0.0.0
 
 client-stats: true
 validator-metrics-url: "http://localhost:8081/metrics"
-clientstats-api-url: "https://beaconcha.in/api/v1/stats/BEACONCHAI_API_KEY/NAME"
+clientstats-api-url: "https://beaconcha.in/api/v1/stats/BEACONCHAIN_API_KEY/NAME"
 
 # Mainnet
 graffiti: "poapaa2VsI8722DeHPPwjXbJooGadtMA"
