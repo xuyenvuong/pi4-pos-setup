@@ -3,8 +3,21 @@
 # Author: Max Vuong
 # Date: 10/17/2021
 
+# ---------------------------------------------------------------
+
 tags=https://api.github.com/repos/ethereum/go-ethereum/tags
 tags_file=/tmp/tags
+
+# ---------------------------------------------------------------
+
+# Check and install jq
+dpkg_name=jq
+
+if [ $(dpkg-query -W -f='${Status}' $dpkg_name 2>/dev/null | grep -c "ok installed") -eq 0 ]
+  then
+    echo "Installing: $dpkg_name"
+    sudo apt install -y $dpkg_name
+fi
 
 # ---------------------------------------------------------------
 
