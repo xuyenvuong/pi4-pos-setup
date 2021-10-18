@@ -70,6 +70,9 @@ function install_essential() {
   # Docker-Compose
   install_docker_compose
   
+  # Validator key generator
+  install_validator_key_generator
+  
   # Configs
   systemd_beacon
   systemd_validator
@@ -81,6 +84,7 @@ function install_essential() {
   config_grafana
   config_logrotate
   config_chrony
+  config_ports
 }
 
 # Install Docker
@@ -183,6 +187,46 @@ function install_docker_compose() {
     sudo pip3 install cryptography
     sudo pip3 install docker-compose
   fi  
+}
+
+# Install Validator Key Generator
+function install_validator_key_generator() {
+  if [ ! -e $HOME/eth2deposit-cli-256ea21-linux-amd64/deposit ]
+  then
+    wget -P /tmp https://github.com/ethereum/eth2.0-deposit-cli/releases/download/v1.2.0/eth2deposit-cli-256ea21-linux-amd64.tar.gz
+	tar -C $HOME -xvf /tmp/eth2deposit-cli-256ea21-linux-amd64.tar.gz
+  fi
+  
+  #-----------------------------------------------------------------#
+  # To run:
+  # > cd eth2deposit-cli-256ea21-linux-amd64
+  # > ./deposit new-mnemonic --num_validators 1 --chain mainnet
+  # At prompt, enter the seeds pharse, then 
+  # At prompt follow by enter ACCOUNT PASSWORD, Save it to Bitwarden
+  
+  #-----------------------------------------------------------------#
+  # To Import Keys
+  # > prysm/prysm.sh validator accounts import --keys-dir=$HOME/eth2.0-deposit-cli/validator_keys --mainnet --accept-terms-of-use
+  # Input wallet path
+	# Prompt> $HOME/.eth2validators/prysm-wallet-v2
+  # Input wallet password
+	# Prompt> (NOTE: Save the WALLET PASSWORD to Bitwarden)
+  # Input Account password (from key generator step)
+	# Prompt> (NOTE: Save the ACCOUNT PASSWORD to Bitwarden)
+  # Add wallet password to password.txt file
+	# > vi .password/password.txt
+  
+  #-----------------------------------------------------------------#  
+  # Generate additional keys
+  # ./deposit existing-mnemonic --num_validators 1 --chain mainnet
+  # At prompt, enter ACCOUNT PASSWORD
+  
+  # Import Additional Keys
+  # > prysm/prysm.sh validator accounts import --wallet-dir=$HOME/.eth2validators/prysm-wallet-v2 --keys-dir=$HOME/validator_keys_mainnet.xx_xx_keys --mainnet --accept-terms-of-use
+  # At prompt, enter the WALLET PASSWORD, then 
+  # At prompt, follow by ACCOUNT PASSWORD
+  
+  #-----------------------------------------------------------------#
 }
 
 #-------------------------------------------------------------------------------------------#
@@ -292,9 +336,15 @@ contract-deployment-block: 11052984
 
 verbosity: info
 http-web3provider: "http://localhost:8545"
+fallback-web3provider: 
+- http://192.168.0.234:8545
+- https://mainnet.infura.io/v3/58983431844f4e42b17917865804f981
+- https://eth-mainnet.alchemyapi.io/v2/EUtJqCEWQcsOS1XSIavXcxSTe5WkscvY
 
-p2p-host-ip: $(curl -s v4.ident.me)
-#p2p-host-dns: "maxvuong.stytes.net"
+attest-timely: true
+
+#p2p-host-ip: $(curl -s v4.ident.me)
+p2p-host-dns: "maxvuong.tplinkdns.com"
 
 p2p-tcp-port: 13000
 p2p-udp-port: 12000
@@ -302,7 +352,7 @@ p2p-udp-port: 12000
 p2p-max-peers: 100
 min-sync-peers: 3
 
-#slasher-provider: localhost:5000
+#slasher-rpc-provider: localhost:4002
 
 graffiti: "Mr.X"
 
@@ -313,6 +363,12 @@ monitoring-port: 8080
 monitoring-host: 0.0.0.0
 
 #slots-per-archived-point: 32
+
+client-stats: true
+beacon-node-metrics-url: "http://localhost:8080/metrics"
+clientstats-api-url: "https://beaconcha.in/api/v1/stats/BEACONCHAI_API_KEY/NAME"
+
+update-head-timely: true
 EOF
   fi
 }
@@ -362,10 +418,19 @@ verbosity: info
 wallet-dir: "$HOME/.eth2validators/prysm-wallet-v2"
 wallet-password-file: "$HOME/.password/password.txt"
 
-beacon-rpc-provider: localhost:4000
+beacon-rpc-provider: localhost:4000,host1:port,host2:port
+
+attest-timely: true
+#enable-external-slasher-protection: true
+enable-slashing-protection-pruning: true
+enable-doppelganger: true
 
 monitoring-port: 8081
 monitoring-host: 0.0.0.0
+
+client-stats: true
+validator-metrics-url: "http://localhost:8081/metrics"
+clientstats-api-url: "https://beaconcha.in/api/v1/stats/BEACONCHAI_API_KEY/NAME"
 
 # Mainnet
 graffiti: "poapaa2VsI8722DeHPPwjXbJooGadtMA"
@@ -419,6 +484,11 @@ beacon-rpc-provider: localhost:4000
 
 monitoring-port: 8082
 monitoring-host: 0.0.0.0
+
+web: true
+grpc-gateway-port: 7500
+grpc-gateway-host: localhost
+
 EOF
   fi
 }
@@ -451,12 +521,15 @@ EOF
   if [ ! -e /etc/ethereum/geth.conf ]
   then
     sudo cat << EOF > /tmp/geth.conf
-ARGS="--port 30303 --http --http.port 8545 --http.addr 0.0.0.0 --syncmode fast --cache 1024 --datadir $HOME/.ethereum --metrics --metrics.expensive --pprof --pprof.port 6060 --pprof.addr 0.0.0.0 --maxpeers 100 --identity Maximus --ethstats Maximus:a38e1e50b1b82fa@ethstats.net"
+ARGS="--port 30303 --http --http.port 8545 --http.addr 0.0.0.0 --syncmode snap --cache 1024 --datadir $HOME/.ethereum --metrics --metrics.expensive --pprof --pprof.port 6060 --pprof.addr 0.0.0.0 --maxpeers 100 --identity Maximus --ethstats Maximus:a38e1e50b1b82fa@ethstats.net"
 EOF
 
-	#ARGS="--goerli --port 30305 --http --http.port 8545 --http.addr 0.0.0.0 --syncmode fast --cache 1024 --datadir /home/ubuntu/.ethereum --metrics --metrics.expensive --pprof --pprof.port 6060 --pprof.addr 0.0.0.0 --maxpeers 100 --ethstats Maximus2:Gooph0Ey@ws://stats.goerli.net:3000"
+	#ARGS="--goerli --port 30305 --http --http.port 8545 --http.addr 0.0.0.0 --syncmode snap --cache 1024 --datadir /home/ubuntu/.ethereum --metrics --metrics.expensive --pprof --pprof.port 6060 --pprof.addr 0.0.0.0 --maxpeers 100 --ethstats Maximus2:Gooph0Ey@ws://stats.goerli.net:3000"
     sudo mv /tmp/geth.conf /etc/ethereum
-  fi  
+  fi
+
+  # Prune geth with tmux
+  # /usr/local/bin/geth snapshot prune-state --datadir $HOME/.ethereum  
 }  
   
 # Systemd Cryptowatch Slasher
@@ -542,6 +615,7 @@ EOF
 ARGS="--collector.textfile.directory=/home/prometheus/node-exporter"
 EOF
     sudo mv /tmp/prometheus-node-exporter /etc/default
+	mkdir -p /home/prometheus/node-exporter
   fi
 
   # TODO: the file may exists, need to concat at the end.
@@ -661,6 +735,49 @@ EOF
 function config_chrony() {
   sudo chronyd -Q
   sudo chronyd -q
+}
+
+# Config Ports
+function config_ports{
+	# SSH
+	sudo ufw allow ssh
+	
+	# Beacon
+	sudo ufw allow 13000:13100/tcp
+	sudo ufw allow 12000:12100/udp
+	sudo ufw allow 4000/tcp
+	sudo ufw allow 8080/tcp
+
+	# Validator
+	sudo ufw allow 8081/tcp
+
+	# Slasher
+	sudo ufw allow 8082/tcp
+	sudo ufw allow 5000/tcp
+
+	# Grafana
+	sudo ufw allow 3000:3100/tcp
+
+	# Geth
+	sudo ufw allow 8545/tcp
+	sudo ufw allow 6060/tcp
+	sudo ufw allow 30303:30309/tcp
+	sudo ufw allow 30303:30309/udp
+
+	# Prometheus
+	sudo ufw allow 9090/tcp
+
+	# Prometheus-node-exporter
+	sudo ufw allow 9100/tcp
+
+	# Cryptowatch
+	sudo ufw allow 9745/tcp
+
+	# Prysm UI
+	sudo ufw allow 7500/tcp
+	
+	# Enable
+	sudo ufw enable
 }
 
 #-------------------------------------------------------------------------------------------#
