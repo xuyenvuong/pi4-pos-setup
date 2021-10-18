@@ -26,8 +26,8 @@ echo "Get latest version info..."
 wget -P /tmp $tags
 
 arch=$(dpkg --print-architecture)
-sha=$(jq '.[0].commit.sha' /tmp/tags | cut -c 2-9)
-latest_version=$(jq '.[0].name' /tmp/tags | cut -d "\"" -f 2 | cut -c 2-30)
+sha=$(jq '.[0].commit.sha' < $tags_file | cut -c 2-9)
+latest_version=$(jq '.[0].name' < $tags_file | cut -d "\"" -f 2 | cut -c 2-30)
 
 # Compose download URL
 download_url=https://gethstore.blob.core.windows.net/builds/geth-linux-$arch-$latest_version-$sha.tar.gz
@@ -54,6 +54,6 @@ echo "journalctl -f -u geth.service -n 200"
 # ---------------------------------------------------------------
 # Clean up
 rm -rf /tmp/geth-linux-$arch-$latest_version-$sha
-rm /tmp/tags*
+rm $tags_file*
 
 # EOF
