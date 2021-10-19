@@ -448,6 +448,8 @@ client-stats: true
 validator-metrics-url: "http://localhost:8081/metrics"
 clientstats-api-url: "https://beaconcha.in/api/v1/stats/BEACONCHAIN_API_KEY/NAME"
 
+enable-get-block-optimizations: true
+
 # Mainnet
 graffiti: "poapaa2VsI8722DeHPPwjXbJooGadtMA"
 EOF
