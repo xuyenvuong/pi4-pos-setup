@@ -1,5 +1,6 @@
 #!/bin/bash
-# helper.sh - A script to quickly setup/upgrade Geth
+# geth_upgrade.sh - A script to quickly setup/upgrade Geth
+# Run: ./geth_upgrade.sh
 # Author: Max Vuong
 # Date: 10/17/2021
 
