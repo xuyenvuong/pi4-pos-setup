@@ -385,6 +385,8 @@ beacon-node-metrics-url: "http://localhost:8080/metrics"
 clientstats-api-url: "https://beaconcha.in/api/v1/stats/BEACONCHAIN_API_KEY/NAME"
 
 update-head-timely: true
+
+enable-get-block-optimizations: true
 EOF
   fi
 }
@@ -447,8 +449,6 @@ monitoring-host: 0.0.0.0
 client-stats: true
 validator-metrics-url: "http://localhost:8081/metrics"
 clientstats-api-url: "https://beaconcha.in/api/v1/stats/BEACONCHAIN_API_KEY/NAME"
-
-enable-get-block-optimizations: true
 
 # Mainnet
 graffiti: "poapaa2VsI8722DeHPPwjXbJooGadtMA"
