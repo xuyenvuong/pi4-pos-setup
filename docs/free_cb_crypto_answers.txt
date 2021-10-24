@@ -1,0 +1,135 @@
+Ampleforth Governance Token (FORTH) Answers
+
+1. Rebases
+2. AMPL and FORTH
+3. DeFi building block
+
+Universal Market Access (UMA) Answers
+
+1. Derivatives
+2. Liquidators and disputers
+3. All of these answers are correct!
+
+Numeraire (NMR) Answers
+
+1. A global community of data scientists
+2. To back up predictions and earn rewards
+3. Nothing
+
+NuCypher (NU) Answers
+
+1. End-to-end encryption
+2. Independent nodes to perform tasks
+3. Paying Ethereum transaction fees
+
+The Graph (GRT) Answers
+
+1. The bitcoin network
+2. GRT Tokens
+3. Curators
+
+CELO (CGLD) Answers
+
+1. By making crypto accessible on mobile phones
+2. Staking, governance
+3. Using the Valora mobile app
+
+Compound (COMP) Answers
+
+1. Earn interest on crypto
+2. Supply crypto asset as collateral
+3. COMP token holders
+.
+Stellar Lumens (XLM) Answers
+
+1. A decentralized protocol that unites the world’s financial infrastructure.
+2. Facilitating low-cost, universal payments.
+3. Transactions are fast, inexpensive, and global.
+4. To issue and exchange tokens quickly.
+5. It relies on a cooperation of trusted nodes.
+
+Filecoin (FIL) Answers
+
+1. A decentralized marketplace for data storage and retrieval.
+2. Proof of replication and proof of spacetime.
+3. By its location
+
+Band Protocol (BAND) Answers
+
+1. Real World Data
+2. Oracles
+3. Earn crypto rewards
+
+Algorand (ALGO) Answers
+
+1. By being scalable, secure, and decentralized
+2. A randomly selected ALGO token
+3. Algorand Standard Asset (ASA)
+
+MKR (MKR) Answers
+
+1. MKR and DAI
+2. MKR holders
+3. A crypto wallet and crypto collateral
+
+Kyber Network (KNC) Answers
+
+1. Exchange one Ethereum token for another
+2. Ethereum
+3. Liquidity
+
+Orchid (OXT) Answers
+
+1. A peer to peer privacy wallet.
+2. Orchid’s Ethereum token, OXT, as well as the Orchid app and a Web3 wallet.
+3. Multihop configurations between bandwidth providers. 
+.
+Tezos (XTZ) Answers
+
+1. Formal Verification.
+2. A decent computer, an internet connection and 1 roll of Tez (8,000 XTZ)
+3. Formal Governance
+
+Dai (DAI) Answers
+
+1. A decentralized stablecoin that aims to be worth one US dollar
+2. Decentralized and borderless
+3. Open a CDP with Maker
+
+EOS (EOS) Answers
+
+1. A blockchain protocol for fast, scalable applications
+2. Delegated proof of stake
+3. Fast, free transfers
+4. Stake EOS tokens
+5. Upgradeable smart contracts
+
+Zcash (ZEC) Answers
+
+1. A privacy protecting crypto
+2. It keeps your financial info safe so it can not be sold
+3. Through a cryptographic breakthrough known as zero-knowledge proof
+
+Basic Attention Token (BAT) Answers
+
+1. There are too many ads and data trackers
+2. It is free, open source web browser built for privacy
+3. Users get paid BAT for viewing opt-in ads, and publishers get rewarded when users pay attention to their content
+
+0x (ZRX) Answers
+
+1. To create a tokenized world, through friction less, peer-to-peer exchange of tokens
+2. A new way to trade tokens and cryptocurrencies with other people.
+3. It can be used to pay relayer fees and and participate in protocol upgrades in the future 
+Max — 05/21/2021
+Polygon
+
+Answers:
+1. What blockchain is Polygon helping to scale?
+- Ethereum
+
+2. Who runs the Polygon network?
+- Polygon Validators
+
+3. What is Polygon building?
+- An internet of blockchains on Ethereum
