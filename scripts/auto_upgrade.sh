@@ -1,6 +1,6 @@
 #!/bin/bash
 # auto_upgrade.sh - A script to quickly setup/upgrade Geth, Beacon, Validator
-# Run: ./auto_upgrade.sh or setup as conjob task
+# Run: ./auto_upgrade.sh or setup as cronjob task
 # Author: Max Vuong
 # Date: 12/02/2021
 
