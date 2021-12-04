@@ -6,6 +6,41 @@
 
 # ---------------------------------------------------------------
 
+<< COMMENT
+Instructions to install and automate node upgrade for Beacon, Validator, and Geth:
+ 
+Step 1: One time download from repo:
+Run:
+> wget https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/auto_upgrade.sh && chmod +x auto_upgrade.sh
+
+Step 2: Enable Cronjob:
+Run this command to edit crontab
+> EDITOR=vim crontab -e
+
+Add this to the bottom of the file to run your upgrade at 1:30 AM daily
+> 30 1 * * * $HOME/auto_upgrade.sh
+or if you prefer to run at 2:45 PM daily, then use this
+> 45 14 * * * $HOME/auto_upgrade.sh
+
+Then, save file.
+
+Step 3: Allow Sudoer:
+In order for the cronjob task to restart the processes, you need to add your current user to the "sudoer" list, this is one time step, here is how:
+Run:
+> sudo EDITOR=vim visudo
+
+Add this line at the bottom. 
+> ubuntu ALL=(ALL) NOPASSWD:ALL
+NOTICE: if your user is not `ubuntu`, then you must change the user to the one you are login with. E.g. If your user login is `billgates`, then you must edit it to:
+> billgates ALL=(ALL) NOPASSWD:ALL
+
+Then, save file.
+
+Do the same for every single node in your cluster. That's all.
+COMMENT
+
+# ---------------------------------------------------------------
+
 beacon_metrics_url=localhost:8080/metrics
 validator_metrics_url=localhost:8081/metrics
 tags_url=https://api.github.com/repos/ethereum/go-ethereum/tags
