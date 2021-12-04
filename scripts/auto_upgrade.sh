@@ -6,7 +6,7 @@
 
 # ---------------------------------------------------------------
 
-<< COMMENT
+<<COMMENT
 Instructions to install and automate node upgrade for Beacon, Validator, and Geth:
  
 Step 1: One time download from repo:
