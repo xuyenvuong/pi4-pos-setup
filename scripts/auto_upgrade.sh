@@ -1,14 +1,16 @@
 #!/bin/bash
 # auto_upgrade.sh - A script to quickly setup/upgrade Geth, Beacon, Validator
-# Run: ./auto_upgrade.sh
+# Run: ./auto_upgrade.sh or setup as conjob task
 # Author: Max Vuong
 # Date: 12/02/2021
 
 # ---------------------------------------------------------------
 
-beacon_metric_url=localhost:8080/metrics
-validator_metric_url=localhost:8081/metrics
+beacon_metrics_url=localhost:8080/metrics
+validator_metrics_url=localhost:8081/metrics
 tags_url=https://api.github.com/repos/ethereum/go-ethereum/tags
+
+process_name="auto_upgrade"
 
 # ---------------------------------------------------------------
 
@@ -17,37 +19,37 @@ dpkg_name=jq
 
 if [ $(dpkg-query -W -f='${Status}' $dpkg_name 2>/dev/null | grep -c "ok installed") -eq 0 ]
   then
-    echo "Installing: $dpkg_name"
+    logger "Installing: $dpkg_name"
     sudo apt install -y $dpkg_name
 fi
 
 # ---------------------------------------------------------------
 
 # Get current beacon version
-beacon_curr_version=$(wget -O - -o /dev/null $beacon_metric_url | grep buildDate= | cut -d "," -f 3 | cut -d "\"" -f 2)
-echo "Beacon current version $beacon_curr_version"
+beacon_curr_version=$(wget -O - -o /dev/null $beacon_metrics_url | grep buildDate= | cut -d "," -f 3 | cut -d "\"" -f 2)
+logger "$process_name Beacon current version $beacon_curr_version"
 
 # Get current validator version
-validator_curr_version=$(wget -O - -o /dev/null $validator_metric_url | grep buildDate= | cut -d "," -f 3 | cut -d "\"" -f 2)
-echo "Validator current version $validator_curr_version"
+validator_curr_version=$(wget -O - -o /dev/null $validator_metrics_url | grep buildDate= | cut -d "," -f 3 | cut -d "\"" -f 2)
+logger "$process_name Validator current version $validator_curr_version"
 
 # Get current geth version
 geth_curr_version=$(/usr/local/bin/geth version 2> /dev/null | grep "stable" | cut -d " " -f 2 | cut -d "-" -f 1)
-echo "Geth current version $geth_curr_version"
+logger "$process_name Geth current version $geth_curr_version"
 
 # ---------------------------------------------------------------
 
 # Get latest available beacon version
 beacon_latest_version=$($HOME/prysm/prysm.sh beacon-chain --version 2> /dev/null | grep "beacon-chain version Prysm" |  cut -d "/" -f 2)
-echo "Latest beacon version $beacon_latest_version"
+logger "$process_name Latest beacon version $beacon_latest_version"
 
 # Get latest available validator version
 validator_latest_version=$($HOME/prysm/prysm.sh validator --version 2> /dev/null | grep "validator version Prysm" |  cut -d "/" -f 2)
-echo "Latest validator version $beacon_latest_version"
+logger "$process_name Latest validator version $beacon_latest_version"
 
 # Get latest available geth version
 geth_latest_version=$(wget -O - -o /dev/null $tags_url | jq '.[0].name' | cut -d "\"" -f 2 | cut -c 2-)
-echo "Latest validator version $geth_latest_version"
+logger "$process_name Latest validator version $geth_latest_version"
 
 # ---------------------------------------------------------------
 
@@ -65,10 +67,10 @@ geth_is_running=$(systemctl list-units --type=service --state=active | grep geth
 # Deciding to upgrade beacon
 if [[ $beacon_is_running && $beacon_curr_version != $beacon_latest_version ]]
   then
-    echo "OK to upgrade Beacon to version "$beacon_latest_version
-	sudo systemctl restart prysm-beacon.service
+    logger "$process_name OK to upgrade Beacon to version "$beacon_latest_version
+    sudo systemctl restart prysm-beacon.service
 else
-    echo "Beacon is up to date or not active."
+    logger "$process_name Beacon is up to date or not active."
 fi
 
 # ---------------------------------------------------------------
@@ -76,10 +78,10 @@ fi
 # Deciding to upgrade validator
 if [[ $validator_is_running && $validator_curr_version != $validator_latest_version ]]
   then
-    echo "OK to upgrade Validator to version "$validator_latest_version
-	sudo systemctl restart prysm-validator.service
+    logger "$process_name OK to upgrade Validator to version "$validator_latest_version
+    sudo systemctl restart prysm-validator.service
 else
-    echo "Validator is up to date or not active."
+    logger "$process_name Validator is up to date or not active."
 fi
 
 # ---------------------------------------------------------------
@@ -87,9 +89,9 @@ fi
 # Deciding to upgrade geth 
 if [[ $geth_is_running && $geth_curr_version != $geth_latest_version ]]
   then
-	arch=$(dpkg --print-architecture)
+    arch=$(dpkg --print-architecture)
     sha=$(wget -O - -o /dev/null $tags_url | jq '.[0].commit.sha' | cut -c 2-9)
-	download_version=$arch-$geth_latest_version-$sha
+    download_version=$arch-$geth_latest_version-$sha
 
     # Compose download URL
     download_url=https://gethstore.blob.core.windows.net/builds/geth-linux-$download_version.tar.gz
@@ -112,6 +114,8 @@ if [[ $geth_is_running && $geth_curr_version != $geth_latest_version ]]
 	
     # Clean up
     rm -rf /tmp/geth-linux-$download_version
+else
+    logger "$process_name Geth is up to date or not active."
 fi
 
 # ---------------------------------------------------------------
