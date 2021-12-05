@@ -5,6 +5,8 @@
 # Date: 12/02/2021
 
 # ---------------------------------------------------------------
+# README
+# ---------------------------------------------------------------
 
 <<COMMENT
 Instructions to install and automate node upgrade for Beacon, Validator, and Geth:
@@ -36,8 +38,38 @@ NOTICE: if your user is not `ubuntu`, then you must change the user to the one y
 
 Then, save file.
 
+Optional Step: Add Discord Notification Webhook 
+To get Discord notification webhook when there's an upgrade, please create the webhook and config DISCORD_WEBHOOK_URL with your own webhook
+To remove Discord Notification, set DISCORD_WEBHOOK_URL=''
+
 Do the same for every single node in your cluster. That's all.
 COMMENT
+
+# ---------------------------------------------------------------
+# END README
+# ---------------------------------------------------------------
+
+# ---------------------------------------------------------------
+# Discord Notification Webhook Config
+# ---------------------------------------------------------------
+
+
+DISCORD_WEBHOOK_URL=''
+
+
+# ---------------------------------------------------------------
+# To send a simple notification to Discord via webhook. This function only send when DISCORD_WEBHOOK_URL variable is not null
+# discord_notify $username $msg_content
+
+function discord_notify() {
+  local username=$1
+  local msg_content=$2  
+    
+  if [ -n "$discord_webhook_url" ]
+    then
+	  curl -H "Content-Type: application/json" -X POST -d "{\"username\": \"$username\",\"content\": \"$msg_content\"}" $DISCORD_WEBHOOK_URL
+  fi  
+}
 
 # ---------------------------------------------------------------
 
@@ -102,8 +134,10 @@ geth_is_running=$(systemctl list-units --type=service --state=active | grep geth
 # Deciding to upgrade beacon
 if [[ $beacon_is_running && $beacon_curr_version != $beacon_latest_version ]]
   then
-    logger "$process_name OK to upgrade Beacon to version "$beacon_latest_version
+    logger "$process_name OK to upgrade Beacon to version $beacon_latest_version"
     sudo systemctl restart prysm-beacon.service
+	
+	discord_notify $process_name "Upgraded Beacon to version $beacon_latest_version"
 else
     logger "$process_name Beacon is up to date or not active."
 fi
@@ -113,8 +147,10 @@ fi
 # Deciding to upgrade validator
 if [[ $validator_is_running && $validator_curr_version != $validator_latest_version ]]
   then
-    logger "$process_name OK to upgrade Validator to version "$validator_latest_version
+    logger "$process_name OK to upgrade Validator to version $validator_latest_version"
     sudo systemctl restart prysm-validator.service
+	
+	discord_notify $process_name "Upgraded Validator to version $validator_latest_version"
 else
     logger "$process_name Validator is up to date or not active."
 fi
@@ -149,6 +185,9 @@ if [[ $geth_is_running && $geth_curr_version != $geth_latest_version ]]
 	
     # Clean up
     rm -rf /tmp/geth-linux-$download_version
+	
+	# Notify Discord
+	discord_notify $process_name "Upgraded Validator to version $validator_latest_version"
 else
     logger "$process_name Geth is up to date or not active."
 fi
