@@ -65,7 +65,7 @@ function discord_notify() {
   local username=$1
   local msg_content=$2  
     
-  if [ -n "$discord_webhook_url" ]
+  if [ -n "$DISCORD_WEBHOOK_URL" ]
     then
 	  curl -H "Content-Type: application/json" -X POST -d "{\"username\": \"$username\",\"content\": \"$msg_content\"}" $DISCORD_WEBHOOK_URL
   fi  
