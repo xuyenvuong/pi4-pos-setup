@@ -42,7 +42,15 @@ Optional Step: Add Discord Notification Webhook
 To get Discord notification webhook when there's an upgrade, please create the webhook and config DISCORD_WEBHOOK_URL with your own webhook
 To remove Discord Notification, set DISCORD_WEBHOOK_URL=''
 
+Step: Geth Prune
+The script will auto do the geth prune when the disk space at 95% by default. 
+Or to prune at a lower pecentage e.g. 80%, you can change GETH_PRUNE_AT_PERCENTAGE=80.
+And to stop the prune, you can change GETH_PRUNE_AT_PERCENTAGE=100.
+If disk is still over the defined GETH_PRUNE_AT_PERCENTAGE after prunning, prune job will be disabled for 7 days until you fix the capacity issue.
+
+
 Do the same for every single node in your cluster. That's all.
+
 COMMENT
 
 # ---------------------------------------------------------------
@@ -55,6 +63,28 @@ COMMENT
 
 
 DISCORD_WEBHOOK_URL=''
+
+
+# ---------------------------------------------------------------
+# Remaining disk percentage to prune Geth database. Default to 95%
+# ---------------------------------------------------------------
+
+
+GETH_PRUNE_AT_PERCENTAGE=95
+
+
+# ---------------------------------------------------------------
+# Other configs
+# ---------------------------------------------------------------
+
+
+BEACON_METRICS_URL=localhost:8080/metrics
+VALIDATOR_METRICS_URL=localhost:8081/metrics
+TAGS_URL=https://api.github.com/repos/ethereum/go-ethereum/tags
+
+GETH_LAST_PRUNE_FILE=/tmp/geth_last_prune
+
+PROCESS_NAME="auto_upgrade"
 
 
 # ---------------------------------------------------------------
@@ -73,14 +103,6 @@ function discord_notify() {
 
 # ---------------------------------------------------------------
 
-beacon_metrics_url=localhost:8080/metrics
-validator_metrics_url=localhost:8081/metrics
-tags_url=https://api.github.com/repos/ethereum/go-ethereum/tags
-
-process_name="auto_upgrade"
-
-# ---------------------------------------------------------------
-
 # Check and install jq
 dpkg_name=jq
 
@@ -93,30 +115,30 @@ fi
 # ---------------------------------------------------------------
 
 # Get current beacon version
-beacon_curr_version=$(wget -O - -o /dev/null $beacon_metrics_url | grep buildDate= | cut -d "," -f 3 | cut -d "\"" -f 2)
-logger "$process_name Beacon current version $beacon_curr_version"
+beacon_curr_version=$(wget -O - -o /dev/null $BEACON_METRICS_URL | grep buildDate= | cut -d "," -f 3 | cut -d "\"" -f 2)
+logger "$PROCESS_NAME Beacon current version $beacon_curr_version"
 
 # Get current validator version
-validator_curr_version=$(wget -O - -o /dev/null $validator_metrics_url | grep buildDate= | cut -d "," -f 3 | cut -d "\"" -f 2)
-logger "$process_name Validator current version $validator_curr_version"
+validator_curr_version=$(wget -O - -o /dev/null $VALIDATOR_METRICS_URL | grep buildDate= | cut -d "," -f 3 | cut -d "\"" -f 2)
+logger "$PROCESS_NAME Validator current version $validator_curr_version"
 
 # Get current geth version
 geth_curr_version=$(/usr/local/bin/geth version 2> /dev/null | grep "stable" | cut -d " " -f 2 | cut -d "-" -f 1)
-logger "$process_name Geth current version $geth_curr_version"
+logger "$PROCESS_NAME Geth current version $geth_curr_version"
 
 # ---------------------------------------------------------------
 
 # Get latest available beacon version
 beacon_latest_version=$($HOME/prysm/prysm.sh beacon-chain --version 2> /dev/null | grep "beacon-chain version Prysm" |  cut -d "/" -f 2)
-logger "$process_name Latest beacon version $beacon_latest_version"
+logger "$PROCESS_NAME Latest beacon version $beacon_latest_version"
 
 # Get latest available validator version
 validator_latest_version=$($HOME/prysm/prysm.sh validator --version 2> /dev/null | grep "validator version Prysm" |  cut -d "/" -f 2)
-logger "$process_name Latest validator version $beacon_latest_version"
+logger "$PROCESS_NAME Latest validator version $beacon_latest_version"
 
 # Get latest available geth version
-geth_latest_version=$(wget -O - -o /dev/null $tags_url | jq '.[0].name' | cut -d "\"" -f 2 | cut -c 2-)
-logger "$process_name Latest validator version $geth_latest_version"
+geth_latest_version=$(wget -O - -o /dev/null $TAGS_URL | jq '.[0].name' | cut -d "\"" -f 2 | cut -c 2-)
+logger "$PROCESS_NAME Latest validator version $geth_latest_version"
 
 # ---------------------------------------------------------------
 
@@ -134,12 +156,12 @@ geth_is_running=$(systemctl list-units --type=service --state=active | grep geth
 # Deciding to upgrade beacon
 if [[ $beacon_is_running && $beacon_curr_version != $beacon_latest_version ]]
   then
-    logger "$process_name OK to upgrade Beacon to version $beacon_latest_version"
+    logger "$PROCESS_NAME OK to upgrade Beacon to version $beacon_latest_version"
     sudo systemctl restart prysm-beacon.service
 	
-	discord_notify $process_name "Upgraded Beacon to version $beacon_latest_version"
+	discord_notify $PROCESS_NAME "Upgraded Beacon to version $beacon_latest_version"
 else
-    logger "$process_name Beacon is up to date or not active."
+    logger "$PROCESS_NAME Beacon is up to date or not active."
 fi
 
 # ---------------------------------------------------------------
@@ -147,12 +169,12 @@ fi
 # Deciding to upgrade validator
 if [[ $validator_is_running && $validator_curr_version != $validator_latest_version ]]
   then
-    logger "$process_name OK to upgrade Validator to version $validator_latest_version"
+    logger "$PROCESS_NAME OK to upgrade Validator to version $validator_latest_version"
     sudo systemctl restart prysm-validator.service
 	
-	discord_notify $process_name "Upgraded Validator to version $validator_latest_version"
+	discord_notify $PROCESS_NAME "Upgraded Validator to version $validator_latest_version"
 else
-    logger "$process_name Validator is up to date or not active."
+    logger "$PROCESS_NAME Validator is up to date or not active."
 fi
 
 # ---------------------------------------------------------------
@@ -161,7 +183,7 @@ fi
 if [[ $geth_is_running && $geth_curr_version != $geth_latest_version ]]
   then
     arch=$(dpkg --print-architecture)
-    sha=$(wget -O - -o /dev/null $tags_url | jq '.[0].commit.sha' | cut -c 2-9)
+    sha=$(wget -O - -o /dev/null $TAGS_URL | jq '.[0].commit.sha' | cut -c 2-9)
     download_version=$arch-$geth_latest_version-$sha
 
     # Compose download URL
@@ -187,10 +209,74 @@ if [[ $geth_is_running && $geth_curr_version != $geth_latest_version ]]
     rm -rf /tmp/geth-linux-$download_version
 	
 	# Notify Discord
-	discord_notify $process_name "Upgraded Validator to version $validator_latest_version"
+	discord_notify $PROCESS_NAME "Upgraded Geth to version $geth_latest_version"
 else
-    logger "$process_name Geth is up to date or not active."
+    logger "$PROCESS_NAME Geth is up to date or not active."
 fi
 
 # ---------------------------------------------------------------
+
+# Geth data directory
+geth_datadir=$(cat /etc/ethereum/geth.conf 2> /dev/null | awk -F'--datadir ' '{print $2}' | cut -d ' ' -f 1)
+
+# Current disk usage
+disk_used_percentage=$(df -lh 2> /dev/null | grep $(du -hs $geth_datadir 2> /dev/null | awk '{print $1}') | awk '{print $5}' | cut -d '%' -f 1)
+logger "$PROCESS_NAME Geth disk usage reaches $disk_used_percentage%"
+
+# Check last prune timestamp
+if [ ! -e $GETH_LAST_PRUNE_FILE ]
+  then
+    date +"%s" > $GETH_LAST_PRUNE_FILE
+fi
+
+geth_is_prune_time=false
+geth_last_prune_timestamp=$(<$GETH_LAST_PRUNE_FILE)
+current_timestamp=$(date +"%s")
+
+# Prune if last prune was older than 1 week
+if [ $((geth_last_prune_timestamp + 60*60*24*7 - current_timestamp)) -le 0 ]
+  then
+    geth_is_prune_time=true
+fi
+
+# ---------------------------------------------------------------
+
+# Deciding to prune geth
+if [[ $geth_is_running && $geth_is_prune_time = true && $disk_used_percentage -ge $GETH_PRUNE_AT_PERCENTAGE ]]
+  then
+    # Stop geth
+    sudo systemctl stop geth.service
+	
+    # Notify Discord
+	discord_notify $PROCESS_NAME "Geth prune-state starting. Don't turn off your server."
+	
+	# Run geth prune
+	/usr/local/bin/geth snapshot prune-state --datadir $geth_datadir
+	
+	# Start geth
+    sudo systemctl start geth.service
+	
+	# Mark prune timestamp
+	echo $current_timestamp > $GETH_LAST_PRUNE_FILE
+	
+	# Notify Discord
+	discord_notify $PROCESS_NAME "Geth prune-state is completed."
+	
+    # Check disk usage after prune
+    disk_used_percentage=$(df -lh 2> /dev/null | grep $(du -hs $geth_datadir 2> /dev/null | awk '{print $1}') | awk '{print $5}' | cut -d '%' -f 1)
+    
+	if [ $disk_used_percentage -ge $GETH_PRUNE_AT_PERCENTAGE ]
+      then
+	    # Remove file to stop prunning again until disk capacity is under the threshold
+	    rm $GETH_LAST_PRUNE_FILE
+	  
+        logger "$PROCESS_NAME WARNING: Geth disk usage reaches full capacity."	  
+		
+        # Notify Discord
+        discord_notify $PROCESS_NAME "WARNING: Geth disk usage reaches full capacity. Prunning job will be deactivated for 7 days. Please fix it asap."
+    fi
+fi
+
+# ---------------------------------------------------------------
+
 # EOF
