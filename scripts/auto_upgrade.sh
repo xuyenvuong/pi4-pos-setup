@@ -8,7 +8,7 @@
 # README
 # ---------------------------------------------------------------
 
-<<COMMENT
+: <<'COMMENT_BLOCK'
 Instructions to install and automate node upgrade for Beacon, Validator, and Geth:
  
 Step 1: One time download from repo:
@@ -51,7 +51,7 @@ If disk is still over the defined GETH_PRUNE_AT_PERCENTAGE after prunning, prune
 
 Do the same for every single node in your cluster. That's all.
 
-COMMENT
+COMMENT_BLOCK
 
 # ---------------------------------------------------------------
 # END README
