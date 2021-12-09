@@ -256,8 +256,8 @@ if [[ $geth_is_running && $geth_is_prune_time = true && $disk_used_percentage -g
     # Start geth
     sudo systemctl start geth.service
 	
-	# Mark prune timestamp
-	echo $current_timestamp > $GETH_LAST_PRUNE_FILE
+    # Mark prune timestamp
+    echo $current_timestamp > $GETH_LAST_PRUNE_FILE
 	
     # Notify Discord
     discord_notify $PROCESS_NAME "Geth prune-state is completed."
