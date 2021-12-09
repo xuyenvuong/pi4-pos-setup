@@ -248,27 +248,27 @@ if [[ $geth_is_running && $geth_is_prune_time = true && $disk_used_percentage -g
     sudo systemctl stop geth.service
 	
     # Notify Discord
-	discord_notify $PROCESS_NAME "Geth prune-state starting. Don't turn off your server."
+    discord_notify $PROCESS_NAME "Geth prune-state starting. Don't turn off your server."
 	
-	# Run geth prune
-	/usr/local/bin/geth snapshot prune-state --datadir $geth_datadir
+    # Run geth prune
+    /usr/local/bin/geth snapshot prune-state --datadir $geth_datadir
 	
-	# Start geth
+    # Start geth
     sudo systemctl start geth.service
 	
 	# Mark prune timestamp
 	echo $current_timestamp > $GETH_LAST_PRUNE_FILE
 	
-	# Notify Discord
-	discord_notify $PROCESS_NAME "Geth prune-state is completed."
+    # Notify Discord
+    discord_notify $PROCESS_NAME "Geth prune-state is completed."
 	
     # Check disk usage after prune
     disk_used_percentage=$(df -lh 2> /dev/null | grep $(du -hs $geth_datadir 2> /dev/null | awk '{print $1}') | awk '{print $5}' | cut -d '%' -f 1)
     
-	if [ $disk_used_percentage -ge $GETH_PRUNE_AT_PERCENTAGE ]
+    if [ $disk_used_percentage -ge $GETH_PRUNE_AT_PERCENTAGE ]
       then
-	    # Remove file to stop prunning again until disk capacity is under the threshold
-	    rm $GETH_LAST_PRUNE_FILE
+        # Remove file to stop prunning again until disk capacity is under the threshold
+        rm $GETH_LAST_PRUNE_FILE
 	  
         logger "$PROCESS_NAME WARNING: Geth disk usage reaches full capacity."	  
 		
