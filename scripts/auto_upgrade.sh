@@ -97,7 +97,7 @@ function discord_notify() {
     
   if [ -n "$DISCORD_WEBHOOK_URL" ]
     then
-	  curl -H "Content-Type: application/json" -X POST -d "{\"username\": \"$username\",\"content\": \"$msg_content\"}" $DISCORD_WEBHOOK_URL
+      curl -H "Content-Type: application/json" -X POST -d "{\"username\": \"$username\",\"content\": \"$msg_content\"}" $DISCORD_WEBHOOK_URL
   fi  
 }
 
@@ -159,7 +159,7 @@ if [[ $beacon_is_running && $beacon_curr_version != $beacon_latest_version ]]
     logger "$PROCESS_NAME OK to upgrade Beacon to version $beacon_latest_version"
     sudo systemctl restart prysm-beacon.service
 	
-	discord_notify $PROCESS_NAME "Upgraded Beacon to version $beacon_latest_version"
+    discord_notify $PROCESS_NAME "Upgraded Beacon to version $beacon_latest_version"
 else
     logger "$PROCESS_NAME Beacon is up to date or not active."
 fi
@@ -172,7 +172,7 @@ if [[ $validator_is_running && $validator_curr_version != $validator_latest_vers
     logger "$PROCESS_NAME OK to upgrade Validator to version $validator_latest_version"
     sudo systemctl restart prysm-validator.service
 	
-	discord_notify $PROCESS_NAME "Upgraded Validator to version $validator_latest_version"
+    discord_notify $PROCESS_NAME "Upgraded Validator to version $validator_latest_version"
 else
     logger "$PROCESS_NAME Validator is up to date or not active."
 fi
@@ -208,8 +208,8 @@ if [[ $geth_is_running && $geth_curr_version != $geth_latest_version ]]
     # Clean up
     rm -rf /tmp/geth-linux-$download_version
 	
-	# Notify Discord
-	discord_notify $PROCESS_NAME "Upgraded Geth to version $geth_latest_version"
+    # Notify Discord
+    discord_notify $PROCESS_NAME "Upgraded Geth to version $geth_latest_version"
 else
     logger "$PROCESS_NAME Geth is up to date or not active."
 fi
