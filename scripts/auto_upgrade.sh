@@ -138,7 +138,7 @@ logger "$PROCESS_NAME Latest validator version $beacon_latest_version"
 
 # Get latest available geth version
 geth_latest_version=$(wget -O - -o /dev/null $TAGS_URL | jq '.[0].name' | cut -d "\"" -f 2 | cut -c 2-)
-logger "$PROCESS_NAME Latest validator version $geth_latest_version"
+logger "$PROCESS_NAME Latest geth version $geth_latest_version"
 
 # ---------------------------------------------------------------
 
@@ -182,6 +182,8 @@ fi
 # Deciding to upgrade geth 
 if [[ $geth_is_running && $geth_curr_version != $geth_latest_version ]]
   then
+    logger "$PROCESS_NAME OK to upgrade GETH to version $geth_latest_version"
+    
     arch=$(dpkg --print-architecture)
     sha=$(wget -O - -o /dev/null $TAGS_URL | jq '.[0].commit.sha' | cut -c 2-9)
     download_version=$arch-$geth_latest_version-$sha
@@ -194,22 +196,44 @@ if [[ $geth_is_running && $geth_curr_version != $geth_latest_version ]]
 
     # Untar
     tar -C /tmp -xvf /tmp/geth-linux-$download_version.tar.gz
-	
-    # Stop geth
-    sudo systemctl stop geth.service
+    
+    if [ -e /tmp/geth-linux-$download_version/geth ]
+      then
+        # Stop geth
+        sudo systemctl stop geth.service
 
-    # Move old geth file
-    sudo mv /usr/local/bin/geth /usr/local/bin/geth.$(date "+%Y%m%d-%H%M%S")
-    sudo cp /tmp/geth-linux-$download_version/geth /usr/local/bin
+        # Move old geth file
+        geth_backup_filename=/usr/local/bin/geth.$(date "+%Y%m%d-%H%M%S")
+        
+        sudo mv /usr/local/bin/geth $geth_backup_filename
+        sudo cp /tmp/geth-linux-$download_version/geth /usr/local/bin
+        
+        # Check to make sure binary file is copied correctly
+        if [ -e /usr/local/bin/geth ]
+          then
+            logger "$PROCESS_NAME Copied geth binary to /usr/local/bin"
+            logger "$PROCESS_NAME Upgraded Geth to version $geth_latest_version"
+            
+            # Notify Discord
+            discord_notify $PROCESS_NAME "Upgraded Geth to version $geth_latest_version"      
+        else
+          # Roll back binary file
+          logger "$PROCESS_NAME Failed to copy latest geth binary to /usr/local/bin. Performing rollback now."
+          
+          # Notify Discord
+          discord_notify $PROCESS_NAME "Failed to copy latest geth binary to /usr/local/bin. Performing rollback now."
+          
+          sudo mv $geth_backup_filename /usr/local/bin/geth          
+        fi
 
-    # Start geth
-    sudo systemctl start geth.service
-	
-    # Clean up
-    rm -rf /tmp/geth-linux-$download_version
-	
-    # Notify Discord
-    discord_notify $PROCESS_NAME "Upgraded Geth to version $geth_latest_version"
+        # Start geth
+        sudo systemctl start geth.service
+      
+        # Clean up
+        rm -rf /tmp/geth-linux-$download_version*
+    else
+      logger "$PROCESS_NAME Geth file was not downloaded /tmp/geth-linux-$download_version/geth. Try again tomorrow."
+    fi
 else
     logger "$PROCESS_NAME Geth is up to date or not active."
 fi
