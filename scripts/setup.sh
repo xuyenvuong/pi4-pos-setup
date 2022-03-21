@@ -22,7 +22,7 @@ function uninstall_package() {
   if [ $(dpkg-query -W -f='${Status}' $dpkg_name 2>/dev/null | grep -c "ok installed") -eq 1 ]
   then
     echo "Uninstalling: $dpkg_name"
-	sudo apt purge -y $dpkg_name
+    sudo apt purge -y $dpkg_name
   fi
 }
 
@@ -99,7 +99,7 @@ function install_docker() {
     sudo apt-get install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 
-	# arch = amd64|arm64|armhf
+    # arch = amd64|arm64|armhf
     sudo add-apt-repository "deb [arch=$(dpkg --print-architecture)] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 	
     sudo apt-get install -y docker-ce docker-ce-cli containerd.io
@@ -117,8 +117,8 @@ function install_prometheus() {
   if [ $(dpkg-query -W -f='${Status}' prometheus 2>/dev/null | grep -c "ok installed") -eq 0 ]
   then
     echo "Installing: Prometheus"
-	sudo useradd -m prometheus
-	sudo chown -R prometheus:prometheus /home/prometheus/
+    sudo useradd -m prometheus
+    sudo chown -R prometheus:prometheus /home/prometheus/
     install_package prometheus
     install_package prometheus-node-exporter
   fi
@@ -129,12 +129,12 @@ function install_python() {
   if [ $(dpkg-query -W -f='${Status}' python3 2>/dev/null | grep -c "ok installed") -eq 0 ]
   then
     echo "Installing: Python"
-	install_package software-properties-common
-	sudo add-apt-repository ppa:deadsnakes/ppa
-	sudo apt-get update
-	install_package python3.8
-	install_package python3-venv
-	install_package python3-pip
+    install_package software-properties-common
+    sudo add-apt-repository ppa:deadsnakes/ppa
+    sudo apt-get update
+    install_package python3.8
+    install_package python3-venv
+    install_package python3-pip
   fi 
 }
 
@@ -145,7 +145,7 @@ function install_grafana() {
     echo "Installing: Grafana"
     install_package apt-transport-https
     install_package software-properties-common
-	wget -q -O - https://packages.grafana.com/gpg.key | sudo apt-key add -
+    wget -q -O - https://packages.grafana.com/gpg.key | sudo apt-key add -
     echo "deb https://packages.grafana.com/enterprise/deb stable main" | sudo tee -a /etc/apt/sources.list.d/grafana.list
     sudo apt-get update
     install_package grafana-enterprise
@@ -181,10 +181,10 @@ function install_cryptowatch() {
   then
     wget -P /tmp https://github.com/nbarrientos/cryptowat_exporter/archive/e4bcf6e16dd2e04c4edc699e795d9450dee486ab.zip
     unzip /tmp/e4bcf6e16dd2e04c4edc699e795d9450dee486ab.zip -d /tmp
-	cd /tmp/cryptowat_exporter-e4bcf6e16dd2e04c4edc699e795d9450dee486ab
-	go build
-	cd
-	sudo cp /tmp/cryptowat_exporter-e4bcf6e16dd2e04c4edc699e795d9450dee486ab/cryptowat_exporter /usr/local/bin
+    cd /tmp/cryptowat_exporter-e4bcf6e16dd2e04c4edc699e795d9450dee486ab
+    go build
+    cd
+    sudo cp /tmp/cryptowat_exporter-e4bcf6e16dd2e04c4edc699e795d9450dee486ab/cryptowat_exporter /usr/local/bin
   fi
 }
 
@@ -210,7 +210,7 @@ function install_validator_key_generator() {
   if [ ! -e $HOME/eth2deposit-cli-256ea21-linux-amd64/deposit ]
   then
     wget -P /tmp https://github.com/ethereum/eth2.0-deposit-cli/releases/download/v1.2.0/eth2deposit-cli-256ea21-linux-amd64.tar.gz
-	tar -C $HOME -xvf /tmp/eth2deposit-cli-256ea21-linux-amd64.tar.gz
+    tar -C $HOME -xvf /tmp/eth2deposit-cli-256ea21-linux-amd64.tar.gz
   fi
   
   #-----------------------------------------------------------------#
@@ -633,7 +633,7 @@ EOF
 ARGS="--collector.textfile.directory=/home/prometheus/node-exporter"
 EOF
     sudo mv /tmp/prometheus-node-exporter /etc/default
-	mkdir -p /home/prometheus/node-exporter
+    mkdir -p /home/prometheus/node-exporter
   fi
 
   # TODO: the file may exists, need to concat at the end.
@@ -743,9 +743,9 @@ $HOME/logs/*.log
 }
 EOF
     sudo mv /tmp/prysm-logs /etc/logrotate.d
-	sudo chmod 644 /etc/logrotate.d/prysm-logs
-	sudo chown -R root:root /etc/logrotate.d/prysm-logs
-	sudo logrotate /etc/logrotate.conf --debug
+    sudo chmod 644 /etc/logrotate.d/prysm-logs
+    sudo chown -R root:root /etc/logrotate.d/prysm-logs
+    sudo logrotate /etc/logrotate.conf --debug
   fi
 }
 
