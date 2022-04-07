@@ -8,8 +8,7 @@ set -eu
 function install_package() {
   local dpkg_name=$1
 
-  if [ $(dpkg-query -W -f='${Status}' $dpkg_name 2>/dev/null | grep -c "ok installed") -eq 0 ]
-  then
+  if [ $(dpkg-query -W -f='${Status}' $dpkg_name 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
     echo "Installing: $dpkg_name"
     sudo apt install -y $dpkg_name
   fi
@@ -19,8 +18,7 @@ function install_package() {
 function uninstall_package() {
   local dpkg_name=$1
 
-  if [ $(dpkg-query -W -f='${Status}' $dpkg_name 2>/dev/null | grep -c "ok installed") -eq 1 ]
-  then
+  if [ $(dpkg-query -W -f='${Status}' $dpkg_name 2>/dev/null | grep -c "ok installed") -eq 1 ]; then
     echo "Uninstalling: $dpkg_name"
     sudo apt purge -y $dpkg_name
   fi
@@ -95,8 +93,7 @@ function install_essential() {
 
 # Install Docker
 # function install_docker() {
-  # if [ ! -e /usr/bin/docker ]
-  # then
+  # if [ ! -e /usr/bin/docker ]; then
     # sudo apt-get install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common
     # curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 
@@ -115,8 +112,7 @@ function install_essential() {
 
 # Install Prometheus
 function install_prometheus() {
-  if [ $(dpkg-query -W -f='${Status}' prometheus 2>/dev/null | grep -c "ok installed") -eq 0 ]
-  then
+  if [ $(dpkg-query -W -f='${Status}' prometheus 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
     echo "Installing: Prometheus"
     sudo useradd -m prometheus
     sudo chown -R prometheus:prometheus /home/prometheus/
@@ -127,8 +123,7 @@ function install_prometheus() {
 
 # Install Python
 # function install_python() {
-  # if [ $(dpkg-query -W -f='${Status}' python3 2>/dev/null | grep -c "ok installed") -eq 0 ]
-  # then
+  # if [ $(dpkg-query -W -f='${Status}' python3 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
     # echo "Installing: Python"
     # install_package software-properties-common
     # sudo add-apt-repository ppa:deadsnakes/ppa
@@ -141,8 +136,7 @@ function install_prometheus() {
 
 # Install Grafana
 function install_grafana() {
-  if [ $(dpkg-query -W -f='${Status}' grafana-enterprise 2>/dev/null | grep -c "ok installed") -eq 0 ]
-  then
+  if [ $(dpkg-query -W -f='${Status}' grafana-enterprise 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
     echo "Installing: Grafana"
     install_package apt-transport-https
     install_package software-properties-common
@@ -155,8 +149,7 @@ function install_grafana() {
 
 # Install GETH
 function install_geth() {  
-  if [ ! -e /usr/local/bin/geth ]
-  then   
+  if [ ! -e /usr/local/bin/geth ]; then
     # Download latest GETH info
     TAGS_URL=https://api.github.com/repos/ethereum/go-ethereum/tags
     geth_latest_version=$(wget -O - -o /dev/null $TAGS_URL | jq '.[0].name' | cut -d "\"" -f 2 | cut -c 2-)
@@ -173,16 +166,14 @@ function install_geth() {
 }
 
 function install_auto_upgrade() {
-  if [ ! -e $HOME/geth_upgrade.sh ]
-  then
+  if [ ! -e $HOME/geth_upgrade.sh ]; then
     wget https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/auto_upgrade.sh && chmod +x auto_upgrade.sh
   fi
 }
 
 # Install Cryptowatch
 function install_cryptowatch() {
-  if [ ! -e /usr/local/bin/cryptowat_exporter ]
-  then
+  if [ ! -e /usr/local/bin/cryptowat_exporter ]; then
     wget -P /tmp https://github.com/nbarrientos/cryptowat_exporter/archive/e4bcf6e16dd2e04c4edc699e795d9450dee486ab.zip
     unzip /tmp/e4bcf6e16dd2e04c4edc699e795d9450dee486ab.zip -d /tmp
     cd /tmp/cryptowat_exporter-e4bcf6e16dd2e04c4edc699e795d9450dee486ab
@@ -194,16 +185,15 @@ function install_cryptowatch() {
 
 # Install Prysm
 function install_prysm() {
-  if [ ! -e $HOME/prysm/prysm.sh ]
-  then
+  if [ ! -e $HOME/prysm/prysm.sh ]; then
     curl https://raw.githubusercontent.com/prysmaticlabs/prysm/master/prysm.sh --output $HOME/prysm/prysm.sh && chmod +x $HOME/prysm/prysm.sh
   fi
 }
 
 # Install Docker-Compose
 # function install_docker_compose() {
-  # if [ ! -e /usr/local/bin/docker-compose ]
-  # then
+  # if [ ! -e /usr/local/bin/docker-compose ]; then
+  
     # sudo pip3 install cryptography
     # sudo pip3 install docker-compose
   # fi  
@@ -211,10 +201,8 @@ function install_prysm() {
 
 # Install Validator Key Generator
 function install_validator_key_generator() {
-  if [ ! -e $HOME/eth2deposit-cli-256ea21-linux-amd64/deposit ]
-  then
-    wget -P $HOME https://github.com/ethereum/staking-deposit-cli/releases/download/v2.0.0/staking_deposit-cli-e2a7c94-linux-amd64.tar.gz
-    # wget -P /tmp https://github.com/ethereum/eth2.0-deposit-cli/releases/download/v1.2.0/eth2deposit-cli-256ea21-linux-amd64.tar.gz
+  if [ ! -e $HOME/staking_deposit-cli-e2a7c94-linux-amd64/deposit ]; then
+    wget -P $HOME https://github.com/ethereum/staking-deposit-cli/releases/download/v2.0.0/staking_deposit-cli-e2a7c94-linux-amd64.tar.gz    
     tar -C $HOME -xvf /tmp/staking_deposit-cli-e2a7c94-linux-amd64.tar.gz
   fi
   
@@ -259,8 +247,7 @@ function upgrade_all() {
   sudo apt-get update && sudo apt-get upgrade
   
   # Pull latest pi4-pos-setup.git repo
-  if [ ! -d $HOME/pos-setup ]
-  then
+  if [ ! -d $HOME/pos-setup ]; then
     git clone https://github.com/xuyenvuong/pi4-pos-setup.git $HOME/pos-setup
   else
     cd $HOME/pos-setup
@@ -282,8 +269,7 @@ function build_pos() {
   touch $HOME/logs/{beacon,validator,slasher}.log
   
   # Clone pi4-pos-setup.git repo
-  if [ ! -d $HOME/pos-setup ]
-  then
+  if [ ! -d $HOME/pos-setup ]; then
     git clone https://github.com/xuyenvuong/pi4-pos-setup.git $HOME/pos-setup
   fi
 }
@@ -313,8 +299,7 @@ function help() {
 
 # Systemd Beacon Service
 function systemd_beacon() {
-  if [ ! -e /etc/systemd/system/prysm-beacon.service ]
-  then
+  if [ ! -e /etc/systemd/system/prysm-beacon.service ]; then
     sudo cat << EOF | sudo tee /etc/systemd/system/prysm-beacon.service >/dev/null
 [Unit]
 Description=Prysm Beacon Daemon
@@ -335,16 +320,14 @@ EOF
   fi
   
   # EnvironmentFile
-  if [ ! -e /etc/ethereum/prysm-beacon.conf ]
-  then
+  if [ ! -e /etc/ethereum/prysm-beacon.conf ]; then
     sudo cat << EOF | sudo tee /etc/ethereum/prysm-beacon.conf >/dev/null
 ARGS="beacon-chain --mainnet --accept-terms-of-use --config-file=$HOME/prysm/configs/beacon.yaml"
 EOF
   fi
   
   # YAML
-  if [ ! -e $HOME/prysm/configs/beacon.yaml ]
-  then
+  if [ ! -e $HOME/prysm/configs/beacon.yaml ]; then
     sudo cat << EOF | tee $HOME/prysm/configs/beacon.yaml >/dev/null
 datadir: "$HOME/.eth2"
 log-file: "$HOME/logs/beacon.log"
@@ -393,8 +376,7 @@ EOF
 
 # Systemd Validator Service
 function systemd_validator() {
-  if [ ! -e /etc/systemd/system/prysm-validator.service ]
-  then
+  if [ ! -e /etc/systemd/system/prysm-validator.service ]; then
     sudo cat << EOF | sudo tee /etc/systemd/system/prysm-validator.service >/dev/null
 [Unit]
 Description=Prysm Validator Daemon
@@ -415,16 +397,14 @@ EOF
   fi
   
   # EnvironmentFile
-  if [ ! -e /etc/ethereum/prysm-validator.conf ]
-  then
+  if [ ! -e /etc/ethereum/prysm-validator.conf ]; then
     sudo cat << EOF | sudo tee /etc/ethereum/prysm-validator.conf >/dev/null
 ARGS="validator --mainnet --accept-terms-of-use --config-file=$HOME/prysm/configs/validator.yaml"
 EOF
   fi
   
   # YAML
-  if [ ! -e $HOME/prysm/configs/validator.yaml ]
-  then
+  if [ ! -e $HOME/prysm/configs/validator.yaml ]; then
     sudo cat << EOF | tee $HOME/prysm/configs/validator.yaml >/dev/null
 datadir: "$HOME/.eth2"
 log-file: "$HOME/logs/validator.log"
@@ -456,8 +436,7 @@ EOF
 
 # Systemd Client Stats Service
 function systemd_clientstats() {
-if [ ! -e /etc/systemd/system/prysm-clientstats.service ]
-  then
+  if [ ! -e /etc/systemd/system/prysm-clientstats.service ]; then
     sudo cat << EOF | sudo tee /etc/systemd/system/prysm-clientstats.service >/dev/null
 [Unit]
 Description=Prysm Client Stats Daemon
@@ -478,16 +457,14 @@ EOF
   fi
   
   # EnvironmentFile
-  if [ ! -e /etc/ethereum/prysm-clientstats.conf ]
-  then
+  if [ ! -e /etc/ethereum/prysm-clientstats.conf ]; then
     sudo cat << EOF | sudo tee /etc/ethereum/prysm-clientstats.conf >/dev/null
 ARGS="client-stats --config-file=$HOME/prysm/configs/clientstats.yaml"
 EOF
   fi
   
   # YAML
-  if [ ! -e $HOME/prysm/configs/clientstats.yaml ]
-  then
+  if [ ! -e $HOME/prysm/configs/clientstats.yaml ]; then
     sudo cat << EOF | tee $HOME/prysm/configs/clientstats.yaml >/dev/null
 validator-metrics-url: "http://localhost:8081/metrics"
 beacon-node-metrics-url: "http://localhost:8080/metrics"
@@ -498,8 +475,7 @@ EOF
   
 # Systemd Slasher Service
 # function systemd_slasher() {
-  # if [ ! -e /etc/systemd/system/prysm-slasher.service ]
-  # then
+  # if [ ! -e /etc/systemd/system/prysm-slasher.service ]; then 
     # sudo cat << EOF > /tmp/prysm-slasher.service
 # [Unit]
 # Description=Prysm Validator Daemon
@@ -521,8 +497,7 @@ EOF
   # fi
 
   # # EnvironmentFile
-  # if [ ! -e /etc/ethereum/prysm-slasher.conf ]
-  # then
+  # if [ ! -e /etc/ethereum/prysm-slasher.conf ]; then  
     # sudo cat << EOF > /tmp/prysm-slasher.conf
 # ARGS="slasher --mainnet --accept-terms-of-use --config-file=$HOME/prysm/configs/slasher.yaml"
 # EOF
@@ -530,8 +505,7 @@ EOF
   # fi
   
   # # YAML
-  # if [ ! -e $HOME/prysm/configs/slasher.yaml ]
-  # then
+  # if [ ! -e $HOME/prysm/configs/slasher.yaml ]; then 
     # sudo cat << EOF > $HOME/prysm/configs/slasher.yaml
 # datadir: "$HOME/.eth2"
 # log-file: "$HOME/logs/slasher.log"
@@ -553,8 +527,7 @@ EOF
   
 # Systemd GETH Service
 function systemd_geth() {
-  if [ ! -e /etc/systemd/system/geth.service ]
-  then
+  if [ ! -e /etc/systemd/system/geth.service ]; then
     sudo cat << EOF | sudo tee /etc/systemd/system/geth.service >/dev/null
 [Unit]
 Description=Geth Node Daemon
@@ -575,8 +548,7 @@ EOF
   fi
   
   # EnvironmentFile
-  if [ ! -e /etc/ethereum/geth.conf ]
-  then
+  if [ ! -e /etc/ethereum/geth.conf ]; then
     sudo cat << EOF | sudo tee /etc/ethereum/geth.conf >/dev/null
 ARGS="--port 30303 --http --http.port 8545 --http.addr 0.0.0.0 --syncmode snap --cache 1024 --datadir $HOME/.ethereum --metrics --metrics.expensive --pprof --pprof.port 6060 --pprof.addr 0.0.0.0 --maxpeers 100 --identity Maximus --ethstats Maximus:a38e1e50b1b82fa@ethstats.net"
 EOF
@@ -590,8 +562,7 @@ EOF
   
 # Systemd Cryptowatch Slasher
 function systemd_cryptowatch() {
-  if [ ! -e /etc/systemd/system/cryptowatch.service ]
-  then
+  if [ ! -e /etc/systemd/system/cryptowatch.service ]; then
     sudo cat << EOF | sudo tee /etc/systemd/system/cryptowatch.service >/dev/null
 [Unit]
 Description=Cryptowatch Daemon
@@ -611,8 +582,7 @@ EOF
   fi
 
   # EnvironmentFile
-  if [ ! -e /etc/ethereum/cryptowatch.conf ]
-  then
+  if [ ! -e /etc/ethereum/cryptowatch.conf ]; then
     sudo cat << EOF | sudo tee /etc/ethereum/cryptowatch.conf >/dev/null
 ARGS="--cryptowat.pairs=etheur,ethusd,ethgbp,ethcad,ethchf,ethjpy,ethbtc --cryptowat.exchanges=kraken"  
 EOF
@@ -621,8 +591,7 @@ EOF
 
 # Systemd Eth2stats Service (Docker check)
 # function systemd_eth2stats() {
-  # if [ ! -e /etc/systemd/system/prysm-eth2stats.service ]
-  # then
+  # if [ ! -e /etc/systemd/system/prysm-eth2stats.service ]; then 
     # sudo cat << EOF > /tmp/prysm-eth2stats.service
 # [Unit]
 # Description=Prysm Eth2stats Daemon
@@ -644,8 +613,7 @@ EOF
   # fi
   
   # # EnvironmentFile
-  # if [ ! -e /etc/ethereum/prysm-eth2stats.conf ]
-  # then
+  # if [ ! -e /etc/ethereum/prysm-eth2stats.conf ]; then 
     # sudo cat << EOF > /tmp/prysm-eth2stats.conf
 # ARGS="start -i eth2stats-client"  
 # EOF
@@ -655,15 +623,13 @@ EOF
 
 # Config Prometheus
 function config_prometheus() {
-  if [ ! -e /etc/default/prometheus ]
-  then
+  if [ ! -e /etc/default/prometheus ]; then
     sudo cat << EOF | sudo tee /etc/default/prometheus >/dev/null
 ARGS="--web.enable-lifecycle --storage.tsdb.retention.time=31d --storage.tsdb.path=/home/prometheus/metrics2/"
 EOF
   fi
   
-  if [ ! -e /etc/default/prometheus-node-exporter ]
-  then
+  if [ ! -e /etc/default/prometheus-node-exporter ]; then
     sudo cat << EOF | sudo tee /etc/default/prometheus-node-exporter >/dev/null
 ARGS="--collector.textfile.directory=/home/prometheus/node-exporter"
 EOF
@@ -671,8 +637,7 @@ EOF
   fi
   
   # Concat to existing file
-  if [ ! -e /etc/prometheus/prometheus.yml ]
-  then
+  if [ ! -e /etc/prometheus/prometheus.yml ]; then
     sudo cat << EOF | sudo tee -a /etc/prometheus/prometheus.yml >/dev/null
 
   - job_name: geth
@@ -704,8 +669,7 @@ EOF
 
 # Config Grafana DB
 function config_grafana() {
-  # if [ ! -e /var/lib/grafana/grafana.db ]
-  # then
+  # if [ ! -e /var/lib/grafana/grafana.db ]; then 
     # wget -P /tmp https://github.com/xuyenvuong/pi4-pos-setup/raw/master/sources/grafana.db
     # sudo cp -a /tmp/grafana.db /var/lib/grafana/grafana.db
     # sudo chown grafana:grafana /var/lib/grafana/grafana.db
@@ -723,8 +687,7 @@ function config_grafana() {
 
 # Config Logrotate
 function config_logrotate() {
-  if [ ! -e /etc/logrotate.d/prysm-logs ]
-  then
+  if [ ! -e /etc/logrotate.d/prysm-logs ]; then
     sudo cat << EOF | sudo tee /etc/logrotate.d/prysm-logs >/dev/null
 $HOME/logs/*.log
 {
