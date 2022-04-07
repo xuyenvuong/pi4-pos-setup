@@ -81,6 +81,7 @@ function install_essential() {
   # Configs
   systemd_beacon
   systemd_validator
+  systemd_clientstats
   # systemd_slasher
   systemd_geth
   systemd_cryptowatch
@@ -370,8 +371,6 @@ p2p-udp-port: 12000
 p2p-max-peers: 100
 min-sync-peers: 3
 
-#slasher-rpc-provider: localhost:4002
-
 graffiti: "Mr.X"
 
 rpc-port: 4000
@@ -382,13 +381,12 @@ monitoring-host: 0.0.0.0
 
 #slots-per-archived-point: 32
 
-client-stats: true
-beacon-node-metrics-url: "http://localhost:8080/metrics"
-clientstats-api-url: "https://beaconcha.in/api/v1/stats/BEACONCHAIN_API_KEY/NAME"
+#client-stats: true
+#beacon-node-metrics-url: "http://localhost:8080/metrics"
+#clientstats-api-url: "https://beaconcha.in/api/v1/stats/BEACONCHAIN_API_KEY/NAME"
 
 update-head-timely: true
 
-enable-get-block-optimizations: true
 EOF
   fi
 }
@@ -446,12 +444,54 @@ enable-doppelganger: true
 monitoring-port: 8081
 monitoring-host: 0.0.0.0
 
-client-stats: true
-validator-metrics-url: "http://localhost:8081/metrics"
-clientstats-api-url: "https://beaconcha.in/api/v1/stats/BEACONCHAIN_API_KEY/NAME"
+#client-stats: true
+#validator-metrics-url: "http://localhost:8081/metrics"
+#clientstats-api-url: "https://beaconcha.in/api/v1/stats/BEACONCHAIN_API_KEY/NAME"
 
 # Mainnet
 graffiti: "poapaa2VsI8722DeHPPwjXbJooGadtMA"
+EOF
+  fi
+}
+
+# Systemd Client Stats Service
+function systemd_clientstats() {
+if [ ! -e /etc/systemd/system/prysm-clientstats.service ]
+  then
+    sudo cat << EOF | sudo tee /etc/systemd/system/prysm-clientstats.service >/dev/null
+[Unit]
+Description=Prysm Client Stats Daemon
+After=network.target auditd.service
+Requires=network.target
+
+[Service]
+EnvironmentFile=/etc/ethereum/prysm-clientstats.conf
+ExecStart=$HOME/prysm/prysm.sh \$ARGS
+Restart=always
+RestartSec=3
+User=$USER
+
+[Install]
+WantedBy=multi-user.target
+Alias=prysm-validator.service
+EOF
+  fi
+  
+  # EnvironmentFile
+  if [ ! -e /etc/ethereum/prysm-clientstats.conf ]
+  then
+    sudo cat << EOF | sudo tee /etc/ethereum/prysm-clientstats.conf >/dev/null
+ARGS="client-stats --config-file=$HOME/prysm/configs/clientstats.yaml"
+EOF
+  fi
+  
+  # YAML
+  if [ ! -e $HOME/prysm/configs/clientstats.yaml ]
+  then
+    sudo cat << EOF | tee $HOME/prysm/configs/clientstats.yaml >/dev/null
+validator-metrics-url: "http://localhost:8081/metrics"
+beacon-node-metrics-url: "http://localhost:8080/metrics"
+clientstats-api-url: "https://beaconcha.in/api/v1/stats/BEACONCHAIN_API_KEY/NAME"
 EOF
   fi
 }
