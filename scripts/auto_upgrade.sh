@@ -1,5 +1,5 @@
 #!/bin/bash
-# auto_upgrade.sh - A script to quickly setup/upgrade Geth, Beacon, Validator
+# auto_upgrade.sh - A script to quickly setup/upgrade Geth, Beacon, Validator, Clientstats
 # Run: ./auto_upgrade.sh or setup as cronjob task
 # Author: Max Vuong
 # Date: 12/02/2021
@@ -164,22 +164,7 @@ geth_is_running=$(systemctl list-units --type=service --state=active | grep geth
 # ---------------------------------------------------------------
 
 # Deciding to upgrade prysm.sh
-if [[ -e $HOME/prysm/prysm.sh && $prysm_sh_crr_version != $prysm_sh_latest_version ]]; then
-  if [[ $beacon_is_running ]]; then
-    # Stop Beacon
-    sudo systemctl stop prysm-beacon.service
-  fi
-
-  if [[ $validator_is_running ]]; then
-    # Stop Validator
-    sudo systemctl stop prysm-validator.service
-  fi
-  
-  if [[ $clientstats_is_running ]]; then
-    # Stop Clientstats
-    sudo systemctl stop prysm-clientstats.service
-  fi
-  
+if [[ -e $HOME/prysm/prysm.sh && $prysm_sh_crr_version != $prysm_sh_latest_version ]]; then 
   # Move old prysm.sh file
   prysm_sh_backup_filename=$HOME/prysm/prysm.sh.$(date "+%Y%m%d-%H%M%S")
   
@@ -198,21 +183,6 @@ if [[ -e $HOME/prysm/prysm.sh && $prysm_sh_crr_version != $prysm_sh_latest_versi
     # Roll back
     sudo mv $prysm_sh_backup_filename $HOME/prysm/prysm.sh 
   fi
-  
-  if [[ $beacon_is_running ]]; then
-    # Start Beacon
-    sudo systemctl start prysm-beacon.service
-  fi
-
-  if [[ $validator_is_running ]]; then
-    # Start Validator
-    sudo systemctl start prysm-validator.service
-  fi
-  
-  if [[ $clientstats_is_running ]]; then
-    # Start Clientstats
-    sudo systemctl start prysm-clientstats.service
-  fi  
 fi
 
 # Deciding to upgrade beacon

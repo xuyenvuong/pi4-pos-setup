@@ -45,6 +45,7 @@ function install_essential() {
   install_package chrony
   install_package jq
   install_package tmux
+  install_package ccze
   
   # Prometheus
   install_prometheus
@@ -337,6 +338,7 @@ deposit-contract: 0x00000000219ab540356cbb839cbe05303d7705fa
 contract-deployment-block: 11052984
 
 verbosity: info
+
 http-web3provider: "http://localhost:8545"
 fallback-web3provider: 
 - http://192.168.0.XXX:8545
@@ -344,6 +346,9 @@ fallback-web3provider:
 - https://eth-mainnet.alchemyapi.io/v2/ALCHEMY_API_KEY
 
 attest-timely: true
+
+# Sync faster (default 64)
+block-batch-limit: 512
 
 #p2p-host-ip: $(curl -s v4.ident.me)
 p2p-host-dns: "maxvuong.tplinkdns.com"
@@ -362,14 +367,12 @@ rpc-host: 0.0.0.0
 monitoring-port: 8080
 monitoring-host: 0.0.0.0
 
-#slots-per-archived-point: 32
-
-#client-stats: true
-#beacon-node-metrics-url: "http://localhost:8080/metrics"
-#clientstats-api-url: "https://beaconcha.in/api/v1/stats/BEACONCHAIN_API_KEY/NAME"
-
 update-head-timely: true
 
+# Running slasher
+slasher: true
+enable-external-slashing-protection: true
+disable-broadcast-slashing: true
 EOF
   fi
 }
@@ -417,16 +420,12 @@ wallet-password-file: "$HOME/.password/password.txt"
 beacon-rpc-provider: localhost:4000,host1:port,host2:port
 
 attest-timely: true
-#enable-external-slasher-protection: true
+
 enable-slashing-protection-pruning: true
 enable-doppelganger: true
 
 monitoring-port: 8081
 monitoring-host: 0.0.0.0
-
-#client-stats: true
-#validator-metrics-url: "http://localhost:8081/metrics"
-#clientstats-api-url: "https://beaconcha.in/api/v1/stats/BEACONCHAIN_API_KEY/NAME"
 
 # Mainnet
 graffiti: "poapaa2VsI8722DeHPPwjXbJooGadtMA"
@@ -714,6 +713,9 @@ EOF
 function config_chrony() {
   sudo chronyd -Q
   sudo chronyd -q
+  
+  # Set local time
+  timedatectl set-timezone America/Los_Angeles
 }
 
 # Config Ports
