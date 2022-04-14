@@ -359,8 +359,6 @@ p2p-udp-port: 12000
 p2p-max-peers: 100
 min-sync-peers: 3
 
-graffiti: "Mr.X"
-
 rpc-port: 4000
 rpc-host: 0.0.0.0
 
@@ -467,7 +465,7 @@ EOF
     sudo cat << EOF | tee $HOME/prysm/configs/clientstats.yaml >/dev/null
 validator-metrics-url: "http://localhost:8081/metrics"
 beacon-node-metrics-url: "http://localhost:8080/metrics"
-clientstats-api-url: "https://beaconcha.in/api/v1/stats/BEACONCHAIN_API_KEY/NAME"
+clientstats-api-url: "https://beaconcha.in/api/v1/client/metrics?apikey=BEACONCHAIN_API_KEY&machine=MACHINE_NAME"
 EOF
   fi
 }
