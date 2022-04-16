@@ -140,7 +140,7 @@ validator_latest_version=$($HOME/prysm/prysm.sh validator --version 2> /dev/null
 logger "$PROCESS_NAME Latest validator version $beacon_latest_version"
 
 # Get latest available geth version
-geth_latest_version=$(wget -O - -o /dev/null $TAGS_URL | jq '.[0].name' | cut -d "\"" -f 2 | cut -c 2-)
+geth_latest_version=$(wget -O - -o /dev/null $TAGS_URL | jq '.[0].name' | tr -d \" | cut -c 2-)
 logger "$PROCESS_NAME Latest geth version $geth_latest_version"
 
 # Get latest available prysm.sh version
