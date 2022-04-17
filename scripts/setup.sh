@@ -480,6 +480,7 @@ ARGS="client-stats
  --config-file=$HOME/prysm/configs/clientstats.yaml
  --validator-metrics-url=http://localhost:8081/metrics
  --beacon-node-metrics-url=http://localhost:8080/metrics
+ --scrape-interval=1m0s
 "
 EOF
   fi
