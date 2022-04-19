@@ -272,14 +272,12 @@ function install_noip() {
     wget -P /tmp https://www.noip.com/client/linux/noip-duc-linux.tar.gz
     tar -C /tmp -xvf /tmp/noip-duc-linux.tar.gz
     cd /tmp/noip-2.1.9-1/
+
     make install
 
     sudo cp noip2 /usr/local/bin
     /usr/local/bin/noip2 -C -c /tmp/no-ip2.conf
     sudo mv /tmp/no-ip2.conf /usr/local/etc/no-ip2.conf
-
-
-
   fi
 }
 
@@ -769,6 +767,9 @@ function config_ports{
 
   # Check ports forwarding tool
   # https://mxtoolbox.com/SuperTool.aspx?action=tcp%3a%7Bnode-IP-address%7D%3a13000&run=toolpage
+  
+  # Check local port
+  # sudo lsof -n | grep TCP | grep LISTEN | grep 8545
 }
 
 # Config NO-IP
