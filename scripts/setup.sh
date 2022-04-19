@@ -29,7 +29,9 @@ function uninstall_package() {
 function install_essential() {
   # Update & Upgrade to latest
   sudo apt-get update && sudo apt-get upgrade
-  
+  sudo apt-get dist-upgrade
+  sudo apt-get autoremove
+
   # Docker
   # install_docker
   
@@ -38,6 +40,8 @@ function install_essential() {
   install_package git-all
   install_package zip
   install_package unzip
+  install_package make
+  install_package gcc
   install_package build-essential
   install_package libssl-dev
   install_package libffi-dev
@@ -46,7 +50,8 @@ function install_essential() {
   install_package jq
   install_package tmux
   install_package ccze
-  
+  install_package net-tools
+    
   # Prometheus
   install_prometheus
   
@@ -80,6 +85,9 @@ function install_essential() {
   # Validator key generator
   install_validator_key_generator
   
+  # NO-IP (optional installation)
+  install_noip
+
   # Configs
   systemd_beacon
   systemd_validator
@@ -92,6 +100,9 @@ function install_essential() {
   config_logrotate
   config_chrony
   config_ports
+  
+  # Optional configs
+  config_noip
 }
 
 # Install Docker
@@ -253,6 +264,23 @@ function install_validator_key_generator() {
   # At prompt, follow by ACCOUNT PASSWORD
   
   #-----------------------------------------------------------------#
+}
+
+# Install NOIP Service
+function install_noip() {
+  if [ ! -e /usr/local/bin/noip2 ]; then
+    wget -P /tmp https://www.noip.com/client/linux/noip-duc-linux.tar.gz
+    tar -C /tmp -xvf /tmp/noip-duc-linux.tar.gz
+    cd /tmp/noip-2.1.9-1/
+    make install
+
+    sudo cp noip2 /usr/local/bin
+    /usr/local/bin/noip2 -C -c /tmp/no-ip2.conf
+    sudo mv /tmp/no-ip2.conf /usr/local/etc/no-ip2.conf
+
+
+
+  fi
 }
 
 #-------------------------------------------------------------------------------------------#
@@ -598,7 +626,7 @@ EOF
 ARGS="
  --cryptowat.pairs=etheur,ethusd,ethgbp,ethcad,ethchf,ethjpy,ethbtc
  --cryptowat.exchanges=kraken
-"  
+"
 EOF
   fi   
 }  
@@ -738,6 +766,32 @@ function config_ports{
 	
 	# Enable
 	sudo ufw enable
+
+  # Check ports forwarding tool
+  # https://mxtoolbox.com/SuperTool.aspx?action=tcp%3a%7Bnode-IP-address%7D%3a13000&run=toolpage
+}
+
+# Config NO-IP
+function config_noip() {
+  if [ ! -e /etc/systemd/system/noip2.service ]; then
+    sudo cat << EOF | sudo tee /etc/systemd/system/noip2.service >/dev/null
+[Unit]
+Description=NO-IP2 Daemon
+After=network.target auditd.service
+Wants=network.target
+
+[Service]
+Type=forking
+ExecStart=/usr/local/bin/noip2
+Restart=always
+RestartSec=3
+User=$USER
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+  fi
 }
 
 #-------------------------------------------------------------------------------------------#
