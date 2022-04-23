@@ -400,6 +400,7 @@ p2p-udp-port: 12000
 
 p2p-max-peers: 100
 min-sync-peers: 3
+enable-peer-scorer: true
 
 rpc-port: 4000
 rpc-host: 0.0.0.0
@@ -411,7 +412,6 @@ update-head-timely: true
 
 # Running slasher
 slasher: true
-enable-external-slashing-protection: true
 disable-broadcast-slashing: true
 EOF
   fi
@@ -465,7 +465,8 @@ beacon-rpc-provider: localhost:4000,host1:port,host2:port
 
 attest-timely: true
 
-enable-slashing-protection-pruning: true
+enable-slashing-protection-history-pruning: true
+enable-external-slashing-protection: true
 enable-doppelganger: true
 
 monitoring-port: 8081
