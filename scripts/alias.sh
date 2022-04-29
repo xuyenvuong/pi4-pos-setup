@@ -5,7 +5,7 @@
 
 : <<'COMMENT_BLOCK'
 Run this command to add aliases to your .bashrc
-> curl -L https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/alias.sh | bash | source $HOME/.bashrc
+> curl -L https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/alias.sh | bash && source $HOME/.bashrc
 
 Description:
 Supporting services [beacon, validator, eth2-stats, geth, prometheus, prometheus-node-exporter, grafana]
