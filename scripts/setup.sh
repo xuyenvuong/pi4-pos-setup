@@ -413,6 +413,8 @@ update-head-timely: true
 # Running slasher
 slasher: true
 disable-broadcast-slashing: true
+
+enable-vectorized-htr: true
 EOF
   fi
 }
@@ -432,6 +434,7 @@ ExecStart=$HOME/prysm/prysm.sh \$ARGS
 Restart=always
 RestartSec=3
 User=$USER
+Environment=USE_PRYSM_MODERN=true
 
 [Install]
 WantedBy=multi-user.target
