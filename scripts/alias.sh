@@ -14,12 +14,12 @@ fi
 
 # ---------------------------------------------------------------
 
-bashrc_file=$HOME/.bashrc
-
 echo "Adding aliases to .bashrc file"
 
 sudo cat << EOF | sudo tee -a $HOME/.bashrc >/dev/null
+
 # Aliases for Node
+
 alias beacon-log='journalctl -f -u prysm-beacon.service -n 200 | ccze -A'
 alias validator-log='journalctl -f -u prysm-validator.service -n 200 | ccze -A'
 alias eth2-stats-log='journalctl -f -u eth2-client-metrics-exporter.service -n 200 | ccze -A'
@@ -61,3 +61,5 @@ alias prometheus-node-exporter-enable='sudo systemctl enable prometheus-node-exp
 alias grafana-enable='sudo systemctl enable grafana-server'
 
 EOF
+
+source $HOME/.bashrc
