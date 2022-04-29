@@ -11,7 +11,8 @@ Description:
 Supporting services [beacon, validator, eth2-stats, geth, prometheus, prometheus-node-exporter, grafana]
 Supporting post-fixes [-log, -start, -stop, -restart, -enable]
 
-Usage: Add post-fixes after your service name e.g. [service]-log.
+Usage: 
+Add post-fixes after your service name [service][-postfix].
 Example: "beacon-log", "validator-restart", "geth-stop', ect...
 
 Test, view beacon log by typing at the command prompt:
