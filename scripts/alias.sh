@@ -3,6 +3,22 @@
 # Author: Max Vuong
 # Date: 04/28/2021
 
+: <<'COMMENT_BLOCK'
+Run this command to add aliases to your .bashrc
+curl -L https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/alias.sh | bash | source $HOME/.bashrc
+
+Description:
+Supporting services [beacon, validator, eth2-stats, geth, prometheus, prometheus-node-exporter, grafana]
+Supporting post-fixes [-log, -start, -stop, -restart, -enable]
+
+Usage: Add post-fixes after your service name e.g. [service]-log.
+Example: "beacon-log", "validator-restart", "geth-stop', ect...
+
+Test by typing:
+> beacon-log
+
+COMMENT_BLOCK
+
 # ---------------------------------------------------------------
 # Check and install ccze (log with colors)
 dpkg_name=ccze
