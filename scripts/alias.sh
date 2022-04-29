@@ -61,5 +61,3 @@ alias prometheus-node-exporter-enable='sudo systemctl enable prometheus-node-exp
 alias grafana-enable='sudo systemctl enable grafana-server'
 
 EOF
-
-source $HOME/.bashrc
