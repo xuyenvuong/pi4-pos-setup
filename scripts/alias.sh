@@ -1,7 +1,7 @@
 #!/bin/bash
 # shortcuts.sh - A script to shorten the linux command for your convinient.
 # Author: Max Vuong
-# Date: 04/28/2021
+# Date: 04/28/2022
 
 : <<'COMMENT_BLOCK'
 Run this command to add aliases to your .bashrc
