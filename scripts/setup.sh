@@ -103,6 +103,7 @@ function install_essential() {
   
   # Optional configs
   config_noip
+  config_aliases
 }
 
 # Install Docker
@@ -797,6 +798,11 @@ WantedBy=multi-user.target
 EOF
 
   fi
+}
+
+# Config Aliases for long commands
+function config_aliases() {
+  curl -L https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/alias.sh | bash && source $HOME/.bashrc
 }
 
 #-------------------------------------------------------------------------------------------#
