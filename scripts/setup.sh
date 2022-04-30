@@ -351,6 +351,7 @@ ExecStart=$HOME/prysm/prysm.sh \$ARGS
 Restart=always
 RestartSec=3
 User=$USER
+Environment=USE_PRYSM_MODERN=$(if [ $(lscpu | grep -wc adx) -eq 1 ]; then echo "true"; else echo "false"; fi)
 
 [Install]
 WantedBy=multi-user.target
@@ -423,7 +424,7 @@ EOF
 # Systemd Validator Service
 function systemd_validator() {
   if [ ! -e /etc/systemd/system/prysm-validator.service ]; then
-    sudo cat << EOF | sudo tee /etc/systemd/system/prysm-validator.service >/dev/null
+    sudo cat << EOF | sudo tee /etc/systemd/system/prysm-validator.service >/dev/null    
 [Unit]
 Description=Prysm Validator Daemon
 After=network.target auditd.service
@@ -435,7 +436,6 @@ ExecStart=$HOME/prysm/prysm.sh \$ARGS
 Restart=always
 RestartSec=3
 User=$USER
-Environment=USE_PRYSM_MODERN=true
 
 [Install]
 WantedBy=multi-user.target
