@@ -347,11 +347,11 @@ Requires=network.target
 
 [Service]
 EnvironmentFile=/etc/ethereum/prysm-beacon.conf
+Environment=USE_PRYSM_MODERN=$(if [ $(lscpu | grep -wc adx) -eq 1 ]; then echo "true"; else echo "false"; fi)
 ExecStart=$HOME/prysm/prysm.sh \$ARGS
 Restart=always
 RestartSec=3
 User=$USER
-Environment=USE_PRYSM_MODERN=$(if [ $(lscpu | grep -wc adx) -eq 1 ]; then echo "true"; else echo "false"; fi)
 
 [Install]
 WantedBy=multi-user.target
