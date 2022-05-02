@@ -104,6 +104,7 @@ function install_essential() {
   # Optional configs
   config_noip
   config_aliases
+  config_disable_power_button
 }
 
 # Install Docker
@@ -803,6 +804,15 @@ EOF
 # Config Aliases for long commands
 function config_aliases() {
   curl -L https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/alias.sh | bash && source $HOME/.bashrc
+}
+
+# Config disable power button
+function config_disable_power_button() {
+  sudo cat << EOF | sudo tee -a /etc/systemd/logind.conf >/dev/null
+HandlePowerKey=ignore
+EOF
+
+  sudo systemctl restart systemd-logind.service
 }
 
 #-------------------------------------------------------------------------------------------#
