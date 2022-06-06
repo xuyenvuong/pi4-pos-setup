@@ -280,7 +280,7 @@ fi
 geth_datadir=$(cat /etc/ethereum/geth.conf 2> /dev/null | awk -F'--datadir ' '{print $2}' | cut -d ' ' -f 1)
 
 # Current disk usage
-disk_used_percentage=$(df -lh 2> /dev/null | grep $(du -hs $geth_datadir 2> /dev/null | awk '{print $1}') | awk '{print $5}' | cut -d '%' -f 1)
+disk_used_percentage=$(df -lh 2> /dev/null | grep $(df -P $geth_datadir | awk 'END{print $1}') | awk '{print $5}' | cut -d '%' -f 1)
 logger "$PROCESS_NAME Geth disk usage reaches $disk_used_percentage%"
 
 # Check last prune timestamp
