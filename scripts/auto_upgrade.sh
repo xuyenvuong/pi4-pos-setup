@@ -280,7 +280,7 @@ fi
 geth_datadir=$(cat /etc/ethereum/geth.conf 2> /dev/null | awk -F'--datadir ' '{print $2}' | cut -d ' ' -f 1)
 
 # Current disk usage
-disk_used_percentage=$(df -lh 2> /dev/null | grep $(du -hs $geth_datadir 2> /dev/null | awk '{print $1}') | awk '{print $5}' | cut -d '%' -f 1)
+disk_used_percentage=$(df $geth_datadir | awk 'END{print $5}' | cut -d '%' -f 1)
 logger "$PROCESS_NAME Geth disk usage reaches $disk_used_percentage%"
 
 # Check last prune timestamp
@@ -320,7 +320,7 @@ if [[ $geth_is_running && $geth_is_prune_time = true && $disk_used_percentage -g
   discord_notify $PROCESS_NAME "Geth prune-state is completed."
 
   # Check disk usage after prune
-  disk_used_percentage=$(df -lh 2> /dev/null | grep $(du -hs $geth_datadir 2> /dev/null | awk '{print $1}') | awk '{print $5}' | cut -d '%' -f 1)
+  disk_used_percentage=$(df $geth_datadir | awk 'END{print $5}' | cut -d '%' -f 1)
   
   if [ $disk_used_percentage -ge $GETH_PRUNE_AT_PERCENTAGE ]; then
     # Remove file to stop prunning again until disk capacity is under the threshold
