@@ -23,34 +23,51 @@ How to upgrade GETH to `v1.10.22`, run these commands:
 ## Step 2: Generate JWT (Java Web Token), run these commands:
 > `openssl rand -hex 32 | tr -d "\n" | sudo tee /etc/ethereum/jwt.hex >/dev/null`
 
-_(Note: If you are running Beacon and Geth on 2 different machine, then you will need to copy the `/etc/ethereum/jwt.hex` file to both machines)_
+_(Note: If you are running Beacon and Geth on 2 different machine, then you will need to copy the `/etc/ethereum/jwt.hex` file to both machines. Also, open port 8551 on the GETH node by running this command `sudo ufw allow 8551/tcp`)_
 
 ## Step 3: Re-configure GETH, edit this file:
 > `sudo vi /etc/ethereum/geth.conf`
+
 Then add these parameters:
 >  `--authrpc.jwtsecret /etc/ethereum/jwt.hex`
 >  `--authrpc.addr 0.0.0.0`
 >  `--authrpc.port 8551`
 >  `--authrpc.vhosts 0.0.0.0`
+
 Save and exit. 
 
 Then, 
+
 > `sudo systemctl restart geth.service`
+
 Check log - if you encounter any error, let me know asap
+
 > `journalctl -f -u geth.service`
 
 ## Step 4: Re-configure Prysm, edit this file:
+
 > `vi prysm/config/beacon.yaml`
+
 Then add these parameters:
+
 > `jwt-secret: /etc/ethereum/jwt.hex`
+
 > `grpc-max-msg-size: 65568081`
+
 > `enable-only-blinded-beacon-blocks: true`
+
 Save and exit.
 
 Then, restart Beacon and Validator
+
 > `sudo systemctl restart prysm-beacon.service`
+
 > `sudo systemctl restart prysm-validator.service`
-Check log - if you encounter any error, let me know asap
+
+Check logs - if you encounter any error, let me know asap
+
 > `journalctl -f -u prysm-beacon.service`
+
 > `journalctl -f -u prysm-validator.service`
+
 Done.
