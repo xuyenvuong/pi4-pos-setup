@@ -1,7 +1,7 @@
 
 # Merge Readiness Update (Its required to upgrade by today)
 
-Ethereum has release new upgrade that would require you to take immediate action today. If you fail to do it by today, you node may go down since incompatibility between the Consensus layer and Execution layer. (I can jump online to help you just incase)
+Ethereum has released new upgrade that would require you to take immediate action today. If you fail to do it by today, you node may go down since incompatibility between the Consensus Layer and Execution Layer. (I can jump online to help you just incase)
 
 ## Step 1:
 First, go to https://ethstats.net/, and make sure your GETH node is at version `v1.10.22` - If you are, then go to **Step 2**
@@ -23,7 +23,7 @@ How to upgrade GETH to `v1.10.22`, run these commands:
 ## Step 2: Generate JWT (Java Web Token), run these commands:
 > `openssl rand -hex 32 | tr -d "\n" | sudo tee /etc/ethereum/jwt.hex >/dev/null`
 
-_(Note: If you are running Beacon and Geth on 2 different machine, then you will need to copy the `/etc/ethereum/jwt.hex` file to both machines. Also, open port 8551 on the GETH node by running this command `sudo ufw allow 8551/tcp`)_
+_(Note: If you are running Beacon and Geth on 2 different machines, then you will need to copy the `/etc/ethereum/jwt.hex` file to both machines. Also, open **port 8551** on the GETH node by running this command `sudo ufw allow 8551/tcp`)_
 
 ## Step 3: Re-configure GETH, edit this file:
 > `sudo vi /etc/ethereum/geth.conf`
@@ -55,6 +55,20 @@ Then add these parameters:
 > `grpc-max-msg-size: 65568081`
 
 > `enable-only-blinded-beacon-blocks: true`
+
+Then remove these parameters:
+
+> `fallback-web3provider` 
+
+> `- https://mainnet.infura.io/v3/INFURA_API_KEY`
+
+> `- https://eth-mainnet.alchemyapi.io/v2/ALCHEMY_API_KEY`
+
+> `enable-peer-scorer`
+
+And Edit this parameter, to port 8551 (instead of the legacy 8545)
+
+> `http-web3provider: "http://localhost:8551"`
 
 Save and exit.
 
