@@ -46,7 +46,7 @@ Check log - if you encounter any error, let me know asap
 
 ## Step 4: Re-configure Prysm, edit this file:
 
-> `vi prysm/config/beacon.yaml`
+> `vi prysm/configs/beacon.yaml`
 
 Then add these parameters:
 
