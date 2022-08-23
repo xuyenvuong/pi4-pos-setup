@@ -70,6 +70,8 @@ And Edit this parameter, to port 8551 (instead of the legacy 8545)
 
 > `http-web3provider: "http://localhost:8551"`
 
+(Don't foreget to setup the `suggested-fee-recipient: 0xYOUR_WALLET_ADDRESS` if you haven't)
+
 Save and exit.
 
 Then, restart Beacon and Validator
