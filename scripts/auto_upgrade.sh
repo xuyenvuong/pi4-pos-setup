@@ -77,6 +77,7 @@ GETH_PRUNE_AT_PERCENTAGE=90
 # Other configs
 # ---------------------------------------------------------------
 
+HOSTNAME=$(hostname)
 
 BEACON_METRICS_URL=localhost:8080/metrics
 VALIDATOR_METRICS_URL=localhost:8081/metrics
@@ -85,7 +86,7 @@ TAGS_URL=https://api.github.com/repos/ethereum/go-ethereum/tags
 
 GETH_LAST_PRUNE_FILE=/tmp/geth_last_prune
 
-PROCESS_NAME="auto_upgrade"
+PROCESS_NAME="auto_upgrade_$HOSTNAME"
 
 
 # ---------------------------------------------------------------
@@ -310,6 +311,8 @@ if [[ $geth_is_running && $geth_is_prune_time = true && $disk_used_percentage -g
   # Run geth prune
   /usr/local/bin/geth snapshot prune-state --datadir $geth_datadir
 
+  # Perform db remove if no disk space. NOTE: Do NOT remove ancient-db when asked.
+  # /usr/local/bin/geth removed --datadir $geth_datadir
   # Start geth
   sudo systemctl start geth.service
 
