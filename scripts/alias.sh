@@ -8,7 +8,7 @@ Run this command to add aliases to your .bashrc
 > curl -L https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/alias.sh | bash && source $HOME/.bashrc
 
 Description:
-Supporting services [beacon, validator, eth2-stats, geth, prometheus, prometheus-node-exporter, grafana]
+Supporting services [mevboost, beacon, validator, eth2-stats, geth, prometheus, prometheus-node-exporter, grafana]
 Supporting post-fixes [-log, -start, -stop, -restart, -enable]
 
 Usage: 
@@ -76,5 +76,11 @@ alias geth-enable='sudo systemctl enable geth.service'
 alias prometheus-enable='sudo systemctl enable prometheus'
 alias prometheus-node-exporter-enable='sudo systemctl enable prometheus-node-exporter'
 alias grafana-enable='sudo systemctl enable grafana-server'
+
+alias mevboost-log='journalctl -f -u mevboost.service -n 200 | ccze -A'
+alias mevboost-start='sudo systemctl start mevboost.service'
+alias mevboost-stop='sudo systemctl stop mevboost.service'
+alias mevboost-restart='sudo systemctl restart mevboost.service'
+alias mevboost-enable='sudo systemctl enable mevboost.service'
 
 EOF
