@@ -32,7 +32,7 @@ Then add these parameters:
 >  `--authrpc.jwtsecret /etc/ethereum/jwt.hex`
 >  `--authrpc.addr 0.0.0.0`
 >  `--authrpc.port 8551`
->  `--authrpc.vhosts 0.0.0.0`
+>  `--authrpc.vhosts localhost`
 
 Save and exit. 
 
