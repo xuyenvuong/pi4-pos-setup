@@ -51,7 +51,7 @@ function install_essential() {
   install_package tmux
   install_package ccze
   install_package net-tools
-    
+  
   # Prometheus
   install_prometheus
   
@@ -88,7 +88,14 @@ function install_essential() {
   # NO-IP (optional installation)
   install_noip
 
+  # Google Auth (optional)
+  install_google_authenticator
+
+  # Yubikey (optional)  
+  install_yubikey
+
   # Configs
+  config_auth_jwt
   systemd_beacon
   systemd_validator
   systemd_clientstats
@@ -105,6 +112,7 @@ function install_essential() {
   config_noip
   config_aliases
   config_disable_power_button
+  config_ssh_yubikey_auth
 }
 
 # Install Docker
@@ -283,6 +291,82 @@ function install_noip() {
   fi
 }
 
+# Install Google Authenticator
+function install_google_authenticator() {
+  if [ $(dpkg-query -W -f='${Status}' libpam-google-authenticator 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
+    echo "Installing: libpam-google-authenticator"
+
+    sudo vi /etc/ssh/sshd_config
+    Set: 
+      ChallengeResponseAuthentication yes
+    
+    
+    sudo apt install libpam-google-authenticator
+    google-authenticator
+
+    # (Backup the info)
+    # (Answer “Y” when asked whether Google Authenticator should update your .google_authenticator file.
+    # Then answer “Y” to disallow multiple uses of the same authentication token, 
+    # “N” to increase the time skew window, 
+    # and “Y” to rate limiting in order to protect against brute-force attacks.)
+
+    sudo vi /etc/pam.d/sshd
+    # (Add new line after @include common-auth)
+    >>> auth required pam_google_authenticator.so
+
+    sudo systemctl restart ssh
+  fi
+}
+
+# Install Yubikey
+function install_yubikey() {
+  # https://monicalent.com/blog/2017/12/16/ssh-via-yubikeys-ubuntu/
+
+  if [ $(dpkg-query -W -f='${Status}' libpam-yubico 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
+    echo "Installing: libpam-yubico"
+
+    sudo add-apt-repository ppa:yubico/stable
+    sudo apt-get update
+    install_package libpam-yubico
+
+    # Generate key here: https://upgrade.yubico.com/getapikey/
+    # Client ID: XXXXX
+    # Secret Key: xxxxxxxxxxxxxxxxxxxx
+
+    sudo vi /etc/pam.d/sshd
+
+    >>> auth required pam_yubico.so id=[Your Client ID] key=[Your Secret Key] debug authfile=/etc/yubikey_mappings mode=client
+
+    # Disable @include common-auth and Google Authenticator
+
+    sudo vi /etc/yubikey_mappings
+    >>> username:first12digitofkey1:first12digitofkey2
+    # username e.g. ubuntu
+
+    sudo vi /etc/ssh/sshd_config
+    Set:
+      PubkeyAuthentication yes
+      AuthorizedKeysFile      %h/.ssh/authorized_keys %h/.ssh/authorized_keys2
+      PasswordAuthentication no
+      ChallengeResponseAuthentication yes
+      >>> AuthenticationMethods publickey,keyboard-interactive:pam
+
+    vi .ssh/authorized_keys
+    # Add publickeys (for PC and Android)
+    # Generate PC key with PuTTYGen: https://www.hostinger.com/tutorials/vps/how-to-generate-ssh-keys-on-putty
+    # -- If key error, check this https://mulcas.com/couldnt-load-private-key-putty-key-format-too-new/
+    # Generate Android key with OpenSSH: https://phoenixnap.com/kb/generate-ssh-key-windows-10
+    # Run
+    #   ssh-keygen -m PEM -P "" -t rsa
+    
+    sudo systemctl restart ssh
+    
+    # Config puTTy to load private key from PC Keys folder
+    # Config JuiceSSH to laod private key from Android Keys folder
+
+  fi
+}
+
 #-------------------------------------------------------------------------------------------#
 # Upgrade all
 # function upgrade_all() {
@@ -337,6 +421,13 @@ function help() {
 # Config Files
 #-------------------------------------------------------------------------------------------#
 
+# Config auth JWT
+function config_auth_jwt() {
+  if [ ! -e /etc/ethereum/jwt.hex ]; then
+    openssl rand -hex 32 | tr -d "\n" | sudo tee /etc/ethereum/jwt.hex >/dev/null
+  fi
+}
+
 # Systemd Beacon Service
 function systemd_beacon() {
   if [ ! -e /etc/systemd/system/prysm-beacon.service ]; then
@@ -383,17 +474,14 @@ contract-deployment-block: 11052984
 
 verbosity: info
 
-http-web3provider: "http://localhost:8545"
-fallback-web3provider: 
-- http://192.168.0.XXX:8545
-- https://mainnet.infura.io/v3/INFURA_API_KEY
-- https://eth-mainnet.alchemyapi.io/v2/ALCHEMY_API_KEY
+execution-endpoint: "http://localhost:8551"
+
+jwt-secret: /etc/ethereum/jwt.hex
 
 attest-timely: true
 
 # Sync faster (default 64)
 block-batch-limit: 512
-head-sync: true
 
 #p2p-host-ip: $(curl -s v4.ident.me)
 p2p-host-dns: "maxvuong.tplinkdns.com"
@@ -403,7 +491,6 @@ p2p-udp-port: 12000
 
 p2p-max-peers: 100
 min-sync-peers: 3
-enable-peer-scorer: true
 
 rpc-port: 4000
 rpc-host: 0.0.0.0
@@ -413,13 +500,25 @@ monitoring-host: 0.0.0.0
 
 update-head-timely: true
 
-# Running slasher
-slasher: true
-disable-broadcast-slashing: true
+suggested-fee-recipient: 0xYOUR_WALLET_ADDRESS
 
-enable-vectorized-htr: true
+# Mev Boost
+http-mev-relay: http://localhost:18550
+
+# Faster sync
+#checkpoint-sync-url: https://xxxxxxxxxxxxxxxxx@eth2-beacon-mainnet.infura.io
+#genesis-beacon-api-url: https://xxxxxxxxxxxxxxxxx@eth2-beacon-mainnet.infura.io
+
+checkpoint-sync-url: http://localhost:3500
+genesis-beacon-api-url: http://localhost:3500 
+grpc-max-msg-size: 65568081
+
+enable-only-blinded-beacon-blocks: true
 EOF
   fi
+
+  # Check beacon sync status
+  # curl http://localhost:3500/eth/v1/node/syncing
 }
 
 # Systemd Validator Service
@@ -479,6 +578,8 @@ monitoring-host: 0.0.0.0
 
 # Mainnet
 graffiti: "poapaa2VsI8722DeHPPwjXbJooGadtMA"
+
+suggested-fee-recipient: 0xYOUR_WALLET_ADDRESS
 EOF
   fi
 }
@@ -582,8 +683,13 @@ EOF
 ARGS="
  --port 30303 
  --http 
+ --http.api eth,net,engine,admin
  --http.port 8545 
  --http.addr 0.0.0.0 
+ --authrpc.jwtsecret /etc/ethereum/jwt.hex
+ --authrpc.addr 0.0.0.0
+ --authrpc.port 8551
+ --authrpc.vhosts 0.0.0.0
  --syncmode snap 
  --cache 1024 
  --datadir $HOME/.ethereum 
@@ -601,6 +707,10 @@ EOF
 
   # Prune geth with tmux
   # /usr/local/bin/geth snapshot prune-state --datadir $HOME/.ethereum  
+
+  # Check Geth syncing status
+  # /usr/local/bin/geth attach http://localhost:8545
+  # > eth.syncing
 }  
   
 # Systemd Cryptowatch Slasher
@@ -744,14 +854,15 @@ function config_ports{
 	sudo ufw allow 8081/tcp
 
 	# Slasher
-	sudo ufw allow 8082/tcp
-	sudo ufw allow 5000/tcp
+	#sudo ufw allow 8082/tcp
+	#sudo ufw allow 5000/tcp
 
 	# Grafana
 	sudo ufw allow 3000:3100/tcp
 
 	# Geth
 	sudo ufw allow 8545/tcp
+  sudo ufw allow 8551/tcp
 	sudo ufw allow 6060/tcp
 	sudo ufw allow 30303:30309/tcp
 	sudo ufw allow 30303:30309/udp
