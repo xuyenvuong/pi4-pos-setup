@@ -1,5 +1,5 @@
 #!/bin/bash
-# auto_upgrade_migration.sh - A script to shorten the linux command for your convinient.
+# auto_upgrade_migration.sh - A script to update and migrate auto_upgrade.sh
 # Author: Max Vuong
 # Date: 09/13/2022
 
