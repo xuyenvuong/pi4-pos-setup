@@ -57,6 +57,8 @@ COMMENT_BLOCK
 # END README
 # ---------------------------------------------------------------
 
+echo "Auto Upgrade is in progress..."
+
 # ---------------------------------------------------------------
 # Discord Notification Webhook Config
 # ---------------------------------------------------------------
@@ -117,50 +119,6 @@ fi
 
 # ---------------------------------------------------------------
 
-# Get current beacon version
-beacon_curr_version=$(wget -O - -o /dev/null $BEACON_METRICS_URL | grep buildDate= | cut -d "," -f 3 | cut -d "\"" -f 2)
-logger "$PROCESS_NAME Beacon current version $beacon_curr_version"
-
-# Get current validator version
-validator_curr_version=$(wget -O - -o /dev/null $VALIDATOR_METRICS_URL | grep buildDate= | cut -d "," -f 3 | cut -d "\"" -f 2)
-logger "$PROCESS_NAME Validator current version $validator_curr_version"
-
-# MEV-Boost current version
-mevboost_curr_version=$(/usr/local/bin/mev-boost -version | awk '{print $2}')
-logger "$PROCESS_NAME MEV-Boost current version $mevboost_curr_version"
-
-# Get current geth version
-geth_curr_version=$(/usr/local/bin/geth version 2> /dev/null | grep "stable" | cut -d " " -f 2 | cut -d "-" -f 1)
-logger "$PROCESS_NAME Geth current version $geth_curr_version"
-
-# Geth current prysm.sh version
-prysm_sh_curr_version=$(md5sum $HOME/prysm/prysm.sh | cut -d " " -f 1)
-logger "$PROCESS_NAME Prysm.sh current version $prysm_sh_curr_version"
-
-# ---------------------------------------------------------------
-
-# Get latest available beacon version
-beacon_latest_version=$(wget -O - -o /dev/null $PRYSM_RELEASES_LATEST | jq '.tag_name' | tr -d \")
-logger "$PROCESS_NAME Latest beacon version $beacon_latest_version"
-
-# Get latest available validator version
-validator_latest_version=$(wget -O - -o /dev/null $PRYSM_RELEASES_LATEST | jq '.tag_name' | tr -d \")
-logger "$PROCESS_NAME Latest validator version $beacon_latest_version"
-
-# Get latest available MEV-Boost version
-mevboost_latest_version=$(wget -O - -o /dev/null $MEVBOOST_RELEASES_LATEST | jq '.tag_name' | tr -d \")
-logger "$PROCESS_NAME Latest MEV-Boost version $mevboost_latest_version"
-
-# Get latest available geth version
-geth_latest_version=$(wget -O - -o /dev/null $GETH_RELEASES_LATEST | jq '.tag_name' | tr -d \" | cut -c 2-)
-logger "$PROCESS_NAME Latest geth version $geth_latest_version"
-
-# Get latest available prysm.sh version
-prysm_sh_latest_version=$(wget -O - -o /dev/null $PRYSM_SH_URL | md5sum | cut -d " " -f 1)
-logger "$PROCESS_NAME Latest prysm.sh current version $prysm_sh_latest_version"
-
-# ---------------------------------------------------------------
-
 # Check for beacon service
 beacon_is_running=$(systemctl list-units --type=service --state=active | grep prysm-beacon | grep running)
 
@@ -176,6 +134,76 @@ clientstats_is_running=$(systemctl list-units --type=service --state=active | gr
 # Check for geth service
 geth_is_running=$(systemctl list-units --type=service --state=active | grep geth | grep running)
 
+# ---------------------------------------------------------------
+
+# Get latest available beacon version
+beacon_latest_version=""
+if [[ $beacon_is_running ]]; then
+  beacon_latest_version=$(wget -O - -o /dev/null $PRYSM_RELEASES_LATEST | jq '.tag_name' | tr -d \")
+  logger "$PROCESS_NAME Latest beacon version $beacon_latest_version"
+fi
+
+# Get latest available validator version
+validator_latest_version=""
+if [[ $validator_is_running ]]; then
+  validator_latest_version=$(wget -O - -o /dev/null $PRYSM_RELEASES_LATEST | jq '.tag_name' | tr -d \")
+  logger "$PROCESS_NAME Latest validator version $beacon_latest_version"
+fi
+
+# Get latest available MEV-Boost version
+mevboost_latest_version=""
+if [[ $mevboost_is_running ]]; then
+  mevboost_latest_version=$(wget -O - -o /dev/null $MEVBOOST_RELEASES_LATEST | jq '.tag_name' | tr -d \")
+  logger "$PROCESS_NAME Latest MEV-Boost version $mevboost_latest_version"
+fi
+
+# Get latest available geth version
+geth_latest_version=""
+if [[ $geth_is_running ]]; then
+  geth_latest_version=$(wget -O - -o /dev/null $GETH_RELEASES_LATEST | jq '.tag_name' | tr -d \" | cut -c 2-)
+  logger "$PROCESS_NAME Latest geth version $geth_latest_version"
+fi
+
+# Get latest available prysm.sh version
+prysm_sh_latest_version=$(wget -O - -o /dev/null $PRYSM_SH_URL | md5sum | cut -d " " -f 1)
+logger "$PROCESS_NAME Latest prysm.sh current version $prysm_sh_latest_version"
+
+# ---------------------------------------------------------------
+
+# Get current beacon version
+beacon_curr_version=""
+if [[ $beacon_is_running ]]; then
+  beacon_curr_version=$(wget -O - -o /dev/null $BEACON_METRICS_URL | grep buildDate= | cut -d "," -f 3 | cut -d "\"" -f 2)
+  logger "$PROCESS_NAME Beacon current version $beacon_curr_version"
+fi
+
+# Get current validator version
+validator_curr_version=""
+if [[ $validator_is_running ]]; then
+  validator_curr_version=$(wget -O - -o /dev/null $VALIDATOR_METRICS_URL | grep buildDate= | cut -d "," -f 3 | cut -d "\"" -f 2)
+  logger "$PROCESS_NAME Validator current version $validator_curr_version"
+fi
+
+# MEV-Boost current version
+mevboost_curr_version=""
+if [[ $mevboost_is_running ]]; then
+  mevboost_curr_version=$(/usr/local/bin/mev-boost -version | awk '{print $2}')
+  logger "$PROCESS_NAME MEV-Boost current version $mevboost_curr_version"
+fi
+
+# Get current geth version
+geth_curr_version=""
+if [[ $geth_is_running ]]; then
+  geth_curr_version=$(/usr/local/bin/geth version 2> /dev/null | grep "stable" | cut -d " " -f 2 | cut -d "-" -f 1)
+  logger "$PROCESS_NAME Geth current version $geth_curr_version"
+fi
+
+# Geth current prysm.sh version
+prysm_sh_curr_version=""
+if [ -e $HOME/prysm/prysm.sh ]; then
+  prysm_sh_curr_version=$(md5sum $HOME/prysm/prysm.sh | cut -d " " -f 1)
+  logger "$PROCESS_NAME Prysm.sh current version $prysm_sh_curr_version"
+fi
 
 # ---------------------------------------------------------------
 
@@ -187,7 +215,7 @@ if [[ -e $HOME/prysm/prysm.sh && $prysm_sh_curr_version != $prysm_sh_latest_vers
   sudo mv $HOME/prysm/prysm.sh $prysm_sh_backup_filename
   
   # Download latest prysm.sh
-  curl https://raw.githubusercontent.com/prysmaticlabs/prysm/master/prysm.sh --output $HOME/prysm/prysm.sh
+  curl $PRYSM_SH_URL --output $HOME/prysm/prysm.sh
   chmod +x $HOME/prysm/prysm.sh
       
   if [ -e $HOME/prysm/prysm.sh ]; then
@@ -229,12 +257,9 @@ fi
 if [[ $mevboost_is_running && $mevboost_curr_version != $mevboost_latest_version ]]; then
   logger "$PROCESS_NAME OK to upgrade MEV-Boost to version $mevboost_latest_version"
 
-  CGO_CFLAGS="-O -D__BLST_PORTABLE__" /usr/local/go/bin/go install github.com/flashbots/mev-boost@latest
-  
+  CGO_CFLAGS="-O -D__BLST_PORTABLE__" /usr/local/go/bin/go install github.com/flashbots/mev-boost@latest  
   sudo systemctl stop mevboost.service
-
   sudo cp ~/go/bin/mev-boost /usr/local/bin
-
   sudo systemctl start mevboost.service
 
   discord_notify $PROCESS_NAME "Upgraded MEV-Boost to version $mevboost_latest_version"
@@ -374,4 +399,5 @@ fi
 
 # ---------------------------------------------------------------
 
+echo "Auto Upgrade is done."
 # EOF
