@@ -1,5 +1,5 @@
 #!/bin/bash
-# shortcuts.sh - A script to shorten the linux command for your convinient.
+# alias.sh - A script to shorten the linux command for your convinient.
 # Author: Max Vuong
 # Date: 04/28/2022
 
