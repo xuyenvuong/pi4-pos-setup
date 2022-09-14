@@ -12,8 +12,8 @@ COMMENT_BLOCK
 # ---------------------------------------------------------------
 
 cd ~
-DISCORD_WEBHOOK_URL=$(cat auto_upgrade.sh | grep 'https://discord.com/api/webhooks')
-GETH_PRUNE_AT_PERCENTAGE=$(cat auto_upgrade.sh | grep 'GETH_PRUNE_AT_PERCENTAGE=90')
+DISCORD_WEBHOOK_URL=$(cat auto_upgrade.sh | grep ^DISCORD_WEBHOOK_URL)
+GETH_PRUNE_AT_PERCENTAGE=$(cat auto_upgrade.sh | grep ^GETH_PRUNE_AT_PERCENTAGE)
 
 mv ~/auto_upgrade.sh /tmp/auto_upgrade.sh.$(date "+%Y%m%d-%H%M%S")
 wget https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/auto_upgrade.sh && chmod +x auto_upgrade.sh
