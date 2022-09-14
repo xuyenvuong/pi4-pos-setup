@@ -9,7 +9,7 @@
 # ---------------------------------------------------------------
 
 : <<'COMMENT_BLOCK'
-Instructions to install and automate node upgrade for Beacon, Validator, Clientstats, and Geth:
+Instructions to install and automate node upgrade for Beacon, Validator, Clientstats, Mevboost, and Geth:
  
 Step 1: One time download from repo:
 Run:
@@ -78,16 +78,19 @@ GETH_PRUNE_AT_PERCENTAGE=90
 # ---------------------------------------------------------------
 
 HOSTNAME=$(hostname)
+PROCESS_NAME="auto_upgrade_$HOSTNAME"
 
 BEACON_METRICS_URL=localhost:8080/metrics
 VALIDATOR_METRICS_URL=localhost:8081/metrics
-PRYSM_SH_URL=https://raw.githubusercontent.com/prysmaticlabs/prysm/master/prysm.sh
-TAGS_URL=https://api.github.com/repos/ethereum/go-ethereum/tags
 
+PRYSM_RELEASES_LATEST=https://api.github.com/repos/prysmaticlabs/prysm/releases/latest
+PRYSM_SH_URL=https://raw.githubusercontent.com/prysmaticlabs/prysm/master/prysm.sh
+
+GETH_TAGS_URL=https://api.github.com/repos/ethereum/go-ethereum/tags
+GETH_RELEASES_LATEST=https://api.github.com/repos/ethereum/go-ethereum/releases/latest
 GETH_LAST_PRUNE_FILE=/tmp/geth_last_prune
 
-PROCESS_NAME="auto_upgrade_$HOSTNAME"
-
+MEVBOOST_RELEASES_LATEST=https://api.github.com/repos/flashbots/mev-boost/releases/latest
 
 # ---------------------------------------------------------------
 # To send a simple notification to Discord via webhook. This function only send when DISCORD_WEBHOOK_URL variable is not null
@@ -122,26 +125,34 @@ logger "$PROCESS_NAME Beacon current version $beacon_curr_version"
 validator_curr_version=$(wget -O - -o /dev/null $VALIDATOR_METRICS_URL | grep buildDate= | cut -d "," -f 3 | cut -d "\"" -f 2)
 logger "$PROCESS_NAME Validator current version $validator_curr_version"
 
+# MEV-Boost current version
+mevboost_curr_version=$(/usr/local/bin/mev-boost -version | awk '{print $2}')
+logger "$PROCESS_NAME MEV-Boost current version $mevboost_curr_version"
+
 # Get current geth version
 geth_curr_version=$(/usr/local/bin/geth version 2> /dev/null | grep "stable" | cut -d " " -f 2 | cut -d "-" -f 1)
 logger "$PROCESS_NAME Geth current version $geth_curr_version"
 
 # Geth current prysm.sh version
-prysm_sh_crr_version=$(md5sum $HOME/prysm/prysm.sh | cut -d " " -f 1)
-logger "$PROCESS_NAME Prysm.sh current version $prysm_sh_crr_version"
+prysm_sh_curr_version=$(md5sum $HOME/prysm/prysm.sh | cut -d " " -f 1)
+logger "$PROCESS_NAME Prysm.sh current version $prysm_sh_curr_version"
 
 # ---------------------------------------------------------------
 
 # Get latest available beacon version
-beacon_latest_version=$($HOME/prysm/prysm.sh beacon-chain --version 2> /dev/null | grep "beacon-chain version Prysm" |  cut -d "/" -f 2)
+beacon_latest_version=$(wget -O - -o /dev/null $PRYSM_RELEASES_LATEST | jq '.tag_name' | tr -d \")
 logger "$PROCESS_NAME Latest beacon version $beacon_latest_version"
 
 # Get latest available validator version
-validator_latest_version=$($HOME/prysm/prysm.sh validator --version 2> /dev/null | grep "validator version Prysm" |  cut -d "/" -f 2)
+validator_latest_version=$(wget -O - -o /dev/null $PRYSM_RELEASES_LATEST | jq '.tag_name' | tr -d \")
 logger "$PROCESS_NAME Latest validator version $beacon_latest_version"
 
+# Get latest available MEV-Boost version
+mevboost_latest_version=$(wget -O - -o /dev/null $MEVBOOST_RELEASES_LATEST | jq '.tag_name' | tr -d \")
+logger "$PROCESS_NAME Latest MEV-Boost version $mevboost_latest_version"
+
 # Get latest available geth version
-geth_latest_version=$(wget -O - -o /dev/null $TAGS_URL | jq '.[0].name' | tr -d \" | cut -c 2-)
+geth_latest_version=$(wget -O - -o /dev/null $GETH_RELEASES_LATEST | jq '.tag_name' | tr -d \" | cut -c 2-)
 logger "$PROCESS_NAME Latest geth version $geth_latest_version"
 
 # Get latest available prysm.sh version
@@ -156,16 +167,20 @@ beacon_is_running=$(systemctl list-units --type=service --state=active | grep pr
 # Check for validator service
 validator_is_running=$(systemctl list-units --type=service --state=active | grep prysm-validator | grep running)
 
+# Check for mevboost service
+mevboost_is_running=$(systemctl list-units --type=service --state=active | grep mevboost | grep running)
+
 # Check for clientstats service
 clientstats_is_running=$(systemctl list-units --type=service --state=active | grep prysm-clientstats | grep running)
 
 # Check for geth service
 geth_is_running=$(systemctl list-units --type=service --state=active | grep geth | grep running)
 
+
 # ---------------------------------------------------------------
 
 # Deciding to upgrade prysm.sh
-if [[ -e $HOME/prysm/prysm.sh && $prysm_sh_crr_version != $prysm_sh_latest_version ]]; then 
+if [[ -e $HOME/prysm/prysm.sh && $prysm_sh_curr_version != $prysm_sh_latest_version ]]; then 
   # Move old prysm.sh file
   prysm_sh_backup_filename=$HOME/prysm/prysm.sh.$(date "+%Y%m%d-%H%M%S")
   
@@ -210,6 +225,25 @@ fi
 
 # ---------------------------------------------------------------
 
+# Deciding to upgrade MEV-Boost
+if [[ $mevboost_is_running && $mevboost_curr_version != $mevboost_latest_version ]]; then
+  logger "$PROCESS_NAME OK to upgrade MEV-Boost to version $mevboost_latest_version"
+
+  CGO_CFLAGS="-O -D__BLST_PORTABLE__" /usr/local/go/bin/go install github.com/flashbots/mev-boost@latest
+  
+  sudo systemctl stop mevboost.service
+
+  sudo cp ~/go/bin/mev-boost /usr/local/bin
+
+  sudo systemctl start mevboost.service
+
+  discord_notify $PROCESS_NAME "Upgraded MEV-Boost to version $mevboost_latest_version"
+else
+  logger "$PROCESS_NAME MEV-Boost is up to date or not active."
+fi
+
+# ---------------------------------------------------------------
+
 # Deciding to restart clientstats
 if [[ $beacon_curr_version != $beacon_latest_version || $validator_curr_version != $validator_latest_version ]]; then
   if [[ $clientstats_is_running ]]; then
@@ -224,7 +258,7 @@ if [[ $geth_is_running && $geth_curr_version != $geth_latest_version ]]; then
   logger "$PROCESS_NAME OK to upgrade GETH to version $geth_latest_version"
   
   arch=$(dpkg --print-architecture)
-  sha=$(wget -O - -o /dev/null $TAGS_URL | jq '.[0].commit.sha' | cut -c 2-9)
+  sha=$(wget -O - -o /dev/null $GETH_TAGS_URL | jq '.[0].commit.sha' | cut -c 2-9)
   download_version=$arch-$geth_latest_version-$sha
 
   # Compose download URL
@@ -278,10 +312,10 @@ fi
 # ---------------------------------------------------------------
 
 # Geth data directory
-geth_datadir=$(cat /etc/ethereum/geth.conf 2> /dev/null | awk -F'--datadir ' '{print $2}' | cut -d ' ' -f 1)
+geth_datadir=$(cat /etc/ethereum/geth.conf 2> /dev/null | grep 'datadir' | awk -F'--datadir ' '{print $2}' | cut -d ' ' -f 1)
 
 # Current disk usage
-disk_used_percentage=$(df -lh 2> /dev/null | grep $(du -hs $geth_datadir 2> /dev/null | awk '{print $1}') | awk '{print $5}' | cut -d '%' -f 1)
+disk_used_percentage=$(df --output $geth_datadir | grep $geth_datadir | awk '{print $10}' | tr -d \%)
 logger "$PROCESS_NAME Geth disk usage reaches $disk_used_percentage%"
 
 # Check last prune timestamp
@@ -306,7 +340,7 @@ if [[ $geth_is_running && $geth_is_prune_time = true && $disk_used_percentage -g
   sudo systemctl stop geth.service
 
   # Notify Discord
-  discord_notify $PROCESS_NAME "Geth prune-state starting. Don't turn off your server."
+  discord_notify $PROCESS_NAME "Geth prune-state starting. Don't turn off your server. You will get another notice when prunning is done."
 
   # Run geth prune
   /usr/local/bin/geth snapshot prune-state --datadir $geth_datadir
