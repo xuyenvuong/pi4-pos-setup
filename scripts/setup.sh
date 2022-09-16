@@ -1,5 +1,5 @@
 #!/bin/bash
-# setup.sh - A script to quickly setup ETH2.0 Prysm node
+# setup.sh - A script to quickly setup ETH PoS node
 # Author: Max Vuong
 
 set -eu
@@ -395,7 +395,7 @@ function build_pos() {
   
   # Create files
   touch $HOME/.password/password.txt
-  touch $HOME/logs/{beacon,validator,slasher}.log
+  touch $HOME/logs/{beacon,validator}.log
 }
 
 #-------------------------------------------------------------------------------------------#
@@ -713,7 +713,7 @@ EOF
   # > eth.syncing
 }  
   
-# Systemd Cryptowatch Slasher
+# Systemd Cryptowatch
 function systemd_cryptowatch() {
   if [ ! -e /etc/systemd/system/cryptowatch.service ]; then
     sudo cat << EOF | sudo tee /etc/systemd/system/cryptowatch.service >/dev/null
@@ -852,10 +852,6 @@ function config_ports{
 
 	# Validator
 	sudo ufw allow 8081/tcp
-
-	# Slasher
-	#sudo ufw allow 8082/tcp
-	#sudo ufw allow 5000/tcp
 
 	# Grafana
 	sudo ufw allow 3000:3100/tcp
