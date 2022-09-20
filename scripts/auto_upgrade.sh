@@ -94,6 +94,8 @@ GETH_LAST_PRUNE_FILE=/tmp/geth_last_prune
 
 MEVBOOST_RELEASES_LATEST=https://api.github.com/repos/flashbots/mev-boost/releases/latest
 
+ARCH=$(dpkg --print-architecture)
+
 # ---------------------------------------------------------------
 # To send a simple notification to Discord via webhook. This function only send when DISCORD_WEBHOOK_URL variable is not null
 # discord_notify $username $msg_content
@@ -281,10 +283,9 @@ fi
 # Deciding to upgrade geth 
 if [[ $geth_is_running && $geth_curr_version != $geth_latest_version ]]; then
   logger "$PROCESS_NAME OK to upgrade GETH to version $geth_latest_version"
-  
-  arch=$(dpkg --print-architecture)
+   
   sha=$(wget -O - -o /dev/null $GETH_TAGS_URL | jq '.[0].commit.sha' | cut -c 2-9)
-  download_version=$arch-$geth_latest_version-$sha
+  download_version=$ARCH-$geth_latest_version-$sha
 
   # Compose download URL
   download_url=https://gethstore.blob.core.windows.net/builds/geth-linux-$download_version.tar.gz
