@@ -2,7 +2,7 @@
 
 Anytime you want to upgrade your MEV Boost to the lastest version, please follow this instructions below:
 
-```Bash
+```bash
 $ CGO_CFLAGS="-O -D__BLST_PORTABLE__" /usr/local/go/bin/go install github.com/flashbots/mev-boost@latest
 $ mevboost-stop
 $ sudo cp ~/go/bin/mev-boost /usr/local/bin
@@ -10,7 +10,7 @@ $ mevboost-start
 ```
 
 Then check mevboost-log for error
-```Bash
+```bash
 $ mevboost-log
 ```
 
