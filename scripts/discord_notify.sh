@@ -1,6 +1,6 @@
 #!/bin/bash
 # discord_notify.sh - A script to send a Discord msg.
-# Run: ./discord_notify.sh
+# Run: ./discord_notify.sh "message string as param"
 # Author: Max Vuong
 # Date: 11/05/2022
 
@@ -51,4 +51,4 @@ function discord_notify() {
 
 # ---------------------------------------------------------------
 
-discord_notify $PROCESS_NAME $1
+discord_notify $PROCESS_NAME "$*"
