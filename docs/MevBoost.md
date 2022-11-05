@@ -65,6 +65,7 @@ $ sudo cat << EOF | sudo tee /etc/ethereum/mevboost.conf >/dev/null
 ARGS="
  -mainnet
  -relay-check
+ -loglevel debug
  -request-timeout-getheader 1000
  -request-timeout-getpayload 4000
  -request-timeout-regval 4000
