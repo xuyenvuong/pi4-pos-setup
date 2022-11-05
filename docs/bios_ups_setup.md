@@ -99,5 +99,26 @@ Download PowerPanel Cloud app on the App Store (iOS, Android, Web) and login to 
 1. iOS: [PowerPanel Cloud](https://apps.apple.com/us/app/powerpanel-cloud/id1342462532)
 1. Android: [PowerPanel Cloud](https://play.google.com/store/apps/details?id=com.cyberpower.pppe&gl=US)
 
+----
+
+### Add Discord notification
+#### Download
+```bash
+wget https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/discord_notify.sh && chmod +x discord_notify.sh
+```
+
+#### Add this to the bottom of this file __**/etc/pwrstatd-lowbatt.sh**__
+```bash
+# Calling custom script
+/home/YOUR_LOGIN_NAME/discord_notify.sh "Warning: The UPS's battery power is not enough, system will be shutdown soon!"
+```
+
+#### Add this to the bottom of this file __**/etc/pwrstatd-powerfail.sh**__
+```bash
+# Calling custom script
+/home/YOUR_LOGIN_NAME/discord_notify.sh "Warning: Utility power failure has occurred for a while, system will be shutdown soon!"
+```
+
+---
 DONE
 ---
