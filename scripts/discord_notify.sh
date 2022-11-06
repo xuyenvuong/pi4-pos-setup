@@ -34,21 +34,17 @@ DISCORD_WEBHOOK_URL=''
 # ---------------------------------------------------------------
 
 HOSTNAME=$(hostname)
-PROCESS_NAME="auto_upgrade_$HOSTNAME"
 
 # ---------------------------------------------------------------
 # To send a simple notification to Discord via webhook. This function only send when DISCORD_WEBHOOK_URL variable is not null
 # discord_notify $username $msg_content
 
-function discord_notify() {
-  local username=$1
-  local msg_content=$2  
-    
+function discord_notify() {    
   if [ -n "$DISCORD_WEBHOOK_URL" ]; then
-    curl -H "Content-Type: application/json" -X POST -d "{\"username\": \"$username\",\"content\": \"$msg_content\"}" $DISCORD_WEBHOOK_URL
+    curl -H "Content-Type: application/json" -X POST -d "{\"username\": \"ALERT - $HOSTNAME\",\"content\": \"$*\"}" $DISCORD_WEBHOOK_URL
   fi  
 }
 
 # ---------------------------------------------------------------
 
-discord_notify $PROCESS_NAME "$*"
+discord_notify "$*"
