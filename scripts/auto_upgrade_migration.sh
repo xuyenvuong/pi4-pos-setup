@@ -12,14 +12,22 @@ COMMENT_BLOCK
 # ---------------------------------------------------------------
 
 cd ~
-DISCORD_WEBHOOK_URL=$(cat auto_upgrade.sh | grep ^DISCORD_WEBHOOK_URL)
+
+DISCORD_WEBHOOK_URL=''
 GETH_PRUNE_AT_PERCENTAGE=$(cat auto_upgrade.sh | grep ^GETH_PRUNE_AT_PERCENTAGE)
 
+if [ ! -e $HOME/discord_notify.sh ]; then
+  wget https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/discord_notify.sh && chmod +x ~/discord_notify.sh
+  DISCORD_WEBHOOK_URL=$(cat auto_upgrade.sh | grep ^DISCORD_WEBHOOK_URL)
+else
+  DISCORD_WEBHOOK_URL=$(cat discord_notify.sh | grep ^DISCORD_WEBHOOK_URL)  
+fi
+
 mv ~/auto_upgrade.sh /tmp/auto_upgrade.sh.$(date "+%Y%m%d-%H%M%S")
-wget https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/auto_upgrade.sh && chmod +x auto_upgrade.sh
+wget https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/auto_upgrade.sh && chmod +x ~/auto_upgrade.sh
 
 if [[ $DISCORD_WEBHOOK_URL ]]; then
-  sed -i "s|^DISCORD_WEBHOOK_URL=''|$DISCORD_WEBHOOK_URL|g" ~/auto_upgrade.sh
+  sed -i "s|^DISCORD_WEBHOOK_URL=''|$DISCORD_WEBHOOK_URL|g" ~/discord_notify.sh
 fi
 
 if [[ $GETH_PRUNE_AT_PERCENTAGE ]]; then
