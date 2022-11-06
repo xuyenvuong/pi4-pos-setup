@@ -97,7 +97,7 @@ function discord_notify() {
 # Check and install package
 
 function install_package() {
-  local dpkg_name = $1
+  local dpkg_name=$1
 
   if [ $(dpkg-query -W -f='${Status}' $dpkg_name 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
     logger "Installing: $dpkg_name"
