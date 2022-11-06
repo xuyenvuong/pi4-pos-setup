@@ -39,7 +39,7 @@ NOTICE: if your user is not `ubuntu`, then you must change the user to the one y
 Then, save file.
 
 Step: Geth Prune
-The script will auto do the geth prune when the disk space at 95% by default. 
+The script will auto do the geth prune when the disk space at 90% by default. 
 Or to prune at a lower pecentage e.g. 80%, you can change GETH_PRUNE_AT_PERCENTAGE=80.
 And to stop the prune, you can change GETH_PRUNE_AT_PERCENTAGE=100.
 If disk is still over the defined GETH_PRUNE_AT_PERCENTAGE after prunning, prune job will be disabled for 7 days until you fix the capacity issue.
@@ -56,7 +56,7 @@ COMMENT_BLOCK
 echo "Auto Upgrade is in progress..."
 
 # ---------------------------------------------------------------
-# Remaining disk percentage to prune Geth database. Default to 95%
+# Remaining disk percentage to prune Geth database. Default to 90%
 # ---------------------------------------------------------------
 
 
