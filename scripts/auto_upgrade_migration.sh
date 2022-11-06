@@ -15,7 +15,7 @@ cd ~
 DISCORD_WEBHOOK_URL=$(cat auto_upgrade.sh | grep ^DISCORD_WEBHOOK_URL)
 GETH_PRUNE_AT_PERCENTAGE=$(cat auto_upgrade.sh | grep ^GETH_PRUNE_AT_PERCENTAGE)
 
-sudo mv ~/auto_upgrade.sh /tmp/auto_upgrade.sh.$(date "+%Y%m%d-%H%M%S")
+mv ~/auto_upgrade.sh /tmp/auto_upgrade.sh.$(date "+%Y%m%d-%H%M%S")
 wget https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/auto_upgrade.sh && chmod +x auto_upgrade.sh
 
 if [[ $DISCORD_WEBHOOK_URL ]]; then
