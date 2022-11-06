@@ -38,10 +38,6 @@ NOTICE: if your user is not `ubuntu`, then you must change the user to the one y
 
 Then, save file.
 
-Optional Step: Add Discord Notification Webhook 
-To get Discord notification webhook when there's an upgrade, please create the webhook and config DISCORD_WEBHOOK_URL with your own webhook
-To remove Discord Notification, set DISCORD_WEBHOOK_URL=''
-
 Step: Geth Prune
 The script will auto do the geth prune when the disk space at 95% by default. 
 Or to prune at a lower pecentage e.g. 80%, you can change GETH_PRUNE_AT_PERCENTAGE=80.
@@ -60,14 +56,6 @@ COMMENT_BLOCK
 echo "Auto Upgrade is in progress..."
 
 # ---------------------------------------------------------------
-# Discord Notification Webhook Config
-# ---------------------------------------------------------------
-
-
-DISCORD_WEBHOOK_URL=''
-
-
-# ---------------------------------------------------------------
 # Remaining disk percentage to prune Geth database. Default to 95%
 # ---------------------------------------------------------------
 
@@ -79,8 +67,7 @@ GETH_PRUNE_AT_PERCENTAGE=90
 # Other configs
 # ---------------------------------------------------------------
 
-HOSTNAME=$(hostname)
-PROCESS_NAME="auto_upgrade_$HOSTNAME"
+PROCESS_NAME="Auto Upgrade:"
 
 BEACON_METRICS_URL=localhost:8080/metrics
 VALIDATOR_METRICS_URL=localhost:8081/metrics
@@ -98,28 +85,30 @@ ARCH=$(dpkg --print-architecture)
 
 # ---------------------------------------------------------------
 # To send a simple notification to Discord via webhook. This function only send when DISCORD_WEBHOOK_URL variable is not null
-# discord_notify $username $msg_content
+# discord_notify $msg_content
 
 function discord_notify() {
-  local username=$1
-  local msg_content=$2  
-    
-  if [ -n "$DISCORD_WEBHOOK_URL" ]; then
-    curl -H "Content-Type: application/json" -X POST -d "{\"username\": \"$username\",\"content\": \"$msg_content\"}" $DISCORD_WEBHOOK_URL
-  fi  
+  if [ -e $HOME/discord_notify.sh ]; then
+    $HOME/discord_notify.sh "$*"
+  fi
+}
+
+# ---------------------------------------------------------------
+# Check and install package
+
+function install_package() {
+  local dpkg_name = $1
+
+  if [ $(dpkg-query -W -f='${Status}' $dpkg_name 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
+    logger "Installing: $dpkg_name"
+    sudo apt install -y $dpkg_name
+  fi
 }
 
 # ---------------------------------------------------------------
 
-# Check and install jq
-dpkg_name=jq
-
-if [ $(dpkg-query -W -f='${Status}' $dpkg_name 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
-  logger "Installing: $dpkg_name"
-  sudo apt install -y $dpkg_name
-fi
-
-# ---------------------------------------------------------------
+# Install jq
+install_package jq
 
 # Check for beacon service
 beacon_is_running=$(systemctl list-units --type=service --state=active | grep prysm-beacon | grep running)
@@ -224,7 +213,7 @@ if [[ -e $HOME/prysm/prysm.sh && $prysm_sh_curr_version != $prysm_sh_latest_vers
     logger "$PROCESS_NAME Upgraded prysm.sh to latest md5sum $prysm_sh_latest_version"
     
     # Notify Discord
-    discord_notify $PROCESS_NAME "Upgraded prysm.sh to latest md5sum $prysm_sh_latest_version"
+    discord_notify "$PROCESS_NAME Upgraded prysm.sh to latest md5sum $prysm_sh_latest_version"
   else
     # Roll back
     sudo mv $prysm_sh_backup_filename $HOME/prysm/prysm.sh 
@@ -236,7 +225,7 @@ if [[ $beacon_is_running && $beacon_curr_version != $beacon_latest_version ]]; t
   logger "$PROCESS_NAME OK to upgrade Beacon to version $beacon_latest_version"
   sudo systemctl restart prysm-beacon.service
 
-  discord_notify $PROCESS_NAME "Upgraded Beacon to version $beacon_latest_version"
+  discord_notify "$PROCESS_NAME Upgraded Beacon to version $beacon_latest_version"
 else
   logger "$PROCESS_NAME Beacon is up to date or not active."
 fi
@@ -248,7 +237,7 @@ if [[ $validator_is_running && $validator_curr_version != $validator_latest_vers
   logger "$PROCESS_NAME OK to upgrade Validator to version $validator_latest_version"
   sudo systemctl restart prysm-validator.service
 
-  discord_notify $PROCESS_NAME "Upgraded Validator to version $validator_latest_version"
+  discord_notify "$PROCESS_NAME Upgraded Validator to version $validator_latest_version"
 else
   logger "$PROCESS_NAME Validator is up to date or not active."
 fi
@@ -264,7 +253,7 @@ if [[ $mevboost_is_running && $mevboost_curr_version != $mevboost_latest_version
   sudo cp ~/go/bin/mev-boost /usr/local/bin
   sudo systemctl start mevboost.service
 
-  discord_notify $PROCESS_NAME "Upgraded MEV-Boost to version $mevboost_latest_version"
+  discord_notify "$PROCESS_NAME Upgraded MEV-Boost to version $mevboost_latest_version"
 else
   logger "$PROCESS_NAME MEV-Boost is up to date or not active."
 fi
@@ -312,13 +301,13 @@ if [[ $geth_is_running && $geth_curr_version != $geth_latest_version ]]; then
       logger "$PROCESS_NAME Upgraded Geth to version $geth_latest_version"
       
       # Notify Discord
-      discord_notify $PROCESS_NAME "Upgraded Geth to version $geth_latest_version"      
+      discord_notify "$PROCESS_NAME Upgraded Geth to version $geth_latest_version"      
     else
       # Roll back binary file
       logger "$PROCESS_NAME Failed to copy latest geth binary to /usr/local/bin. Performing rollback now."
       
       # Notify Discord
-      discord_notify $PROCESS_NAME "Failed to copy latest geth binary to /usr/local/bin. Performing rollback now."
+      discord_notify "$PROCESS_NAME Failed to copy latest geth binary to /usr/local/bin. Performing rollback now."
       
       sudo mv $geth_backup_filename /usr/local/bin/geth          
     fi
@@ -368,7 +357,7 @@ if [[ $geth_is_running && $geth_is_prune_time = true && $disk_used_percentage -g
   sudo systemctl stop geth.service
 
   # Notify Discord
-  discord_notify $PROCESS_NAME "Geth prune-state starting. Don't turn off your server. You will get another notice when prunning is done."
+  discord_notify "$PROCESS_NAME Geth prune-state starting. Don't turn off your server. You will get another notice when prunning is done."
 
   # Run geth prune
   /usr/local/bin/geth snapshot prune-state --datadir $geth_datadir
@@ -382,7 +371,7 @@ if [[ $geth_is_running && $geth_is_prune_time = true && $disk_used_percentage -g
   echo $current_timestamp > $GETH_LAST_PRUNE_FILE
 
   # Notify Discord
-  discord_notify $PROCESS_NAME "Geth prune-state is completed."
+  discord_notify "$PROCESS_NAME Geth prune-state is completed."
 
   # Check disk usage after prune
   disk_used_percentage=$(df -lh 2> /dev/null | grep $(du -hs $geth_datadir 2> /dev/null | awk '{print $1}') | awk '{print $5}' | cut -d '%' -f 1)
@@ -394,7 +383,7 @@ if [[ $geth_is_running && $geth_is_prune_time = true && $disk_used_percentage -g
     logger "$PROCESS_NAME WARNING: Geth disk usage reaches full capacity."	  
 
     # Notify Discord
-    discord_notify $PROCESS_NAME "WARNING: Geth disk usage reaches full capacity. Prunning job will be deactivated for 7 days. Please fix it asap."
+    discord_notify "$PROCESS_NAME WARNING: Geth disk usage reaches full capacity. Prunning job will be deactivated for 7 days. Please fix it asap."
   fi
 fi
 
