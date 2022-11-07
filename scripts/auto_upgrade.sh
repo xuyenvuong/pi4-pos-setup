@@ -89,7 +89,7 @@ ARCH=$(dpkg --print-architecture)
 
 function discord_notify() {
   if [ -e $HOME/discord_notify.sh ]; then
-    $HOME/discord_notify.sh "$*"
+    /srv/discord_notify.sh "$*"
   fi
 }
 
