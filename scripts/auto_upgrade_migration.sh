@@ -26,7 +26,7 @@ if [ -e /srv/discord_notify.sh ]; then
   DISCORD_WEBHOOK_URL=$(cat /srv/discord_notify.sh | grep ^DISCORD_WEBHOOK_URL)
   
   # Remove /srv/discord_notify.sh
-  mv /srv/discord_notify.sh /tmp/discord_notify.sh.$(date "+%Y%m%d-%H%M%S")
+  sudo mv /srv/discord_notify.sh /tmp/discord_notify.sh.$(date "+%Y%m%d-%H%M%S")
 else
   DISCORD_WEBHOOK_URL=$(cat ~/auto_upgrade.sh | grep ^DISCORD_WEBHOOK_URL)
 fi
@@ -39,7 +39,7 @@ if [ -e ~/auto_upgrade.sh ]; then
 fi
 
 # Get latest version of discord_notify.sh script
-sudo wget -P /srv $GITHUB_REPO_URI/discord_notify.sh && chmod +x /srv/discord_notify.sh
+sudo wget -P /srv $GITHUB_REPO_URI/discord_notify.sh && sudo chmod +x /srv/discord_notify.sh
 
 # Get latest version of auto_upgrade.sh script
 wget $GITHUB_REPO_URI/auto_upgrade.sh && chmod +x ~/auto_upgrade.sh
