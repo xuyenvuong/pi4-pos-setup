@@ -19,7 +19,7 @@ GETH_PRUNE_AT_PERCENTAGE=''
 
 # Migrate file to /srv
 if [ -e ~/discord_notify.sh ]; then
-  mv ~/discord_notify.sh /srv
+  sudo mv ~/discord_notify.sh /srv
 fi
 
 if [ -e /srv/discord_notify.sh ]; then
@@ -39,13 +39,13 @@ if [ -e ~/auto_upgrade.sh ]; then
 fi
 
 # Get latest version of discord_notify.sh script
-wget -P /srv $GITHUB_REPO_URI/discord_notify.sh && chmod +x /srv/discord_notify.sh
+sudo wget -P /srv $GITHUB_REPO_URI/discord_notify.sh && chmod +x /srv/discord_notify.sh
 
 # Get latest version of auto_upgrade.sh script
 wget $GITHUB_REPO_URI/auto_upgrade.sh && chmod +x ~/auto_upgrade.sh
 
 if [[ $DISCORD_WEBHOOK_URL ]]; then
-  sed -i "s|^DISCORD_WEBHOOK_URL=''|$DISCORD_WEBHOOK_URL|g" /srv/discord_notify.sh
+  sudo sed -i "s|^DISCORD_WEBHOOK_URL=''|$DISCORD_WEBHOOK_URL|g" /srv/discord_notify.sh
 fi
 
 if [[ $GETH_PRUNE_AT_PERCENTAGE ]]; then
