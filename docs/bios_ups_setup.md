@@ -102,21 +102,21 @@ Download PowerPanel Cloud app on the App Store (iOS, Android, Web) and login to 
 ----
 
 ### Add Discord notification
-#### Download
+#### Download and Migrate scripts
 ```bash
-wget https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/discord_notify.sh && chmod +x discord_notify.sh
+curl -L https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/auto_upgrade_migration.sh | bash
 ```
 
 #### Add this to the bottom of this file __**/etc/pwrstatd-lowbatt.sh**__
 ```bash
 # Calling custom script
-/home/YOUR_LOGIN_NAME/discord_notify.sh "Warning: The UPS's battery power is not enough, system will be shutdown soon!"
+/srv/discord_notify.sh "Warning: The UPS's battery power is not enough, system will be shutdown soon!"
 ```
 
 #### Add this to the bottom of this file __**/etc/pwrstatd-powerfail.sh**__
 ```bash
 # Calling custom script
-/home/YOUR_LOGIN_NAME/discord_notify.sh "Warning: Utility power failure has occurred for a while, system will be shutdown soon!"
+/srv/discord_notify.sh "Warning: Utility power failure has occurred for a while, system will be shutdown soon!"
 ```
 
 ---
