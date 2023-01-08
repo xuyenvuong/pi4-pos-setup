@@ -8,7 +8,7 @@
 echo -n "Enter the number of quick-picks (1-100): "
 read userinput
 
-if [[ $userinput -lt 0 || $userinput -gt 100 ]]; then
+if [[ $userinput -lt 1 || $userinput -gt 100 ]]; then
   echo "Input outside acceptable range. Terminate script."
   exit 1
 fi
@@ -17,17 +17,20 @@ fi
 echo -n "Enter the number of quick-picks from the SELECTED NUMBERS (1-100): "
 read userinputselected
 
-if [[ $userinputselected -lt 0 || $userinputselected -gt 100 ]]; then
+if [[ $userinputselected -lt 1 || $userinputselected -gt 100 ]]; then
   echo "Input outside acceptable range. Terminate script."
   exit 1
 fi
 
-# Power ball number format
+# Power Ball: 5 regular number 1-69, and a Mega number 1-26
 MAX_REGULAR_NUMBER=5
+MAX_SPECIAL_NUMBER=1
+
+REGULAR_NUMBER_RANGE=69
+MEGA_NUMBER_RANGE=26
+
 SELECTED_NUMBERS=(61 63 20 10 16 26 17 54 41 32 8 15 42 23 40 36 39 22 45 28 27 19 69 35 60 55 34 11 14 6 2 9 7 50 38)
 SELECTED_SPECIAL_NUMBERS=(8 17 21 3 12 19 2 4 9 7 1 14 22 26)
-
-MAX_SPECIAL_NUMBER=1
 
 # Row count
 row_num=1
@@ -47,7 +50,7 @@ do
 
   while [ $number_count -lt $MAX_REGULAR_NUMBER ]
   do
-    number=$(( $RANDOM % 69 + 1 ))
+    number=$(( $RANDOM % $REGULAR_NUMBER_RANGE + 1 ))
 
     if [ $((numbers[$number])) -ne $number ]; then
       if [ $number -lt 10 ]; then
@@ -60,7 +63,7 @@ do
     fi
   done
 
-  special_number=$(( $RANDOM % 26 + 1 ))
+  special_number=$(( $RANDOM % $MEGA_NUMBER_RANGE + 1 ))
 
   if [ $special_number -lt 10 ]; then
     numbers+=("PB:  ${bold}$special_number${normal}")
@@ -112,7 +115,7 @@ do
 
   while [ $number_count -lt $MAX_REGULAR_NUMBER ]
   do
-    number=$(( $RANDOM % 69 + 1 ))
+    number=$(( $RANDOM % $REGULAR_NUMBER_RANGE + 1 ))
 
     if [ $((selected_numbers[$number])) -eq $number ]; then
       if [ $((numbers[$number])) -ne $number ]; then
@@ -132,7 +135,7 @@ do
 
   while [ $special_number_count -lt $MAX_SPECIAL_NUMBER ]
   do
-    special_number=$(( $RANDOM % 26 + 1 ))
+    special_number=$(( $RANDOM % $MEGA_NUMBER_RANGE + 1 ))
 
     if [ $((selected_special_numbers[$special_number])) -eq $special_number ]; then
       if [ $special_number -lt 10 ]; then

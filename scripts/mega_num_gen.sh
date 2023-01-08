@@ -8,7 +8,7 @@
 echo -n "Enter the number of quick-picks (1-100): "
 read userinput
 
-if [[ $userinput -lt 0 || $userinput -gt 100 ]]; then
+if [[ $userinput -lt 1 || $userinput -gt 100 ]]; then
   echo "Input outside acceptable range. Terminate script."
   exit 1
 fi
@@ -16,7 +16,7 @@ fi
 # Mega pick: 5 regular number 1-70, and a Mega number 1-25
 MAX_REGULAR_NUMBER=5
 REGULAR_NUMBER_RANGE=70
-MEGA_NUMBER_RANGE=25
+SPECIAL_NUMBER_RANGE=25
 
 # Row count
 row_num=1
@@ -47,7 +47,7 @@ do
     fi
   done
 
-  mega_number=$(( $RANDOM % $MEGA_NUMBER_RANGE + 1 ))
+  mega_number=$(( $RANDOM % $SPECIAL_NUMBER_RANGE + 1 ))
 
   if [ $mega_number -lt 10 ]; then
     numbers+=("MEGA:  ${bold}$mega_number${normal}")
