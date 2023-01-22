@@ -15,6 +15,7 @@ fi
 
 # Mega pick: 5 regular number 1-70, and a Mega number 1-25
 MAX_REGULAR_NUMBER=5
+
 REGULAR_NUMBER_RANGE=70
 SPECIAL_NUMBER_RANGE=25
 
