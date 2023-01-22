@@ -7,6 +7,6 @@
 
 # Restart only if uncommunicative
 if ! ping -c5 www.google.com ; then
-  sudo shutdown -r now
-  logger "Rebooting due to internet connection. (Max Vuong)"
+  logger "Auto rebooting due to internet connection."
+  sudo shutdown -r now  
 fi
