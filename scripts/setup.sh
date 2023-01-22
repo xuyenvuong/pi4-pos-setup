@@ -15,14 +15,30 @@ function install_package() {
 }
 
 # Uninstall package
-function uninstall_package() {
-  local dpkg_name=$1
+# function uninstall_package() {
+#   local dpkg_name=$1
 
-  if [ $(dpkg-query -W -f='${Status}' $dpkg_name 2>/dev/null | grep -c "ok installed") -eq 1 ]; then
-    echo "Uninstalling: $dpkg_name"
-    sudo apt purge -y $dpkg_name
-  fi
-}
+#   if [ $(dpkg-query -W -f='${Status}' $dpkg_name 2>/dev/null | grep -c "ok installed") -eq 1 ]; then
+#     echo "Uninstalling: $dpkg_name"
+#     sudo apt purge -y $dpkg_name
+#   fi
+# }
+
+#-------------------------------------------------------------------------------------------#
+
+PRYSM_SH_URL=https://raw.githubusercontent.com/prysmaticlabs/prysm/master/prysm.sh
+
+DEPOSIT_CLI_RELEASES_LATEST=https://api.github.com/repos/ethereum/staking-deposit-cli/releases/latest
+
+ETH2_CLIENT_METRICS_EXPORTER_RELEASES_LATEST=https://api.github.com/repos/gobitfly/eth2-client-metrics-exporter/releases/latest
+
+GETH_TAGS_URL=https://api.github.com/repos/ethereum/go-ethereum/tags
+
+AUTO_UPGRADE_URL=https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/auto_upgrade_migration.sh
+
+NOIP_URL=https://www.noip.com/client/linux/noip-duc-linux.tar.gz
+
+ARCH=$(dpkg --print-architecture)
 
 #-------------------------------------------------------------------------------------------#
 # Main function to install all necessary package to support the node
@@ -122,7 +138,7 @@ function install_essential() {
     # curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 
     # # arch = amd64|arm64|armhf
-    # sudo add-apt-repository "deb [arch=$(dpkg --print-architecture)] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+    # sudo add-apt-repository "deb [$ARCH] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 	
     # sudo apt-get install -y docker-ce docker-ce-cli containerd.io
   
@@ -179,7 +195,7 @@ function install_grafana() {
 function install_eth2_client_metrics_exporter() {
   if [ ! -e /usr/local/bin/eth2-client-metrics-exporter ]; then
     echo "Installing: Eth2 Client Metrics Exporter"    
-    curl -s https://api.github.com/repos/gobitfly/eth2-client-metrics-exporter/releases/latest | grep "eth2-client-metrics-exporter-linux-$(dpkg --print-architecture)" | cut -d : -f 2,3 |  tr -d \" | wget -qi - -O /tmp/eth2-client-metrics-exporter
+    curl -s $ETH2_CLIENT_METRICS_EXPORTER_RELEASES_LATEST | grep "eth2-client-metrics-exporter-linux-$ARCH" | cut -d : -f 2,3 |  tr -d \" | wget -qi - -O /tmp/eth2-client-metrics-exporter
     chmod +x /tmp/eth2-client-metrics-exporter
     sudo mv /tmp/eth2-client-metrics-exporter /usr/local/bin
   fi 
@@ -189,12 +205,10 @@ function install_eth2_client_metrics_exporter() {
 function install_geth() {  
   if [ ! -e /usr/local/bin/geth ]; then
     # Download latest GETH info
-    TAGS_URL=https://api.github.com/repos/ethereum/go-ethereum/tags
-    geth_latest_version=$(wget -O - -o /dev/null $TAGS_URL | jq '.[0].name' | tr -d \" | cut -c 2-)
-    
-    arch=$(dpkg --print-architecture)
-    sha=$(wget -O - -o /dev/null $TAGS_URL | jq '.[0].commit.sha' | cut -c 2-9)
-    download_version=$arch-$geth_latest_version-$sha
+    geth_latest_version=$(wget -O - -o /dev/null $GETH_TAGS_URL | jq '.[0].name' | tr -d \" | cut -c 2-)
+        
+    sha=$(wget -O - -o /dev/null $GETH_TAGS_URL | jq '.[0].commit.sha' | cut -c 2-9)
+    download_version=$ARCH-$geth_latest_version-$sha
     
     # Download latest tar ball and move to bin folder
     wget -P /tmp https://gethstore.blob.core.windows.net/builds/geth-linux-$download_version.tar.gz
@@ -205,7 +219,7 @@ function install_geth() {
 
 function install_auto_upgrade() {
   if [ ! -e $HOME/auto_upgrade.sh ]; then
-    wget https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/auto_upgrade.sh && chmod +x auto_upgrade.sh
+    curl -L $AUTO_UPGRADE_URL | bash
   fi
 }
 
@@ -216,7 +230,7 @@ function install_cryptowatch() {
     unzip /tmp/e4bcf6e16dd2e04c4edc699e795d9450dee486ab.zip -d /tmp
     cd /tmp/cryptowat_exporter-e4bcf6e16dd2e04c4edc699e795d9450dee486ab
     go build
-    cd
+    cd ~
     sudo cp /tmp/cryptowat_exporter-e4bcf6e16dd2e04c4edc699e795d9450dee486ab/cryptowat_exporter /usr/local/bin
   fi
 }
@@ -224,7 +238,7 @@ function install_cryptowatch() {
 # Install Prysm
 function install_prysm() {
   if [ ! -e $HOME/prysm/prysm.sh ]; then
-    curl https://raw.githubusercontent.com/prysmaticlabs/prysm/master/prysm.sh --output $HOME/prysm/prysm.sh && chmod +x $HOME/prysm/prysm.sh
+    curl $PRYSM_SH_URL --output $HOME/prysm/prysm.sh && chmod +x $HOME/prysm/prysm.sh
   fi
 }
 
@@ -239,9 +253,12 @@ function install_prysm() {
 
 # Install Validator Key Generator
 function install_validator_key_generator() {
-  if [ ! -e $HOME/staking_deposit-cli-e2a7c94-linux-amd64/deposit ]; then
-    wget -P $HOME https://github.com/ethereum/staking-deposit-cli/releases/download/v2.0.0/staking_deposit-cli-e2a7c94-linux-amd64.tar.gz    
-    tar -C $HOME -xvf /tmp/staking_deposit-cli-e2a7c94-linux-amd64.tar.gz
+  if [ ! -e $HOME/staking_deposit-cli-e2a7c94-linux-amd64/deposit ]; then    
+    deposit_cli_filename=$(wget -O - -o /dev/null $DEPOSIT_CLI_RELEASES_LATEST | jq '.assets[].name' | grep linux-$ARCH | tr -d \")
+    browser_download_url=$(wget -O - -o /dev/null $DEPOSIT_CLI_RELEASES_LATEST | jq '.assets[].browser_download_url' | grep linux-$ARCH | tr -d \")
+
+    wget -P /tmp $browser_download_url
+    tar -C $HOME -xzvf /tmp/$deposit_cli_filename
   fi
   
   #-----------------------------------------------------------------#
@@ -279,7 +296,7 @@ function install_validator_key_generator() {
 # Install NOIP Service
 function install_noip() {
   if [ ! -e /usr/local/bin/noip2 ]; then
-    wget -P /tmp https://www.noip.com/client/linux/noip-duc-linux.tar.gz
+    wget -P /tmp $NOIP_URL
     tar -C /tmp -xvf /tmp/noip-duc-linux.tar.gz
     cd /tmp/noip-2.1.9-1/
 
@@ -399,25 +416,6 @@ function build_pos() {
 }
 
 #-------------------------------------------------------------------------------------------#
-# Run backup for all
-function backup_all() {
-  echo "Backing up...."
-}
-
-#-------------------------------------------------------------------------------------------#
-# Verify setup 
-function verify() {
-  echo "Verifying...."
-}
-
-#-------------------------------------------------------------------------------------------#
-# Display help
-function help() {
-  echo "Help..."
-}
-
-
-#-------------------------------------------------------------------------------------------#
 # Config Files
 #-------------------------------------------------------------------------------------------#
 
@@ -481,7 +479,7 @@ jwt-secret: /etc/ethereum/jwt.hex
 attest-timely: true
 
 # Sync faster (default 64)
-block-batch-limit: 512
+block-batch-limit: 64
 
 #p2p-host-ip: $(curl -s v4.ident.me)
 p2p-host-dns: "maxvuong.tplinkdns.com"
@@ -509,11 +507,13 @@ http-mev-relay: http://localhost:18550
 #checkpoint-sync-url: https://xxxxxxxxxxxxxxxxx@eth2-beacon-mainnet.infura.io
 #genesis-beacon-api-url: https://xxxxxxxxxxxxxxxxx@eth2-beacon-mainnet.infura.io
 
-checkpoint-sync-url: http://localhost:3500
-genesis-beacon-api-url: http://localhost:3500 
+checkpoint-sync-url: https://sync-mainnet.beaconcha.in
+genesis-beacon-api-url: https://sync-mainnet.beaconcha.in
 grpc-max-msg-size: 65568081
 
 enable-only-blinded-beacon-blocks: true
+
+engine-endpoint-timeout-seconds: 5
 EOF
   fi
 
@@ -692,7 +692,7 @@ ARGS="
  --authrpc.vhosts 0.0.0.0
  --syncmode snap 
  --cache 1024 
- --datadir $HOME/.ethereum 
+ --datadir $HOME/.ethereum
  --metrics 
  --metrics.expensive 
  --pprof 
@@ -705,6 +705,9 @@ ARGS="
 EOF
   fi
 
+  # Use ancient db dir with this flag:  
+  #--datadir.ancient /mnt/ssd2/ethereum/geth/chaindata/ancient
+  
   # Prune geth with tmux
   # /usr/local/bin/geth snapshot prune-state --datadir $HOME/.ethereum  
 
@@ -880,6 +883,7 @@ function config_ports{
 
   # Check ports forwarding tool
   # https://mxtoolbox.com/SuperTool.aspx?action=tcp%3a%7Bnode-IP-address%7D%3a13000&run=toolpage
+  # curl --http0.9 localhost:13000
   
   # Check local port
   # sudo lsof -n | grep TCP | grep LISTEN | grep 8545
@@ -923,22 +927,9 @@ EOF
 }
 
 #-------------------------------------------------------------------------------------------#
-case $1 in
-  -i|--install)    
-    install_essential 
-	;;  
-  -b|--build)
-    build_pos
-	;;  
-  -s|--save)
-    backup_all
-	;;  
-  -h|--help)
-    help
-	;;
-  *)
-    echo "Task '$1' is not found!"
-    echo "Please use 'setup.sh help' for more info."
-    exit 1
-    ;;
-esac  
+
+install_essential
+
+#-------------------------------------------------------------------------------------------#
+
+# EOF
