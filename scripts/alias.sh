@@ -84,6 +84,6 @@ alias mevboost-restart='sudo systemctl restart mevboost.service'
 alias mevboost-enable='sudo systemctl enable mevboost.service'
 
 alias beacon-syncing='curl http://localhost:3500/eth/v1/node/syncing'
-alias geth-syncing='/usr/local/bin/geth attach http://localhost:8545'
+alias geth-syncing="printf 'eth.syncing' | /usr/local/bin/geth attach http://localhost:8545"
 
 EOF
