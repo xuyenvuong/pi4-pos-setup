@@ -123,6 +123,7 @@ function install_essential() {
   config_logrotate
   config_chrony
   config_ports
+  config_systemd_resolved
   
   # Optional configs
   config_noip
@@ -887,6 +888,23 @@ function config_ports{
   
   # Check local port
   # sudo lsof -n | grep TCP | grep LISTEN | grep 8545
+}
+
+# Config Systemd-Resolved
+function config_systemd_resolved() {
+  if [ ! -e /etc/systemd/resolved.conf.d/dns_servers.conf ]; then
+    sudo mkdir /etc/systemd/resolved.conf.d
+    
+    sudo cat << EOF | sudo tee /etc/systemd/resolved.conf.d/dns_servers.conf >/dev/null
+[Resolve]
+DNS=8.8.8.8 1.1.1.1
+EOF
+
+    sudo systemctl restart systemd-resolved
+    # resolvectl status
+    # systemd-resolve --status
+    # resolvectl query www.google.com
+  fi
 }
 
 # Config NO-IP
