@@ -10,7 +10,8 @@
 ## Create User 
 ### Login with default ubuntu/ubuntu
 ```bash
-ssh ubuntu@PI-IP
+ssh ubuntu@local_ip_address
+# Change default password
 passwd
 ```
 
@@ -20,7 +21,7 @@ sudo adduser username
 sudo usermod -aG sudo username
 ```
 
-### Delete default user
+### Delete default user (default 'ubuntu')
 ```bash
 sudo userdel -r username
 ```
@@ -30,7 +31,27 @@ sudo userdel -r username
 sudo EDITOR=vim visudo
 
 # Add this line at the bottom of the file
-# username ALL=(ALL:ALL) ALL
+# username  ALL=(ALL) NOPASSWD:ALL
+```
+
+### SSH only for matched user
+```bash
+# Add this block at the end of /etc/ssh/sshd_conf file
+# Match User username
+#        PubkeyAuthentication yes
+#        AuthorizedKeysFile %h/.ssh/authorized_keys
+#        AuthenticationMethods publickey
+#        PubkeyAcceptedKeyTypes +ssh-rsa
+
+# Next set 
+# PasswordAuthentication no
+
+# Copy the public key to ~/.ssh/authorized_keys file
+
+# Restart SSH
+sudo systemctl restart ssh
+
+# Open another console to check. If not working, revert
 ```
 
 ### Change hostname 
@@ -60,9 +81,9 @@ sudo blkid
 ```bash
 sudo vi /etc/fstab
 ```
-#### Add this line at the end
+#### Add this line at the end with the above UUID
 ```bash
-UUID=e087e709-20f9-42a4-a4dc-d74544c490a6   /mnt/ssd   ext4   defaults   0   2
+# UUID=e087e709-20f9-42a4-a4dc-d74544c490a6   /mnt/ssd   ext4   defaults   0   2
 ```
 ### Reboot then check
 ```bash
