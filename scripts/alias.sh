@@ -10,6 +10,7 @@ Run this command to add aliases to your .bashrc
 Description:
 Supporting services [mevboost, beacon, validator, eth2-stats, geth, prometheus, prometheus-node-exporter, grafana]
 Supporting post-fixes [-log, -start, -stop, -restart, -enable]
+Supporting post-fixes beacon-syncing, geth-syncing
 
 Usage: 
 Add post-fixes after your service name [service][-postfix].
