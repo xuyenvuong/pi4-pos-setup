@@ -364,7 +364,8 @@ function install_yubikey() {
     sudo vi /etc/ssh/sshd_config
     Set:
       PubkeyAuthentication yes
-      AuthorizedKeysFile      %h/.ssh/authorized_keys %h/.ssh/authorized_keys2
+      AuthorizedKeysFile      %h/.ssh/authorized_keys
+      PubkeyAcceptedKeyTypes +ssh-rsa
       PasswordAuthentication no
       ChallengeResponseAuthentication yes
       >>> AuthenticationMethods publickey,keyboard-interactive:pam
@@ -384,24 +385,6 @@ function install_yubikey() {
 
   fi
 }
-
-#-------------------------------------------------------------------------------------------#
-# Upgrade all
-# function upgrade_all() {
-  # echo "Upgrading...."
-  
-  # # Update & Upgrade to latest
-  # sudo apt-get update && sudo apt-get upgrade
-  
-  # # Pull latest pi4-pos-setup.git repo
-  # if [ ! -d $HOME/pos-setup ]; then
-    # git clone https://github.com/xuyenvuong/pi4-pos-setup.git $HOME/pos-setup
-  # else
-    # cd $HOME/pos-setup
-    # git pull origin master
-    # cd $HOME
-  # fi  
-# }
 
 #-------------------------------------------------------------------------------------------#
 # Initialize pos setup: important files/directories in order to run the PoS node
@@ -441,7 +424,7 @@ EnvironmentFile=/etc/ethereum/prysm-beacon.conf
 Environment=USE_PRYSM_MODERN=$(if [ $(lscpu | grep -wc adx) -eq 1 ]; then echo "true"; else echo "false"; fi)
 ExecStart=$HOME/prysm/prysm.sh \$ARGS
 Restart=always
-RestartSec=3
+RestartSec=10
 User=$USER
 
 [Install]
@@ -535,7 +518,7 @@ Requires=network.target
 EnvironmentFile=/etc/ethereum/prysm-validator.conf
 ExecStart=$HOME/prysm/prysm.sh \$ARGS
 Restart=always
-RestartSec=3
+RestartSec=10
 User=$USER
 
 [Install]
@@ -598,7 +581,7 @@ Requires=network.target
 EnvironmentFile=/etc/ethereum/prysm-clientstats.conf
 ExecStart=$HOME/prysm/prysm.sh \$ARGS
 Restart=always
-RestartSec=3
+RestartSec=10
 User=$USER
 
 [Install]
@@ -633,7 +616,7 @@ Requires=network.target
 EnvironmentFile=/etc/ethereum/eth2-client-metrics-exporter.conf
 ExecStart=/usr/local/bin/eth2-client-metrics-exporter \$ARGS
 Restart=always
-RestartSec=3
+RestartSec=10
 User=$USER
 
 [Install]
@@ -669,7 +652,7 @@ Wants=network.target
 EnvironmentFile=/etc/ethereum/geth.conf
 ExecStart=/usr/local/bin/geth \$ARGS
 Restart=always
-RestartSec=3
+RestartSec=10
 User=$USER
 
 [Install]
@@ -730,7 +713,7 @@ Requires=prometheus.service
 EnvironmentFile=/etc/ethereum/cryptowatch.conf
 ExecStart=/usr/local/bin/cryptowat_exporter \$ARGS
 Restart=always
-RestartSec=3
+RestartSec=10
 User=$USER
 
 [Install]
@@ -823,7 +806,7 @@ $HOME/logs/*.log
     delaycompress
     compress
     postrotate
-        systemctl reload prysm-logs
+    systemctl reload prysm-logs
     endscript
 }
 EOF
@@ -920,7 +903,7 @@ Wants=network.target
 Type=forking
 ExecStart=/usr/local/bin/noip2
 Restart=always
-RestartSec=3
+RestartSec=10
 User=$USER
 
 [Install]
