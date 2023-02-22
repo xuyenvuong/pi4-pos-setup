@@ -675,7 +675,8 @@ ARGS="
  --authrpc.port 8551
  --authrpc.vhosts 0.0.0.0
  --syncmode snap 
- --cache 4096
+ --cache 8192
+ --db.engine pebble
  --datadir $HOME/.ethereum
  --metrics 
  --metrics.expensive 
