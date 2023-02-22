@@ -4,7 +4,7 @@
 
 [Download latest Ubuntu 64-bit](https://ubuntu.com/download/raspberry-pi)
 
-[Using Echer to flash the microSD card](https://www.balena.io/etcher/)
+[Using Etcher to flash the microSD card](https://www.balena.io/etcher/)
 
 ---
 ## Create User 
@@ -37,7 +37,7 @@ sudo EDITOR=vim visudo
 ### SSH only for matched user
 ```bash
 # Add this block at the end of /etc/ssh/sshd_conf file
-# Match User username
+# Match User username Address 192.168.0.0/24,10.8.0.0/24
 #        PubkeyAuthentication yes
 #        AuthorizedKeysFile %h/.ssh/authorized_keys
 #        AuthenticationMethods publickey
