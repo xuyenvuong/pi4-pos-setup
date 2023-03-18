@@ -54,7 +54,7 @@ There are 3 different ways to perform `withdrawal process`. It depends on how mu
 
 <div id="onlineUnsafe"></div>
 
-## 1. Online Process on `Staking Machine` 
+## 1. Online Process on Staking Machine 
 <span style="color:red">WARNING</span>: <span style="color:orange">_This is the quickest method, but it's the most `UNSAFE` method since you won't be able to review the submitted data and your machine will log the `mnemonic` key in the history/system-log. Error will be irreversable.</span> <span style="color:red">You've been WARNED!!!_</span>
 
 ![Online Method](https://raw.githubusercontent.com/wealdtech/ethdo/master/docs/images/credentials-change-online.png)
@@ -160,12 +160,12 @@ sudo ufw enable
 1. Name: `ssh` (or whatever you like)
 1. Protocol: `TCP`
 1. Host Port: `2222` (or any other port you like)
-1. Gust port: `22`
+1. Guest port: `22`
 
 * The IP fields can be left empty.
 ![Port Forwarding](https://averagelinuxuser.com/assets/images/posts/2022-05-21-ssh-into-virtualbox/Virtualbox-port-forwarding.jpg)
 
-* Test SSH, you can use PuTTY to connect to VM by using `localhost` and port `2222`. If it works then you are ready for the next part #3.
+* Test SSH: You can use PuTTY to connect to VM by using `localhost` and port `2222`. If it works then you are ready for the next part #3.
 
 ### Part 3 - Generate Offline Data
 
