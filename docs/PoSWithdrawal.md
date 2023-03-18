@@ -133,7 +133,7 @@ Congrats! You are DONE.
 ### Part 1 - Virtual Machine Installation/Setup
 * On your current `Windows Machine`
 
-* Follow this guide to download and setup `Virtual Box 7.0` and `Ubuntu Destop ISO 22.04 LTS`. Click here to follow the guide => [Open Guide](https://ubuntu.com/tutorials/how-to-run-ubuntu-desktop-on-a-virtual-machine-using-virtualbox#1-overview)
+* Follow this guide to download and setup `Virtual Box 7.0` and `Ubuntu Desktop ISO 22.04 LTS`. Click here to follow the guide => [Open Guide](https://ubuntu.com/tutorials/how-to-run-ubuntu-desktop-on-a-virtual-machine-using-virtualbox#1-overview)
 
 * Or, reference to manual download sites:
 
@@ -197,7 +197,7 @@ scp -r -P 2222 ~/ethdo_withdrawal username@XXX.XXX.XXX.XXX:~/.
 * Open a Terminal
 ![Open Terminal](https://vegibit.com/wp-content/uploads/2016/07/ubuntu-desktop-terminal.jpg)
 
-* Go to ethdo_withdrawal directory
+* Go to `ethdo_withdrawal` directory
 ```bash
 cd ~/ethdo_withdrawal
 ```
