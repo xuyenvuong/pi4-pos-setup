@@ -1,13 +1,6 @@
-<style>
-r { color: Red }
-o { color: Orange }
-g { color: Green }
-m { color: Gray }
-</style>
+## <span style="color:red">**NOTE: This guide is NOT YET available for MAINNET until April 12th.**</span>
 
-## <r>**NOTE: This guide is NOT YET available for MAINNET until April 12th.**</r>
-
-<o>Note: This guide doesn't cover `validator exiting`.</o>
+<span style="color:orange">Note: This guide doesn't cover `validator exiting`.</span>
 
 ---
 
@@ -51,18 +44,18 @@ vi withdrawal_address.txt
 # Step II - BASIC OPERATION
 There are 3 different ways to perform `withdrawal process`. It depends on how much risk you want to take.
 
-<o>_To proceed, click your preferred method:_</o>
+<span style="color:orange">_To proceed, click your preferred method:_</span>
 
-1. [Online Process on `Staking Machine` (<r>Unsafe</r>)](#onlineUnsafe)
-1. [Offline Process on `Staking Machine` (<r>Unsafe</r>)](#offlineUnsafe)
-1. [Offline Process on Virtual Machine (<g>Safe</g>)](#offlineSafe)
+1.  [Online Process on `Staking Machine` (<span style="color:red">Unsafe</span>)](#onlineUnsafe)
+1.  [Offline Process on `Staking Machine` (<span style="color:red">Unsafe</span>)](#offlineUnsafe)
+1.  [Offline Process on Virtual Machine (<span style="color:green">Safe</span>)](#offlineSafe)
 
 ---
 
 <div id="onlineUnsafe"></div>
 
 ## 1. Online Process on `Staking Machine` 
-<r>WARNING</r>: <o>_This is the quickest method, but it's the most `UNSAFE` method since you won't be able to review the submitted data and your machine will log the `mnemonic` key in the history/system-log. Error will be irreversable.</o> <r>You've been WARNED!!!_</r>
+<span style="color:red">WARNING</span>: <span style="color:orange">_This is the quickest method, but it's the most `UNSAFE` method since you won't be able to review the submitted data and your machine will log the `mnemonic` key in the history/system-log. Error will be irreversable.</span> <span style="color:red">You've been WARNED!!!_</span>
 
 ![Online Method](https://raw.githubusercontent.com/wealdtech/ethdo/master/docs/images/credentials-change-online.png)
 
@@ -89,7 +82,7 @@ Congrats! You are DONE.
 
 ## 2. Offline Process on `Staking Machine`
 
-<r>WARNING</r>: <o>_This is an easy method, but it's `UNSAFE` since the `mnemonic` key will be kept in the history/system-log._</o>
+<span style="color:red">WARNING</span>: <span style="color:orange">_This is an easy method, but it's `UNSAFE` since the `mnemonic` key will be kept in the history/system-log._</span>
 
 ![Offline Method](https://raw.githubusercontent.com/wealdtech/ethdo/master/docs/images/credentials-change-offline.png)
 
@@ -131,7 +124,7 @@ Congrats! You are DONE.
 <div id="offlineSafe"></div>
 
 ## 3. Offline Process on Virtual Machine
-<r>WARNING</r>: <o>_This is the safest method, but it's complex. You will spin up a temporary offline `virtual machine`, then review the data before submit it to the network. The `virtual machine` will be discard for any potential data leaks to the network._<o>
+<span style="color:red">WARNING</span>: <span style="color:orange">_This is the safest method, but it's complex. You will spin up a temporary offline `virtual machine`, then review the data before submit it to the network. The `virtual machine` will be discard for any potential data leaks to the network._<span style="color:orange">
 
 ![Offline Method](https://raw.githubusercontent.com/wealdtech/ethdo/master/docs/images/credentials-change-offline.png)
 
