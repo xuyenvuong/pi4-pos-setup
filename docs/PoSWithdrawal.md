@@ -7,9 +7,9 @@
 # Step I - PREPARATION
 _Reference => [Ethdo Github](https://github.com/wealdtech/ethdo/releases)_
 
-* SSH into your Staking Machine.
+* SSH into your `Staking Machine`.
 
-* Create ethdo_withdrawal directory
+* Create `ethdo_withdrawal` directory
 ```bash
 mkdir ~/ethdo_withdrawal
 ```
@@ -31,7 +31,7 @@ tar -C ~/ethdo_withdrawal -xvzf /tmp/ethdo-X.XX.X-linux-amd64.tar.gz
 * Make `ethdo_withdrawal` your current working dir
 
 ```bash
-cd ethdo_withdrawal
+cd ~/ethdo_withdrawal
 ```
 
 * Create `withdrawal_address.txt` and paste your `withdrawal-address` (aka wallet address) in there. Save & Exit.
@@ -54,7 +54,7 @@ There are 3 different ways to perform `Withdrawal Process`. It depends on how mu
 <div id="onlineUnsafe"></div>
 
 ## 1. Online Process on Staking Machine 
-<span style="color:red">WARNING</span>: <span style="color:orange">_This is the quickest method, but it's the most `UNSAFE` method since you won't be able to review the `submitted BLS data` and your machine will log the `mnemonic` key in the history/system-log. Error will be irreversable.</span> <span style="color:red">You've been WARNED!!!_</span>
+<span style="color:red">WARNING</span>: <span style="color:orange">_This is the quickest method, but it's the most `UNSAFE` method since you won't be able to review the `submitted BLS data` and your machine will log the `mnemonic key` in the history/system-log. Error will be irreversable.</span> <span style="color:red">You've been WARNED!!!_</span>
 
 ![Online Method](https://raw.githubusercontent.com/wealdtech/ethdo/master/docs/images/credentials-change-online.png)
 
@@ -62,7 +62,7 @@ There are 3 different ways to perform `Withdrawal Process`. It depends on how mu
 
 * Run this command after replacing the `--mnemonic` with your validator's `mnemonic key`, and `--withdrawal-address` with your wallet's public address (aka Metamask).
 * Any validator which associated with the `mnemonic key` will be subject for BLS changes and be submitted.
-* Tripple check your wallet-address before execute the command
+* Tripple check your `wallet-address` before execute the command
 
 ```bash
 ./ethdo validator credentials set --mnemonic="abandon abandon abandon … art" --withdrawal-address=0x0123…cdef
@@ -83,7 +83,7 @@ Congrats! You are DONE.
 
 ## 2. Offline Process on Staking Machine
 
-<span style="color:red">WARNING</span>: <span style="color:orange">_This is an easy method, but it's `UNSAFE` since the `mnemonic` key will be kept in the history/system-log._</span>
+<span style="color:red">WARNING</span>: <span style="color:orange">_This is an easy method, but it's `UNSAFE` since the `mnemonic key` will be kept in the history/system-log._</span>
 
 ![Offline Method](https://raw.githubusercontent.com/wealdtech/ethdo/master/docs/images/credentials-change-offline.png)
 
@@ -98,7 +98,7 @@ Congrats! You are DONE.
 
 * Run this command after replacing the `--mnemonic` with your validator's `mnemonic key`, and `--withdrawal-address` with your wallet's public address (aka Metamask). 
 * Any validator which associated with the `mnemonic key` will be subject for BLS changes and be submitted.
-* Tripple check your wallet-address before execute the command
+* Tripple check your `wallet-address` before execute the command
 
 ```bash
 ./ethdo validator credentials set --offline --mnemonic="abandon abandon abandon … art" --withdrawal-address=0x0123…cdef
@@ -136,18 +136,17 @@ Congrats! You are DONE.
 * Follow this guide to download and setup `Virtual Box 7.0` and `Ubuntu Desktop ISO 22.04 LTS`. Click here to follow the guide => [Open Guide](https://ubuntu.com/tutorials/how-to-run-ubuntu-desktop-on-a-virtual-machine-using-virtualbox#1-overview)
 
 * Or, reference to manual download sites:
-
-1. Download [VirtualBox 7.0](https://www.virtualbox.org/wiki/Downloads)
-1. Download [Ubuntu Desktop ISO 22.04 LTS](https://ubuntu.com/download/desktop/thank-you?version=22.04.2&architecture=amd64)
+  1. Download [VirtualBox 7.0](https://www.virtualbox.org/wiki/Downloads)
+  1. Download [Ubuntu Desktop ISO 22.04 LTS](https://ubuntu.com/download/desktop/thank-you?version=22.04.2&architecture=amd64)
 
 ### Part 2 - Setup SSH to Ubuntu Virtual Machine
 
 * On your VirtualBox
 ![VirtualBox](https://lh5.googleusercontent.com/yMQCsjA_n3ldbxGQ10zvqehVr3t-gt6Do9Wb42LH6C--9s1-YLYNLqZEUETaBeGYmNDDIEBpFal34Pot87CmkRp-I-JKg8Cv3A5KNpK-c7D-FOoHS0LHvih3mqMzudDZLk-gHa9qGPlx_8y0zPJFTNasgTKvU328wpsCkNiaVKJLUFoPmIMM263RpYhCUQ)
 
-* Boot up your VM, login, then
+* Boot up your VM, login, then open a terminal, run:
 ```bash
-# Set firewall to sllow SSH port 22
+# Set firewall to allow SSH port 22
 sudo ufw allow ssh
 
 # Enable firewall
@@ -158,11 +157,10 @@ sudo ufw enable
 ![VM NAT Settings](https://averagelinuxuser.com/assets/images/posts/2022-05-21-ssh-into-virtualbox/Virtualbox-NAT.jpg)
 
 * Then go to `Advanced` -> `Port Forwarding` and add these settings:
-
-1. Name: `ssh` (or whatever you like)
-1. Protocol: `TCP`
-1. Host Port: `2222` (or any other port you like)
-1. Guest port: `22`
+  1. Name: `ssh` (or whatever you like)
+  1. Protocol: `TCP`
+  1. Host Port: `2222` (or any other port you like)
+  1. Guest port: `22`
 
 * The IP fields can be left empty.
 ![Port Forwarding](https://averagelinuxuser.com/assets/images/posts/2022-05-21-ssh-into-virtualbox/Virtualbox-port-forwarding.jpg)
@@ -182,8 +180,8 @@ sudo ufw enable
 
 ### Part 4 - Copy Working Directory to Virtual Machine
 
-* Copy the whole ethdo_withdrawal directory to offline VM
 * On your `Staking Machine`. Replace with your `username@XXX.XXX.XXX.XXX` with your username and windows' IP address.
+* Copy the whole ethdo_withdrawal directory to offline VM
 
 ```bash
 scp -r -P 2222 ~/ethdo_withdrawal username@XXX.XXX.XXX.XXX:~/.
@@ -211,7 +209,7 @@ vi withdrawal_address.txt
 
 * Run this command after replacing the `--mnemonic` with your validator's `mnemonic key`, and `--withdrawal-address` with your wallet's public address (aka Metamask). 
 * Any validator which associated with the `mnemonic key` will be subject for BLS changes and be submitted.
-* Tripple check your wallet-address before execute the command
+* Tripple check your `wallet-address` before execute the command
 
 ```bash
 # Tips: Paste the withdrawal-address instead of re-type. You have to manually type in your mnemonic key to make sure.
@@ -232,10 +230,10 @@ vi withdrawal_address.txt
 scp -r -P 2222 username@XXX.XXX.XXX.XXX:~/ethdo_withdrawal/change-operations.json ~/ethdo_withdrawal
 ```
 
-* Shutdown your `Virtual Machine` (No longer need it)
+* Shutdown your `Virtual Machine` (No longer need it. You can also remove the VM from VirtualBox)       
 ![Power Off](https://ubuntuhandbook.org/wp-content/uploads/2020/05/bring-out-submenu.png)
 
-### Part 7 - Submit BLS Data to Consensus Mainnet Nodes
+### Part 7 - Submit BLS Data to Local Consensus Mainnet Nodes
 
 * On your `Staking Machine`, run this command to submit the data
 
