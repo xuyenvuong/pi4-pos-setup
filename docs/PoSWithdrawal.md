@@ -235,7 +235,7 @@ scp -r -P 2222 username@XXX.XXX.XXX.XXX:~/ethdo_withdrawal/change-operations.jso
 * Shutdown your `Virtual Machine` (No longer need it)
 ![Power Off](https://ubuntuhandbook.org/wp-content/uploads/2020/05/bring-out-submenu.png)
 
-### Part 9 - Submit BLS Data to Consensus Mainnet Nodes
+### Part 7 - Submit BLS Data to Consensus Mainnet Nodes
 
 * On your `Staking Machine`, run this command to submit the data
 
