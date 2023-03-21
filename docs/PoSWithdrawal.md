@@ -22,7 +22,7 @@ wget -P /tmp https://github.com/wealdtech/ethdo/releases/download/v1.28.5/ethdo-
 tar -C ~/ethdo_withdrawal -xvzf /tmp/ethdo-1.28.5-linux-amd64.tar.gz
 ```
 
-* Make sure ethdo can connect to your `Beaconchain` on your local `Staking Machine`. Check for `Syncing: true`. Only proceed if it is true. Abort otherwise.
+* Make sure `ethdo` can connect to your `Beaconchain` on your local `Staking Machine`. Check for `Syncing: true`. Only proceed if it is `true`. Abort otherwise.
 
 ```bash
 ./ethdo node info
@@ -34,7 +34,7 @@ tar -C ~/ethdo_withdrawal -xvzf /tmp/ethdo-1.28.5-linux-amd64.tar.gz
 cd ~/ethdo_withdrawal
 ```
 
-* Create `withdrawal_address.txt` and paste your `withdrawal-address` (aka wallet address) in there. Save & Exit.
+* Create `withdrawal_address.txt` and paste your `withdrawal-address` (aka wallet address) in there. `Save` & `Exit`.
 ```bash
 vi withdrawal_address.txt
 ```
@@ -54,7 +54,7 @@ There are 3 different ways to perform `Withdrawal Process`. It depends on how mu
 <div id="onlineUnsafe"></div>
 
 ## 1. Online Process on Staking Machine 
-<span style="color:red">WARNING</span>: <span style="color:orange">_This is the quickest method, but it's the most `UNSAFE` method since you won't be able to review the `submitted BLS data` and your machine will log the `mnemonic key` in the history/system-log. Error will be irreversable.</span> <span style="color:red">You've been WARNED!!!_</span>
+<span style="color:red">WARNING</span>: <span style="color:orange">_This is the quickest method, but it's the most `UNSAFE` method since you won't be able to review the `submitted BLS data` and your machine will log the `mnemonic key` in the history/system-log. Error will be irreversable.</span> <span style="color:red">`You've been WARNED!!!`_</span>
 
 ![Online Method](https://raw.githubusercontent.com/wealdtech/ethdo/master/docs/images/credentials-change-online.png)
 
