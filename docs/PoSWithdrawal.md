@@ -16,10 +16,10 @@ mkdir ~/ethdo_withdrawal
 
 * Download `ethdo` binary
 ```bash
-wget -P /tmp https://github.com/wealdtech/ethdo/releases/download/vX.XX.X/ethdo-X.XX.X-linux-amd64.tar.gz
+wget -P /tmp https://github.com/wealdtech/ethdo/releases/download/v1.28.5/ethdo-1.28.5-linux-amd64.tar.gz
 
 # Untar to ethdo_withdrawal directory
-tar -C ~/ethdo_withdrawal -xvzf /tmp/ethdo-X.XX.X-linux-amd64.tar.gz
+tar -C ~/ethdo_withdrawal -xvzf /tmp/ethdo-1.28.5-linux-amd64.tar.gz
 ```
 
 * Make sure ethdo can connect to your `Beaconchain` on your local `Staking Machine`. Check for `Syncing: true`. Only proceed if it is true. Abort otherwise.
