@@ -1,4 +1,4 @@
-## <span style="color:red">**NOTE: This guide is NOT YET available for MAINNET until April 12th.**</span>
+# <span style="color:red">**ONLY submit to MAINNET after the Shanghai fork on April 12th.**</span>
 
 <span style="color:orange">Note: This guide doesn't cover `Validator Exiting`.</span>
 
