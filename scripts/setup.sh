@@ -493,7 +493,9 @@ http-mev-relay: http://localhost:18550
 
 checkpoint-sync-url: https://sync-mainnet.beaconcha.in
 genesis-beacon-api-url: https://sync-mainnet.beaconcha.in
-grpc-max-msg-size: 65568081
+
+rpc-max-page-size: 200000
+grpc-max-msg-size: 268435456
 
 enable-only-blinded-beacon-blocks: true
 
