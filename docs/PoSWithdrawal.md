@@ -28,7 +28,7 @@ tar -C ~/ethdo_withdrawal -xvzf /tmp/ethdo-1.28.5-linux-amd64.tar.gz
 cd ~/ethdo_withdrawal
 ```
 
-* Make sure `ethdo` can connect to your `Beaconchain` on your local `Staking Machine`. Check for `Syncing: true`. Only proceed if it is `true`. Abort otherwise.
+* Make sure `ethdo` can connect to your `Beaconchain` on your local `Staking Machine`. Check for `Syncing: false`. Only proceed if it is `false`. Abort otherwise.
 
 ```bash
 ./ethdo node info
