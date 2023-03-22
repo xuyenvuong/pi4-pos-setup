@@ -9,6 +9,17 @@ _Reference => [Ethdo Github](https://github.com/wealdtech/ethdo/releases)_
 
 * SSH into your `Staking Machine`.
 
+* Change Prysm config. 
+```bash
+vi prysm/configs/beacon.yaml
+```
+
+* Add these two lines into your: `rpc-max-page-size: 200000` and `grpc-max-msg-size: 268435456`
+```bash
+# restart beacon-chain
+beacon-restart
+```
+
 * Create `ethdo_withdrawal` directory
 ```bash
 mkdir ~/ethdo_withdrawal
