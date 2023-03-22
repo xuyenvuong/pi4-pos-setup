@@ -25,18 +25,18 @@ beacon-restart
 mkdir ~/ethdo_withdrawal
 ```
 
+* Make `ethdo_withdrawal` your current working dir
+
+```bash
+cd ~/ethdo_withdrawal
+```
+
 * Download `ethdo` binary
 ```bash
 wget -P /tmp https://github.com/wealdtech/ethdo/releases/download/v1.28.5/ethdo-1.28.5-linux-amd64.tar.gz
 
 # Untar to ethdo_withdrawal directory
 tar -C ~/ethdo_withdrawal -xvzf /tmp/ethdo-1.28.5-linux-amd64.tar.gz
-```
-
-* Make `ethdo_withdrawal` your current working dir
-
-```bash
-cd ~/ethdo_withdrawal
 ```
 
 * Make sure `ethdo` can connect to your `Beaconchain` on your local `Staking Machine`. Check for `Syncing: false`. Only proceed if it is `false`. Abort otherwise.
