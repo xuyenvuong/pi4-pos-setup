@@ -22,16 +22,16 @@ wget -P /tmp https://github.com/wealdtech/ethdo/releases/download/v1.28.5/ethdo-
 tar -C ~/ethdo_withdrawal -xvzf /tmp/ethdo-1.28.5-linux-amd64.tar.gz
 ```
 
-* Make sure `ethdo` can connect to your `Beaconchain` on your local `Staking Machine`. Check for `Syncing: true`. Only proceed if it is `true`. Abort otherwise.
-
-```bash
-./ethdo node info
-```
-
 * Make `ethdo_withdrawal` your current working dir
 
 ```bash
 cd ~/ethdo_withdrawal
+```
+
+* Make sure `ethdo` can connect to your `Beaconchain` on your local `Staking Machine`. Check for `Syncing: true`. Only proceed if it is `true`. Abort otherwise.
+
+```bash
+./ethdo node info
 ```
 
 * Create `withdrawal_address.txt` and paste your `withdrawal-address` (aka wallet address) in there. `Save` & `Exit`.
