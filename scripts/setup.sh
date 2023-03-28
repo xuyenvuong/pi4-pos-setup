@@ -497,8 +497,6 @@ genesis-beacon-api-url: https://sync-mainnet.beaconcha.in
 rpc-max-page-size: 200000
 grpc-max-msg-size: 268435456
 
-enable-only-blinded-beacon-blocks: true
-
 engine-endpoint-timeout-seconds: 5
 EOF
   fi
