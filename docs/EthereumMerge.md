@@ -1,4 +1,6 @@
 
+# This guide is obsoleted since this feature is done.
+
 # Merge Readiness Update (Its required to upgrade by today)
 
 Ethereum has released new upgrade that would require you to take immediate action today. If you fail to do it by today, you node may go down since incompatibility between the Consensus Layer and Execution Layer. (I can jump online to help you just incase)
