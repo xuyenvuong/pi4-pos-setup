@@ -33,10 +33,10 @@ cd ~/ethdo_withdrawal
 
 * Download `ethdo` binary
 ```bash
-wget -P /tmp https://github.com/wealdtech/ethdo/releases/download/v1.28.5/ethdo-1.28.5-linux-amd64.tar.gz
+wget -P /tmp https://github.com/wealdtech/ethdo/releases/download/v1.29.2/ethdo-1.29.2-linux-amd64.tar.gz
 
 # Untar to ethdo_withdrawal directory
-tar -C ~/ethdo_withdrawal -xvzf /tmp/ethdo-1.28.5-linux-amd64.tar.gz
+tar -C ~/ethdo_withdrawal -xvzf /tmp/ethdo-1.29.2-linux-amd64.tar.gz
 ```
 
 * Make sure `ethdo` can connect to your `Beaconchain` on your local `Staking Machine`. Check for `Syncing: false`. Only proceed if it is `false`. Abort otherwise.
@@ -157,6 +157,17 @@ Congrats! You are DONE.
 
 * Boot up your VM, login, then open a terminal, run:
 ```bash
+su root
+# Enter your password.
+
+usermod -aG sudo vboxuser
+su vbox
+sudo whoami
+# Expect to see `root`
+```
+
+* Next, allow firewall for SSH
+```bash
 # Set firewall to allow SSH port 22
 sudo ufw allow ssh
 
@@ -179,6 +190,8 @@ sudo ufw enable
 * Test SSH: You can use PuTTY to connect to VM by using `localhost` and port `2222`. If it works then you are ready for the next part #3.
 
 * _(NOTE: To get your `localhost` IP on Windows, open `cmd`, then enter `ipconfig`, hit `Enter` - Copy `IPv4 Address`)_
+
+* _NOTE: If it's not working, refer to this [setup guide](https://wiredrevolution.com/virtualbox/setup-ssh-access-between-virtualbox-host-and-guest-vms)_
 
 ### Part 3 - Generate Offline Consensus Nodes Data
 
