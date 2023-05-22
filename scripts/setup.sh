@@ -498,6 +498,11 @@ rpc-max-page-size: 200000
 grpc-max-msg-size: 268435456
 
 engine-endpoint-timeout-seconds: 5
+build-block-parallel: true
+
+aggregate-first-interval: 7500ms
+aggregate-second-interval: 9800ms
+aggregate-third-interval: 11800ms
 EOF
   fi
 
