@@ -18,7 +18,6 @@ passwd
 ### Add new user (other than default user 'ubuntu')
 ```bash
 sudo adduser username
-sudo usermod -aG sudo username
 ```
 
 ### Delete default user (default 'ubuntu')
@@ -28,8 +27,10 @@ sudo userdel -r username
 
 ### Give ubuntu user sudo access
 ```bash
-sudo EDITOR=vim visudo
+# Add user to sudoer group
+sudo usermod -aG sudo username
 
+sudo EDITOR=vim visudo
 # Add this line at the bottom of the file
 # username  ALL=(ALL) NOPASSWD:ALL
 ```
