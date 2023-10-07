@@ -104,6 +104,9 @@ function install_essential() {
   # NO-IP (optional installation)
   install_noip
 
+  # ddclient (optional installation)
+  install_ddclient
+
   # Google Auth (optional)
   install_google_authenticator
 
@@ -127,6 +130,7 @@ function install_essential() {
   
   # Optional configs
   config_noip
+  config_ddclient
   config_aliases
   config_disable_power_button
   config_ssh_yubikey_auth
@@ -155,8 +159,10 @@ function install_essential() {
 function install_prometheus() {
   if [ $(dpkg-query -W -f='${Status}' prometheus 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
     echo "Installing: Prometheus"
-    sudo useradd -m prometheus
-    sudo chown -R prometheus:prometheus /home/prometheus/
+    sudo groupadd --system prometheus
+    #sudo useradd -m prometheus
+    sudo useradd -s /sbin/nologin --system -g prometheus prometheus
+    #sudo chown -R prometheus:prometheus /home/prometheus/
     install_package prometheus
     install_package prometheus-node-exporter
     
@@ -261,10 +267,13 @@ function install_validator_key_generator() {
     wget -P /tmp $browser_download_url
     tar -C $HOME -xzvf /tmp/$deposit_cli_filename
   fi
+
+  # Download via Github GUI
+  # https://github.com/ethereum/staking-deposit-cli/releases
   
   #-----------------------------------------------------------------#
   # To run:
-  # > cd eth2deposit-cli-256ea21-linux-amd64
+  # > cd staking_deposit-cli-d7b5304-linux-amd64
   # > ./deposit new-mnemonic --num_validators 1 --chain mainnet
   # At prompt, enter the seeds pharse, then 
   # At prompt follow by enter ACCOUNT PASSWORD, Save it to Bitwarden
@@ -301,11 +310,27 @@ function install_noip() {
     tar -C /tmp -xvf /tmp/noip-duc-linux.tar.gz
     cd /tmp/noip-2.1.9-1/
 
-    make install
+    sudo make
+    sudo make install
 
     sudo cp noip2 /usr/local/bin
     /usr/local/bin/noip2 -C -c /tmp/no-ip2.conf
     sudo mv /tmp/no-ip2.conf /usr/local/etc/no-ip2.conf
+  fi
+}
+
+# Install ddclient Service
+function install_ddclient() {
+  if [ ! -e /usr/sbin/ddclient ]; then
+    sudo apt install ddclient
+
+    #1. Select "other"
+    #2. Enter "freemyip.com"
+    #3. Select "dyndns2"
+    #4. Enter freemyip.com token for username      
+    #5. Enter freemyip.com token for password
+    #6. Network interface empty
+    #7. Enter your full domain name: e.g. mvuong.freemyip.com
   fi
 }
 
@@ -316,7 +341,8 @@ function install_google_authenticator() {
 
     sudo vi /etc/ssh/sshd_config
     Set: 
-      ChallengeResponseAuthentication yes
+      # ChallengeResponseAuthentication yes (has been replaced with the below cmd)
+      KbdInteractiveAuthentication yes
     
     
     sudo apt install libpam-google-authenticator
@@ -463,7 +489,7 @@ jwt-secret: /etc/ethereum/jwt.hex
 attest-timely: true
 
 # Sync faster (default 64)
-block-batch-limit: 64
+block-batch-limit: 128
 
 #p2p-host-ip: $(curl -s v4.ident.me)
 p2p-host-dns: "maxvuong.tplinkdns.com"
@@ -488,21 +514,23 @@ suggested-fee-recipient: 0xYOUR_WALLET_ADDRESS
 http-mev-relay: http://localhost:18550
 
 # Faster sync
-#checkpoint-sync-url: https://xxxxxxxxxxxxxxxxx@eth2-beacon-mainnet.infura.io
-#genesis-beacon-api-url: https://xxxxxxxxxxxxxxxxx@eth2-beacon-mainnet.infura.io
-
 checkpoint-sync-url: https://sync-mainnet.beaconcha.in
 genesis-beacon-api-url: https://sync-mainnet.beaconcha.in
 
 rpc-max-page-size: 200000
 grpc-max-msg-size: 268435456
 
-engine-endpoint-timeout-seconds: 5
-build-block-parallel: true
+# 12s is the upper bound
+engine-endpoint-timeout-seconds: 10
+
+# Temporary turn this flag on due to missed attestation
+enable-optional-engine-methods: true
 
 aggregate-first-interval: 7500ms
 aggregate-second-interval: 9800ms
-aggregate-third-interval: 11800ms
+aggregate-third-interval: 11900ms
+
+#aggregate-parallel: true
 EOF
   fi
 
@@ -568,7 +596,7 @@ monitoring-host: 0.0.0.0
 # Mainnet
 graffiti: "poapaa2VsI8722DeHPPwjXbJooGadtMA"
 
-suggested-fee-recipient: 0xYOUR_WALLET_ADDRESS
+suggested-fee-recipient: ______0xYOUR_WALLET_ADDRESS______
 EOF
   fi
 }
@@ -678,10 +706,10 @@ ARGS="
  --authrpc.jwtsecret /etc/ethereum/jwt.hex
  --authrpc.addr 0.0.0.0
  --authrpc.port 8551
- --authrpc.vhosts 0.0.0.0
+ --authrpc.vhosts * 
  --syncmode snap 
- --cache 8192
  --db.engine pebble
+ --state.scheme path
  --datadir $HOME/.ethereum
  --metrics 
  --metrics.expensive 
@@ -745,7 +773,7 @@ function config_prometheus() {
 ARGS="
  --web.enable-lifecycle
  --storage.tsdb.retention.time=31d
- --storage.tsdb.path=/home/prometheus/metrics2/
+ --storage.tsdb.path=/var/lib/prometheus
 "
 EOF
   fi
@@ -753,10 +781,10 @@ EOF
   if [ ! -e /etc/default/prometheus-node-exporter ]; then
     sudo cat << EOF | sudo tee /etc/default/prometheus-node-exporter >/dev/null
 ARGS="
- --collector.textfile.directory=/home/prometheus/node-exporter
+ --collector.textfile.directory=/var/lib/prometheus/node-exporter
 "
 EOF
-    mkdir -p /home/prometheus/node-exporter
+    #mkdir -p /home/prometheus/node-exporter
   fi
   
   # Concat to existing file
@@ -872,6 +900,7 @@ function config_ports{
 	sudo ufw enable
 
   # Check ports forwarding tool
+  # https://www.yougetsignal.com/tools/open-ports/
   # https://mxtoolbox.com/SuperTool.aspx?action=tcp%3a%7Bnode-IP-address%7D%3a13000&run=toolpage
   # curl --http0.9 localhost:13000
   
@@ -916,6 +945,19 @@ User=$USER
 WantedBy=multi-user.target
 EOF
 
+  fi
+}
+
+# Config ddclient
+function config_ddclient() {
+  if [ -e /etc/ddclient.conf ]; then
+    sudo vi /etc/ddclient.conf
+
+    # replace the whole file with ddclient config preset from
+    # https://freemyip.com/help?domain=mvuong.freemyip.com&token=5b29...7520
+
+    sudo systemctl restart ddclient.service
+    sudo systemctl enable ddclient.service    
   fi
 }
 
