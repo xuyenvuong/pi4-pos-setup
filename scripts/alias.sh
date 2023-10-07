@@ -60,7 +60,7 @@ alias node-exporter-stop='sudo systemctl stop eth2-client-metrics-exporter.servi
 alias geth-stop='sudo systemctl stop geth.service'
 alias prometheus-stop='sudo systemctl stop prometheus'
 alias prometheus-node-exporter-stop='sudo systemctl stop prometheus-node-exporter'
-alias grafana-stop='sudo systemctl stop grafana-server'
+alias grafana-stop='sudo systemctl stop grafana-server'sudo
 
 alias beacon-restart='sudo systemctl restart prysm-beacon.service'
 alias validator-restart='sudo systemctl restart prysm-validator.service'
@@ -86,5 +86,8 @@ alias mevboost-enable='sudo systemctl enable mevboost.service'
 
 alias beacon-syncing='curl http://localhost:3500/eth/v1/node/syncing'
 alias geth-syncing="printf 'eth.syncing' | /usr/local/bin/geth attach http://localhost:8545"
+
+alias node-upgrade='./auto_upgrade.sh'
+alias node-health='curl http://localhost:8080/healthz'
 
 EOF
