@@ -517,14 +517,20 @@ http-mev-relay: http://localhost:18550
 checkpoint-sync-url: https://sync-mainnet.beaconcha.in
 genesis-beacon-api-url: https://sync-mainnet.beaconcha.in
 
+# **** CHECK THIS FLAG WHEN RESYNC ****
+# save-full-execution-payloads: true
+
+# BAD - corrupted db
+#enable-experimental-state: true
+
+# BAD - corrupted db
+#enable-eip-4881: true
+
 rpc-max-page-size: 200000
 grpc-max-msg-size: 268435456
 
 # 12s is the upper bound
 engine-endpoint-timeout-seconds: 10
-
-# Temporary turn this flag on due to missed attestation
-enable-optional-engine-methods: true
 
 aggregate-first-interval: 7500ms
 aggregate-second-interval: 9800ms
@@ -853,6 +859,36 @@ EOF
 
 # Config Chrony
 function config_chrony() {
+
+  sudo vi /etc/chrony/chrony.conf
+
+  /** 
+  # Replacing original ubuntu servers by Google servers
+  # pool ntp.ubuntu.com        iburst maxsources 4
+  # pool 0.ubuntu.pool.ntp.org iburst maxsources 1
+  # pool 1.ubuntu.pool.ntp.org iburst maxsources 1
+  # pool 2.ubuntu.pool.ntp.org iburst maxsources 2
+
+  # Add these 4 lines
+  server time1.google.com iburst minpoll 4 maxpoll 6 polltarget 16
+  server time2.google.com iburst minpoll 4 maxpoll 6 polltarget 16
+  server time3.google.com iburst minpoll 4 maxpoll 6 polltarget 16
+  server time4.google.com iburst minpoll 4 maxpoll 6 polltarget 16
+  
+  # Update these 
+  #log tracking measurements statistics
+  maxupdateskew 100.0
+  #maxupdateskew 5.0
+
+  makestep 1 3
+  #makestep 0.1 -1
+
+  # rest of the doc ...
+  # leapsectz right/UTC
+  */
+
+  sudo systemctl force-reload chrony
+
   sudo chronyd -Q
   sudo chronyd -q
   
