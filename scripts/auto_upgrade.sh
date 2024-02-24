@@ -38,13 +38,6 @@ NOTICE: if your user is not `ubuntu`, then you must change the user to the one y
 
 Then, save file.
 
-Step: Geth Prune
-The script will auto do the geth prune when the disk space at 90% by default. 
-Or to prune at a lower pecentage e.g. 80%, you can change GETH_PRUNE_AT_PERCENTAGE=80.
-And to stop the prune, you can change GETH_PRUNE_AT_PERCENTAGE=100.
-If disk is still over the defined GETH_PRUNE_AT_PERCENTAGE after prunning, prune job will be disabled for 7 days until you fix the capacity issue.
-
-
 Do the same for every single node in your cluster. That's all.
 
 COMMENT_BLOCK
@@ -54,14 +47,6 @@ COMMENT_BLOCK
 # ---------------------------------------------------------------
 
 echo "Auto Upgrade is in progress..."
-
-# ---------------------------------------------------------------
-# Remaining disk percentage to prune Geth database. Default to 90%
-# ---------------------------------------------------------------
-
-
-GETH_PRUNE_AT_PERCENTAGE=90
-
 
 # ---------------------------------------------------------------
 # Other configs
@@ -346,44 +331,6 @@ if [[ $geth_is_running ]]; then
   # Prune if last prune was older than 1 week
   if [ $((geth_last_prune_timestamp + 60*60*24*7 - current_timestamp)) -le 0 ]; then
     geth_is_prune_time=true
-  fi
-fi
-
-# ---------------------------------------------------------------
-
-# Deciding to prune geth
-if [[ $geth_is_running && $geth_is_prune_time = true && $disk_used_percentage -ge $GETH_PRUNE_AT_PERCENTAGE ]]; then
-  # Stop geth
-  sudo systemctl stop geth.service
-
-  # Notify Discord
-  discord_notify "$PROCESS_NAME Geth prune-state starting. Don't turn off your server. You will get another notice when prunning is done."
-
-  # Run geth prune
-  /usr/local/bin/geth snapshot prune-state --datadir $geth_datadir
-
-  # Perform db remove if no disk space. NOTE: Do NOT remove ancient-db when asked.
-  # /usr/local/bin/geth removed --datadir $geth_datadir
-  # Start geth
-  sudo systemctl start geth.service
-
-  # Mark prune timestamp
-  echo $current_timestamp > $GETH_LAST_PRUNE_FILE
-
-  # Notify Discord
-  discord_notify "$PROCESS_NAME Geth prune-state is completed."
-
-  # Check disk usage after prune
-  disk_used_percentage=$(df -lh 2> /dev/null | grep $(du -hs $geth_datadir 2> /dev/null | awk '{print $1}') | awk '{print $5}' | cut -d '%' -f 1)
-  
-  if [ $disk_used_percentage -ge $GETH_PRUNE_AT_PERCENTAGE ]; then
-    # Remove file to stop prunning again until disk capacity is under the threshold
-    rm $GETH_LAST_PRUNE_FILE
-
-    logger "$PROCESS_NAME WARNING: Geth disk usage reaches full capacity."	  
-
-    # Notify Discord
-    discord_notify "$PROCESS_NAME WARNING: Geth disk usage reaches full capacity. Prunning job will be deactivated for 7 days. Please fix it asap."
   fi
 fi
 
