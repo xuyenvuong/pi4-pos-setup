@@ -311,30 +311,5 @@ fi
 
 # ---------------------------------------------------------------
 
-if [[ $geth_is_running ]]; then
-  # Geth data directory
-  geth_datadir=$(cat /etc/ethereum/geth.conf 2> /dev/null | grep 'datadir' | awk -F'--datadir ' '{print $2}' | cut -d ' ' -f 1)
-
-  # Current disk usage
-  disk_used_percentage=$(df --output $geth_datadir | grep $geth_datadir | awk '{print $10}' | tr -d \%)
-  logger "$PROCESS_NAME Geth disk usage reaches $disk_used_percentage%"
-
-  # Check last prune timestamp
-  if [ ! -e $GETH_LAST_PRUNE_FILE ]; then
-    date +"%s" > $GETH_LAST_PRUNE_FILE
-  fi
-
-  geth_is_prune_time=false
-  geth_last_prune_timestamp=$(<$GETH_LAST_PRUNE_FILE)
-  current_timestamp=$(date +"%s")
-
-  # Prune if last prune was older than 1 week
-  if [ $((geth_last_prune_timestamp + 60*60*24*7 - current_timestamp)) -le 0 ]; then
-    geth_is_prune_time=true
-  fi
-fi
-
-# ---------------------------------------------------------------
-
 echo "Auto Upgrade is done."
 # EOF
