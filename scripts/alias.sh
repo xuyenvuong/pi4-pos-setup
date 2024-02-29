@@ -32,6 +32,20 @@ fi
 
 # ---------------------------------------------------------------
 
+echo "Clean up .bashrc aliases"
+
+sudo sed -i "/Aliases/d" ~/.bashrc
+sudo sed -i "/beacon/d" ~/.bashrc
+sudo sed -i "/validator/d" ~/.bashrc
+sudo sed -i "/eth2/d" ~/.bashrc
+sudo sed -i "/geth/d" ~/.bashrc
+sudo sed -i "/prometheus/d" ~/.bashrc
+sudo sed -i "/grafana/d" ~/.bashrc
+sudo sed -i "/mevboost/d" ~/.bashrc
+sudo sed -i "/node-/d" ~/.bashrc
+
+# ---------------------------------------------------------------
+
 echo "Adding aliases to .bashrc file"
 
 sudo cat << EOF | sudo tee -a $HOME/.bashrc >/dev/null
@@ -91,3 +105,5 @@ alias node-upgrade='./auto_upgrade.sh'
 alias node-health='curl http://localhost:8080/healthz'
 
 EOF
+
+source ~/.bashrc
