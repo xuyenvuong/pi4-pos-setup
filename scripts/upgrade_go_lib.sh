@@ -5,7 +5,7 @@
 
 : <<'COMMENT_BLOCK'
 Run this command to update and migrate the auto_upgrade.sh script
-> curl -L https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/upgrade_go_lib.sh | bash
+> curl -L https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/upgrade_go_lib.sh | bash && source ~/.bashrc
 
 COMMENT_BLOCK
 

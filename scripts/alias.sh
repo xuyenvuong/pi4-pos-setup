@@ -5,7 +5,7 @@
 
 : <<'COMMENT_BLOCK'
 Run this command to add aliases to your .bashrc
-> curl -L https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/alias.sh | bash && source $HOME/.bashrc
+> curl -L https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/alias.sh | bash && source ~/.bashrc
 
 Description:
 Supporting services [mevboost, beacon, validator, eth2-stats, geth, prometheus, prometheus-node-exporter, grafana]
@@ -97,6 +97,9 @@ alias mevboost-start='sudo systemctl start mevboost.service'
 alias mevboost-stop='sudo systemctl stop mevboost.service'
 alias mevboost-restart='sudo systemctl restart mevboost.service'
 alias mevboost-enable='sudo systemctl enable mevboost.service'
+
+alias geth-version="geth version"
+alias mevboost-version='mev-boost -version'
 
 alias beacon-syncing='curl http://localhost:3500/eth/v1/node/syncing'
 alias geth-syncing="printf 'eth.syncing' | /usr/local/bin/geth attach http://localhost:8545"
