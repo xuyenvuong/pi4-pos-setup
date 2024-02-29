@@ -12,24 +12,7 @@ COMMENT_BLOCK
 # ---------------------------------------------------------------
 cd ~
 
-
-# [
-#   {
-#     "filename": "go1.22.0.linux-amd64.tar.gz",
-#     "os": "linux",
-#     "arch": "amd64",
-#     "version": "go1.22.0",
-#     "sha256": "f6c8a87aa03b92c4b0bf3d558e28ea03006eb29db78917daec5cfb6ec1046265",
-#     "size": 68988925,
-#     "kind": "archive"
-#    }
-# ]
-
-
 GO_LATEST_VERSION_JSON=https://go.dev/dl/?mode=json
-
-
-#GO_BIN_DOWNLOAD_URL=https://go.dev/dl/go1.22.0.linux-amd64.tar.gz
 GO_BIN_DOWNLOAD_URL=https://go.dev/dl/
 
 # ---------------------------------------------------------------
