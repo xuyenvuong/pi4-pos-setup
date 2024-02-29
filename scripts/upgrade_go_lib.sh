@@ -62,5 +62,33 @@ echo "Start downloading..."
 
 wget -P /tmp $go_bin_tar_url
 
-echo "Downloaded successfully"
+echo "Downloaded successfully."
 
+echo "Remove legacy version at /usr/local/go"
+sudo rm -rvf /usr/local/go
+
+echo "Untar to /usr/local"
+sudo tar -xvf /tmp/$go_latest_version -C /usr/local
+
+echo "Clean up..."
+rm -rf /tmp/$go_latest_version
+
+echo "Update .bashrc GOROOT and GOPATH variables"
+
+sudo sed -i "/GoLang/d" ~/.bashrc
+sudo sed -i "/GOROOT/d" ~/.bashrc
+sudo sed -i "/GOPATH/d" ~/.bashrc
+
+sudo cat << EOF | sudo tee -a $HOME/.bashrc >/dev/null
+
+# GoLang
+export GOROOT=/usr/local/go
+export GOPATH=$HOME/go
+export PATH=\$GOPATH/bin:\$GOROOT/bin:\$PATH
+
+EOF
+
+echo "Verify installed version: "
+go version
+
+echo "Done"
