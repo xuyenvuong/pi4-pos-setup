@@ -50,7 +50,7 @@ install_package jq
 
 # ---------------------------------------------------------------
 
-
+echo wget $GO_LATEST_VERSION_JSON
 
 #go_latest_version=$(wget -O - -o /dev/null $GO_LATEST_VERSION_JSON | jq '.[] | select(.color=="yellow" and .price>=0.5)' | tr -d \")
 go_latest_version=$(wget -O - -o /dev/null $GO_LATEST_VERSION_JSON | jq '.[] | select(.os=="linux" and .arch=="amd64")')
