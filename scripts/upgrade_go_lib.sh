@@ -29,7 +29,8 @@ cd ~
 GO_LATEST_VERSION_JSON=https://go.dev/dl/?mode=json
 
 
-GO_BIN_TAR=https://go.dev/dl/go1.22.0.linux-amd64.tar.gz
+#GO_BIN_DOWNLOAD_URL=https://go.dev/dl/go1.22.0.linux-amd64.tar.gz
+GO_BIN_DOWNLOAD_URL=https://go.dev/dl/
 
 # ---------------------------------------------------------------
 # Check and install package
@@ -50,11 +51,16 @@ install_package jq
 
 # ---------------------------------------------------------------
 
-#go_latest_version=$(wget -O - -o /dev/null $GO_LATEST_VERSION_JSON | jq '.[] | select(.color=="yellow" and .price>=0.5)' | tr -d \")
 go_latest_version=$(wget -O - -o /dev/null $GO_LATEST_VERSION_JSON | jq '.[0].files | .[] | select(.os=="linux" and .arch=="amd64") | .filename'  | tr -d \")
 
 echo "Version: $go_latest_version"
 
+go_bin_tar_url="$GO_BIN_DOWNLOAD_URL$go_latest_version"
+echo "Download URL: go_bin_tar_url"
+
 echo "Start downloading..."
 
+wget -P /tmp $go_bin_tar_url
+
+echo "Downloaded successfully"
 
