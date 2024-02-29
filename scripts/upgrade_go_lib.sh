@@ -88,6 +88,8 @@ export PATH=\$GOPATH/bin:\$GOROOT/bin:\$PATH
 
 EOF
 
+source ~/.bashrc
+
 echo "Verify installed version: "
 go version
 
