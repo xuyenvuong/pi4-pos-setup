@@ -61,6 +61,8 @@ echo "Update .bashrc GOROOT and GOPATH variables"
 sudo sed -i "/GoLang/d" ~/.bashrc
 sudo sed -i "/GOROOT/d" ~/.bashrc
 sudo sed -i "/GOPATH/d" ~/.bashrc
+# Replace multiples blank lines with one blank line
+sudo sed -i "$!N;/^\n$/{$q;D;};P;D;" ~/.bashrc
 
 sudo cat << EOF | sudo tee -a $HOME/.bashrc >/dev/null
 # GoLang
