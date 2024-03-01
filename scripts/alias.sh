@@ -105,6 +105,7 @@ alias beacon-syncing='curl http://localhost:3500/eth/v1/node/syncing'
 alias geth-syncing="printf 'eth.syncing' | /usr/local/bin/geth attach http://localhost:8545"
 
 alias node-upgrade='./auto_upgrade.sh'
+alias node-get-latest='rm auto_upgrade.sh && wget https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/auto_upgrade.sh && chmod +x auto_upgrade.sh'
 alias node-health='curl http://localhost:8080/healthz'
 
 EOF
