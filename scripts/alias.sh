@@ -49,9 +49,7 @@ sudo sed -i "/node-/d" ~/.bashrc
 echo "Adding aliases to .bashrc file"
 
 sudo cat << EOF | sudo tee -a $HOME/.bashrc >/dev/null
-
 # Aliases for Node
-
 alias beacon-log='journalctl -f -u prysm-beacon.service -n 200 | ccze -A'
 alias validator-log='journalctl -f -u prysm-validator.service -n 200 | ccze -A'
 alias eth2-stats-log='journalctl -f -u eth2-client-metrics-exporter.service -n 200 | ccze -A'
@@ -108,7 +106,6 @@ alias node-upgrade='./auto_upgrade.sh'
 alias node-get-latest='rm auto_upgrade.sh && wget https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/auto_upgrade.sh && chmod +x auto_upgrade.sh'
 alias node-aliases-latest='curl -L https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/alias.sh | bash && source ~/.bashrc'
 alias node-health='curl http://localhost:8080/healthz'
-
 EOF
 
 source ~/.bashrc
