@@ -106,6 +106,7 @@ alias geth-syncing="printf 'eth.syncing' | /usr/local/bin/geth attach http://loc
 
 alias node-upgrade='./auto_upgrade.sh'
 alias node-get-latest='rm auto_upgrade.sh && wget https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/auto_upgrade.sh && chmod +x auto_upgrade.sh'
+alias node-aliases-latest='curl -L https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/alias.sh | bash && source ~/.bashrc'
 alias node-health='curl http://localhost:8080/healthz'
 
 EOF
