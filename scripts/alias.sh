@@ -43,6 +43,8 @@ sudo sed -i "/prometheus/d" ~/.bashrc
 sudo sed -i "/grafana/d" ~/.bashrc
 sudo sed -i "/mevboost/d" ~/.bashrc
 sudo sed -i "/node-/d" ~/.bashrc
+# Replace multiples blank lines with one blank line
+sudo sed -i '$!N;/^\n$/{$q;D;};P;D;'
 
 # ---------------------------------------------------------------
 
@@ -58,6 +60,7 @@ alias prometheus-log='journalctl -f -u prometheus -n 200 | ccze -A'
 alias prometheus-node-exporter-log='journalctl -f -u prometheus-node-exporter -n 200 | ccze -A'
 alias grafana-log='journalctl -f -u grafana-server -n 200 | ccze -A'
 alias mevboost-log='journalctl -f -u mevboost.service -n 200 | ccze -A'
+
 alias beacon-start='sudo systemctl start prysm-beacon.service'
 alias validator-start='sudo systemctl start prysm-validator.service'
 alias eth2-stats-start='sudo systemctl start eth2-client-metrics-exporter.service'
@@ -66,6 +69,7 @@ alias prometheus-start='sudo systemctl start prometheus'
 alias prometheus-node-exporter-start='sudo systemctl start prometheus-node-exporter'
 alias grafana-start='sudo systemctl start grafana-server'
 alias mevboost-start='sudo systemctl start mevboost.service'
+
 alias beacon-stop='sudo systemctl stop prysm-beacon.service'
 alias validator-stop='sudo systemctl stop prysm-validator.service'
 alias node-exporter-stop='sudo systemctl stop eth2-client-metrics-exporter.service'
@@ -74,6 +78,7 @@ alias prometheus-stop='sudo systemctl stop prometheus'
 alias prometheus-node-exporter-stop='sudo systemctl stop prometheus-node-exporter'
 alias grafana-stop='sudo systemctl stop grafana-server'sudo
 alias mevboost-stop='sudo systemctl stop mevboost.service'
+
 alias beacon-restart='sudo systemctl restart prysm-beacon.service'
 alias validator-restart='sudo systemctl restart prysm-validator.service'
 alias eth2-stats-restart='sudo systemctl restart eth2-client-metrics-exporter.service'
@@ -82,6 +87,7 @@ alias prometheus-restart='sudo systemctl restart prometheus'
 alias prometheus-node-exporter-restart='sudo systemctl restart prometheus-node-exporter'
 alias grafana-restart='sudo systemctl restart grafana-server'
 alias mevboost-restart='sudo systemctl restart mevboost.service'
+
 alias beacon-enable='sudo systemctl enable prysm-beacon.service'
 alias validator-enable='sudo systemctl enable prysm-validator.service'
 alias eth2-stats-enable='sudo systemctl enable eth2-client-metrics-exporter.service'
@@ -92,8 +98,10 @@ alias grafana-enable='sudo systemctl enable grafana-server'
 alias mevboost-enable='sudo systemctl enable mevboost.service'
 alias geth-version="geth version"
 alias mevboost-version='mev-boost -version'
+
 alias beacon-syncing='curl http://localhost:3500/eth/v1/node/syncing'
 alias geth-syncing="printf 'eth.syncing' | /usr/local/bin/geth attach http://localhost:8545"
+
 alias node-upgrade='./auto_upgrade.sh'
 alias node-get-latest='rm auto_upgrade.sh && wget https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/auto_upgrade.sh && chmod +x auto_upgrade.sh'
 alias node-aliases-latest='curl -L https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/alias.sh | bash && source ~/.bashrc'
