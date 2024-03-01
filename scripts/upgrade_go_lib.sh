@@ -36,7 +36,7 @@ install_package jq
 
 # ---------------------------------------------------------------
 
-go_latest_version=$(wget -O - -o /dev/null $GO_LATEST_VERSION_JSON | jq '.[0].files | .[] | select(.os=="linux" and .arch=="$ARCH") | .filename'  | tr -d \")
+go_latest_version=$(wget -O - -o /dev/null $GO_LATEST_VERSION_JSON | jq '.[0].files | .[] | select(.os=="linux" and .arch=="'$ARCH'") | .filename'  | tr -d \")
 
 echo "Version: $go_latest_version"
 
