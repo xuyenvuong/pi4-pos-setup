@@ -4,7 +4,7 @@
 # Date: 02/28/2024
 
 : <<'COMMENT_BLOCK'
-Run this command to update and migrate the auto_upgrade.sh script
+Run this command to upgrade GO library to the latest version.
 > curl -L https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/upgrade_go_lib.sh | bash && source ~/.bashrc
 
 COMMENT_BLOCK
