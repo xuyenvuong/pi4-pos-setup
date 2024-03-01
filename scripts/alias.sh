@@ -96,6 +96,7 @@ alias prometheus-enable='sudo systemctl enable prometheus'
 alias prometheus-node-exporter-enable='sudo systemctl enable prometheus-node-exporter'
 alias grafana-enable='sudo systemctl enable grafana-server'
 alias mevboost-enable='sudo systemctl enable mevboost.service'
+
 alias geth-version="geth version"
 alias mevboost-version='mev-boost -version'
 
@@ -103,7 +104,7 @@ alias beacon-syncing='curl http://localhost:3500/eth/v1/node/syncing'
 alias geth-syncing="printf 'eth.syncing' | /usr/local/bin/geth attach http://localhost:8545"
 
 alias node-upgrade='./auto_upgrade.sh'
-alias node-get-latest='rm auto_upgrade.sh && wget https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/auto_upgrade.sh && chmod +x auto_upgrade.sh'
+alias node-auto-upgrade-latest='rm auto_upgrade.sh && wget https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/auto_upgrade.sh && chmod +x auto_upgrade.sh'
 alias node-aliases-latest='curl -L https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/alias.sh | bash && source ~/.bashrc'
 alias node-go-lib-latest='curl -L https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/upgrade_go_lib.sh | bash && source ~/.bashrc'
 alias node-health='curl http://localhost:8080/healthz'
