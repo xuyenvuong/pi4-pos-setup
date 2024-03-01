@@ -233,19 +233,24 @@ fi
 if [[ $mevboost_is_running && $mevboost_curr_version != $mevboost_latest_version ]]; then
   logger "$PROCESS_NAME OK to upgrade MEV-Boost to version $mevboost_latest_version"
 
-  CGO_CFLAGS="-O -D__BLST_PORTABLE__" /usr/local/go/bin/go install github.com/flashbots/mev-boost@latest  
+  CGO_CFLAGS="-O -D__BLST_PORTABLE__" /usr/local/go/bin/go install github.com/flashbots/mev-boost@latest
 
-  # Move old mevboost file
-  mevboost_backup_filename=/usr/local/bin/mev-boost.$(date "+%Y%m%d-%H%M%S")
-  
-  sudo systemctl stop mevboost.service
+  md5sum_curr_bin=$(md5sum /usr/local/bin/mev-boost | awk '{print $1}')
+  md5sum_new_bin=$(md5sum go/bin/mev-boost | awk '{print $1}')
 
-  sudo mv /usr/local/bin/mev-boost $mevboost_backup_filename
-  sudo cp ~/go/bin/mev-boost /usr/local/bin
-  
-  sudo systemctl start mevboost.service
+  if [[ $md5sum_curr_bin != $md5sum_new_bin ]]; then
+    # Move old mevboost file
+    mevboost_backup_filename=/usr/local/bin/mev-boost.$(date "+%Y%m%d-%H%M%S")
+    
+    sudo systemctl stop mevboost.service
 
-  discord_notify "$PROCESS_NAME Upgraded MEV-Boost to version $mevboost_latest_version"
+    sudo mv /usr/local/bin/mev-boost $mevboost_backup_filename
+    sudo cp ~/go/bin/mev-boost /usr/local/bin
+
+    sudo systemctl start mevboost.service
+
+    discord_notify "$PROCESS_NAME Upgraded MEV-Boost to version $mevboost_latest_version"
+  fi
 else
   logger "$PROCESS_NAME MEV-Boost is up to date or not active."
 fi
