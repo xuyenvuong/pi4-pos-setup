@@ -537,6 +537,15 @@ aggregate-second-interval: 9800ms
 aggregate-third-interval: 11900ms
 
 #aggregate-parallel: true
+
+blob-save-fsync: true
+enable-minimal-slashing-protection: true
+save-invalid-block-temp: true
+
+# Optional
+local-block-value-boost: 5
+#backfill-oldest-slot: 0
+
 EOF
   fi
 
