@@ -97,6 +97,11 @@ alias prometheus-node-exporter-enable='sudo systemctl enable prometheus-node-exp
 alias grafana-enable='sudo systemctl enable grafana-server'
 alias mevboost-enable='sudo systemctl enable mevboost.service'
 
+alias beacon-config="vi prysm/configs/beacon.yaml"
+alias validator-config="vi prysm/configs/validator.yaml"
+alias geth-config="sudo vi /etc/ethereum/geth.conf"
+alias mevboost-config="sudo vi /etc/ethereum/mevboost.conf"
+
 alias geth-version="geth version"
 alias mevboost-version='mev-boost -version'
 
