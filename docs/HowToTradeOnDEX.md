@@ -5,7 +5,7 @@ DEX Aggregators are tools to help you to search for the best price options. Some
 
 This instructions is mainly for DeFiLlama. If you are interested, the go to the next steps.
 
-### DeFILlama
+### DeFiLlama
 Goto DeFiLlama [https://swap.defillama.com/](https://swap.defillama.com/)
 
 <img src="../src/images/dex/defillamaWebGui.jpg" width="500" />
