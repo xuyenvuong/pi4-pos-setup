@@ -65,3 +65,11 @@ COMCAST CABLE MODEM ISSUE FIX
 # Only use it if there's random modem reboot issue)
 System->Settings->Tunables
 net.link.ether.inet.max_age=120
+
+INTRUSION DETECTION
+https://homenetworkguy.com/how-to/configure-intrusion-detection-opnsense/
+
+TROUBLESHOOTING
+https://docs.opnsense.org/troubleshooting/webgui.html
+# Restart GUI
+> configctl webgui restart renew
