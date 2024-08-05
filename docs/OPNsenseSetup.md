@@ -73,3 +73,25 @@ TROUBLESHOOTING
 https://docs.opnsense.org/troubleshooting/webgui.html
 # Restart GUI
 > configctl webgui restart renew
+
+ADGUARD SETUP
+https://windgate.net/setup-adguard-home-opnsense-adblocker/
+# Configs tips
+https://www.smarthomebeginner.com/adguard-home-configuration-tips/
+# Block lists
+https://firebog.net/
+
+# HAPROXY SETUP
+*  https://www.youtube.com/watch?v=uACQrhtsgFk
+*  https://www.duckdns.org/domains
+*  Info is in BitWarden
+
+*  Note: Generate specific certificate for each subdomain (instead of wildcard domain) to prevent wrong site loading issue.
+*  Info here: https://forum.opnsense.org/index.php?topic=24055.0;prev_next=prev#new
+
+# https://community.spiceworks.com/t/opnsense-haproxy-as-reverse-proxy-for-self-hosted-services/1013494
+# https://forum.opnsense.org/index.php?topic=23339.msg110962#msg110962
+
+# TROUBLESHOOT
+# NOTE: If GUI doesn't start, try to run this command, then resolve any Permission Denied issue:
+* `sudo /usr/local/sbin/lighttpd -f /var/etc/lighty-webConfigurator.conf`
