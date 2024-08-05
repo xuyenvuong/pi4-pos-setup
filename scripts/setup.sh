@@ -69,7 +69,9 @@ function install_essential() {
   install_package net-tools
   
   # Prometheus
-  install_prometheus
+  #install_prometheus
+  install_prometheus_latest
+  install_prometheus_node_exporter
   
   # Golang
   install_package golang
@@ -121,7 +123,8 @@ function install_essential() {
   systemd_eth2_client_metrics_exporter
   systemd_geth
   systemd_cryptowatch  
-  config_prometheus
+  #config_prometheus
+  config_prometheus_latest  
   config_grafana
   config_logrotate
   config_chrony
@@ -156,19 +159,86 @@ function install_essential() {
 # }
 
 # Install Prometheus
-function install_prometheus() {
+# function install_prometheus() {
+#   if [ $(dpkg-query -W -f='${Status}' prometheus 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
+#     echo "Installing: Prometheus"
+#     sudo groupadd --system prometheus
+#     #sudo useradd -m prometheus
+#     sudo useradd -s /sbin/nologin --system -g prometheus prometheus
+#     #sudo chown -R prometheus:prometheus /home/prometheus/
+#     install_package prometheus
+#     install_package prometheus-node-exporter
+    
+#     # NOTE prometheus-node-exporter: Bug found with awk . Manual remove a backslash on line 13 of this file
+#     # /usr/share/prometheus-node-exporter-collectors/apt.sh - Should look like this after.
+#     # | awk '{ gsub(/\\\\/, "\\\\", $2); gsub(/"/, "\\\"", $2);
+#   fi
+# }
+
+# Install Prometheus latest
+function install_prometheus_latest() {
+  # https://computingforgeeks.com/install-prometheus-server-on-debian-ubuntu-linux/
   if [ $(dpkg-query -W -f='${Status}' prometheus 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
     echo "Installing: Prometheus"
-    sudo groupadd --system prometheus
-    #sudo useradd -m prometheus
+    sudo groupadd --system prometheus    
     sudo useradd -s /sbin/nologin --system -g prometheus prometheus
-    #sudo chown -R prometheus:prometheus /home/prometheus/
-    install_package prometheus
-    install_package prometheus-node-exporter
+    sudo mkdir /etc/prometheus
+    sudo mkdir /var/lib/prometheus
+
+    for i in rules rules.d files_sd; do sudo mkdir -p /etc/prometheus/${i}; done
+
+    # Download latest here: https://prometheus.io/download/
+    wget -P /tmp https://github.com/prometheus/prometheus/releases/download/v2.54.0-rc.0/prometheus-2.54.0-rc.0.linux-amd64.tar.gz
+    cd /tmp
+    tar xvf prometheus*.tar.gz
+    cd prometheus*/
+    sudo mv prometheus promtool /usr/local/bin/
+    prometheus --version
+    sudo mv prometheus.yml /etc/prometheus/prometheus.yml
+    sudo mv consoles/ console_libraries/ /etc/prometheus/
+    cd
+  fi
+}
+
+# Install Prometheus Node Exporter
+function install_prometheus_node_exporter() {
+  # https://ourcodeworld.com/articles/read/1686/how-to-install-prometheus-node-exporter-on-ubuntu-2004
+  if [ $(dpkg-query -W -f='${Status}' prometheus-node-exporter 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
+    echo "Installing: Prometheus Node Exporter"
     
-    # NOTE prometheus-node-exporter: Bug found with awk . Manual remove a backslash on line 13 of this file
-    # /usr/share/prometheus-node-exporter-collectors/apt.sh - Should look like this after.
-    # | awk '{ gsub(/\\\\/, "\\\\", $2); gsub(/"/, "\\\"", $2);
+    # Download latest here: https://prometheus.io/download/#node_exporter
+    wget -P /tmp https://github.com/prometheus/node_exporter/releases/download/v1.8.2/node_exporter-1.8.2.linux-amd64.tar.gz
+    cd /tmp
+    tar xvf node_exporter-1.3.1.linux-amd64.tar.gz
+    cd cd node_exporter-1.3.1.linux-amd64
+    sudo cp node_exporter /usr/local/bin
+
+    sudo useradd --no-create-home --shell /bin/false node_exporter
+    sudo chown node_exporter:node_exporter /usr/local/bin/node_exporter
+
+    sudo cat << EOF | sudo tee /etc/systemd/system/prometheus-node-exporter.service >/dev/null
+[Unit]
+Description=Node Exporter
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=node_exporter
+Group=node_exporter
+Type=simple
+ExecStart=/usr/local/bin/node_exporter
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
+EOF 
+
+    sudo systemctl daemon-reload
+    sudo systemctl enable node_exporter
+    sudo systemctl start node_exporter
+
+    # Note: open port 9100
   fi
 }
 
@@ -195,7 +265,31 @@ function install_grafana() {
     echo "deb https://packages.grafana.com/enterprise/deb stable main" | sudo tee -a /etc/apt/sources.list.d/grafana.list
     sudo apt-get update
     install_package grafana-enterprise
-  fi 
+  fi
+
+  sudo openssl genrsa -out /etc/grafana/grafana.key 2048
+  $ sudo openssl req -new -key /etc/grafana/grafana.key -out /etc/grafana/grafana.csr
+  
+  # Leave empty when prompt except Common Name: 'localhost' 
+
+  sudo openssl x509 -req -days 365 -in /etc/grafana/grafana.csr -signkey /etc/grafana/grafana.key -out /etc/grafana/grafana.crt
+  
+  sudo chown grafana:grafana /etc/grafana/grafana.crt
+  sudo chown grafana:grafana /etc/grafana/grafana.key
+  sudo chmod 400 /etc/grafana/grafana.key /etc/grafana/grafana.crt
+
+  sudo vi /etc/grafana/grafana.ini
+  # Edit:
+  # http_addr =
+  # http_port = 3000
+  # domain = mysite.com
+  # root_url = https://subdomain.mysite.com:3000
+  # cert_key = /etc/grafana/grafana.key
+  # cert_file = /etc/grafana/grafana.crt
+  # enforce_domain = False
+  # protocol = https
+
+  grafana-restart
 }
 
 # Install Eth2 Client Metrics Exporter
@@ -782,25 +876,94 @@ EOF
 }  
 
 # Config Prometheus
-function config_prometheus() {
-  if [ ! -e /etc/default/prometheus ]; then
-    sudo cat << EOF | sudo tee /etc/default/prometheus >/dev/null
-ARGS="
- --web.enable-lifecycle
- --storage.tsdb.retention.time=31d
- --storage.tsdb.path=/var/lib/prometheus
-"
-EOF
-  fi
+# function config_prometheus() {
+#   if [ ! -e /etc/default/prometheus ]; then
+#     sudo cat << EOF | sudo tee /etc/default/prometheus >/dev/null
+# ARGS="
+#  --web.enable-lifecycle
+#  --storage.tsdb.retention.time=31d
+#  --storage.tsdb.path=/var/lib/prometheus
+# "
+# EOF
+#   fi
   
-  if [ ! -e /etc/default/prometheus-node-exporter ]; then
-    sudo cat << EOF | sudo tee /etc/default/prometheus-node-exporter >/dev/null
-ARGS="
- --collector.textfile.directory=/var/lib/prometheus/node-exporter
-"
+#   if [ ! -e /etc/default/prometheus-node-exporter ]; then
+#     sudo cat << EOF | sudo tee /etc/default/prometheus-node-exporter >/dev/null
+# ARGS="
+#  --collector.textfile.directory=/var/lib/prometheus/node-exporter
+# "
+# EOF
+#     #mkdir -p /home/prometheus/node-exporter
+#   fi
+  
+#   # Concat to existing file
+#   if [ ! -e /etc/prometheus/prometheus.yml ]; then
+#     sudo cat << EOF | sudo tee -a /etc/prometheus/prometheus.yml >/dev/null
+
+#   - job_name: geth
+#     scrape_interval: 15s
+#     scrape_timeout: 10s
+#     metrics_path: /debug/metrics/prometheus
+#     scheme: http
+#     static_configs:
+#       - targets: ['localhost:6060']
+
+#   - job_name: 'validator'
+#     static_configs:
+#       - targets: ['localhost:8081']
+
+#   - job_name: 'beacon node'
+#     static_configs:
+#       - targets: ['localhost:8080']
+
+#   - job_name: 'cryptowat'
+#     static_configs:
+#       - targets: ['localhost:9745']
+# EOF
+#   fi 
+# }
+
+# Config Prometheus lastest
+function config_prometheus_latest() {
+  if [ ! -e /etc/systemd/system/prometheus.service ]; then
+    sudo cat << EOF | sudo tee /etc/systemd/system/prometheus.service >/dev/null
+[Unit]
+Description=Prometheus
+Documentation=https://prometheus.io/docs/introduction/overview/
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=prometheus
+Group=prometheus
+ExecReload=/bin/kill -HUP \$MAINPID
+ExecStart=/usr/local/bin/prometheus \
+  --config.file=/etc/prometheus/prometheus.yml \
+  --storage.tsdb.path=/var/lib/prometheus \
+  --web.console.templates=/etc/prometheus/consoles \
+  --web.console.libraries=/etc/prometheus/console_libraries \
+  --web.listen-address=0.0.0.0:9090 \
+  --web.enable-lifecycle \
+  --storage.tsdb.retention.time=31d \
+  --web.external-url=
+
+SyslogIdentifier=prometheus
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
 EOF
-    #mkdir -p /home/prometheus/node-exporter
+
   fi
+
+  for i in rules rules.d files_sd; do sudo chown -R prometheus:prometheus /etc/prometheus/${i}; done
+  for i in rules rules.d files_sd; do sudo chmod -R 775 /etc/prometheus/${i}; done
+  sudo chown -R prometheus:prometheus /var/lib/prometheus/
+
+  sudo systemctl daemon-reload
+  sudo systemctl start prometheus
+  sudo systemctl enable prometheus
   
   # Concat to existing file
   if [ ! -e /etc/prometheus/prometheus.yml ]; then
