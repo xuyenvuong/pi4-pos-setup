@@ -17,6 +17,12 @@
 
 # Download `HandBreak`
 *  Here: `https://handbrake.fr/downloads.php`
+# Install `libdvdcss.dll`
+*  `https://www.howtogeek.com/102886/how-to-decrypt-dvds-with-hardbrake-so-you-can-rip-them/`
+*  `https://www.videohelp.com/software/libdvdcss`
 
 # Download `TeraCopy`
 *  Here: `https://www.codesector.com/downloads`
+
+# Download `VLC` player
+*  Here: `https://www.videolan.org/vlc/`

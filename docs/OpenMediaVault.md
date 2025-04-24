@@ -112,7 +112,7 @@ services:
       - PUID=1000
       - PGID=100
       - TZ=Etc/UTC
-      - JELLYFIN_PublishedServerUrl=192.168.0.5 #optional
+      #- JELLYFIN_PublishedServerUrl=192.168.0.5 #optional
     volumes:
       - /srv/dev-disk-by-uuid-e2efdf44-41ae-4887-9018-0772c6554c5f/appdata:/config
       - /srv/dev-disk-by-uuid-e2efdf44-41ae-4887-9018-0772c6554c5f/contents/media:/data/tvshows
@@ -129,7 +129,7 @@ services:
     restart: unless-stopped
 ```
 # Setup Jellyfin on Samsung TV (Developer Mode)
-*  Goto: `https://docs.tizen.org/`
+*  Goto: `https://docs.tizen.org/` & `https://itechhacks.com/jellyfin-on-samsung-smart-tv/`
 *  Register a developer account (same as your Samsung TV login)
 *  Download and install: `Tizen Studio` - Install `SDK SDK Tools`
 
@@ -146,10 +146,16 @@ services:
 #  Conifg Jellyfin app
 *  Go to `Jellyfin app -> Playback -> Transcoding`
 *  Hardware acceleration: `Video4Linux2(V4L2)`
-*  Add Repo: `https://github.com/danieladov/jellyfin-plugin-skin-manager`
+*  Add Repos: 
+*   `https://github.com/danieladov/jellyfin-plugin-skin-manager`
+*   `https://raw.githubusercontent.com/jumoog/intro-skipper/master/manifest.json`
 *  (Check for latest release info `https://github.com/jeppevinkel/jellyfin-tizen-builds/releases`)
 *  Then install `Skin Manager` plugin
 *  Done
+
+# FFMpeg tool to convert video and audio for Jellyfin
+*  `sudo apt install ffmpeg`
+*  Run: `ffmpeg -i input.mkv -map 0 -c:v copy -c:a eac3 -c:s copy output.mkv` to convert audio to eac3 format.
 
 # Setup Users
 *  Goto: `openmediavault -> Users`
