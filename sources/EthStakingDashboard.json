@@ -30,7 +30,7 @@
         "#FA6400",
         "rgb(176, 83, 5)"
       ],
-      "datasource": "Prometheus",
+      
       "fieldConfig": {
         "defaults": {
           "custom": {}
@@ -112,7 +112,7 @@
       "valueName": "avg"
     },
     {
-      "datasource": "Prometheus",
+      
       "description": "This panel shows the earning during the last hour, and the annualized % of the hourly earning.\n\nThose data won't be shown until the first validator is at least one hour old, or that you started prometheus at least one hour ago.\n\nAlso, the annualized % might be wrong if you have downtime while new validators are getting validated",
       "fieldConfig": {
         "defaults": {
@@ -327,7 +327,7 @@
       "type": "stat"
     },
     {
-      "datasource": "Prometheus",
+      
       "description": "This panel shows the earning during the last day, and the annualized % of the daily earning.\n\nThose data won't be shown until the first validator is at least one day old, or that you started prometheus at least one day ago.\n\nAlso, the annualized % might be wrong if you have downtime while new validators are getting validated",
       "fieldConfig": {
         "defaults": {
@@ -542,7 +542,7 @@
       "type": "stat"
     },
     {
-      "datasource": "Prometheus",
+      
       "description": "This panel shows the earning during the last week, and the annualized % of the weekly earning.\n\nThose data won't be shown until the first validator is at least one week old, or that you started prometheus at least one week ago.\n\nAlso, the annualized % might be wrong if you have downtime while new validators are getting validated",
       "fieldConfig": {
         "defaults": {
@@ -757,7 +757,7 @@
       "type": "stat"
     },
     {
-      "datasource": "Prometheus",
+      
       "description": "This panel shows the earning during the last month, and the annualized % of the monthly earning.\n\nThose data won't be shown until the first validator is at least one month old, or that you started prometheus at least one month ago. Ensure to run Prometheus with the flag `--storage.tsdb.retention.time=31d` if you want this panel to get enough data\n\nAlso, the annualized % might be wrong if you have downtime while new validators are getting validated",
       "fieldConfig": {
         "defaults": {
@@ -972,7 +972,7 @@
       "type": "stat"
     },
     {
-      "datasource": "Prometheus",
+      
       "fieldConfig": {
         "defaults": {
           "custom": {},
@@ -1179,7 +1179,7 @@
     },
     {
       "cacheTimeout": null,
-      "datasource": "Prometheus",
+      
       "fieldConfig": {
         "defaults": {
           "custom": {},
@@ -1251,7 +1251,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "Prometheus",
+      
       "fieldConfig": {
         "defaults": {
           "custom": {},
@@ -1345,7 +1345,7 @@
     },
     {
       "columns": [],
-      "datasource": "Prometheus",
+      
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -1500,7 +1500,7 @@
     },
     {
       "columns": [],
-      "datasource": "Prometheus",
+      
       "description": "This panel will count only the votes done since your validator process started",
       "fieldConfig": {
         "defaults": {
@@ -1747,7 +1747,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "Prometheus",
+      
       "fieldConfig": {
         "defaults": {
           "custom": {},
@@ -1852,7 +1852,7 @@
         "rgba(237, 129, 40, 0.89)",
         "rgb(99, 99, 99)"
       ],
-      "datasource": "Prometheus",
+      
       "fieldConfig": {
         "defaults": {
           "custom": {}
@@ -2067,7 +2067,7 @@
         "rgba(237, 129, 40, 0.89)",
         "#8F3BB8"
       ],
-      "datasource": "Prometheus",
+      
       "decimals": null,
       "fieldConfig": {
         "defaults": {
@@ -2162,7 +2162,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "Prometheus",
+      
       "fieldConfig": {
         "defaults": {
           "custom": {},
@@ -2339,7 +2339,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "Prometheus",
+      
       "description": "This alert is useful only for people who has automatic restart of the process after crash. \nThis can be made for example by using the prysm.bat file on windows with \"set PRYSM_AUTORESTART=true&\", or with docker with \"--restart always\"",
       "fieldConfig": {
         "defaults": {
@@ -2491,7 +2491,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "Prometheus",
+      
       "fieldConfig": {
         "defaults": {
           "custom": {},
@@ -2635,7 +2635,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "Prometheus",
+      
       "fieldConfig": {
         "defaults": {
           "custom": {},
@@ -2811,7 +2811,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "Prometheus",
+      
       "fieldConfig": {
         "defaults": {
           "custom": {},
@@ -2981,7 +2981,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "Prometheus",
+      
       "fieldConfig": {
         "defaults": {
           "custom": {},
@@ -3134,7 +3134,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "Prometheus",
+      
       "fieldConfig": {
         "defaults": {
           "custom": {},
@@ -3285,7 +3285,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "Prometheus",
+      
       "fieldConfig": {
         "defaults": {
           "custom": {},
@@ -3393,7 +3393,7 @@
         "rgba(237, 129, 40, 0.89)",
         "#1F60C4"
       ],
-      "datasource": "Prometheus",
+      
       "fieldConfig": {
         "defaults": {
           "custom": {}
@@ -3484,7 +3484,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "Prometheus",
+      
       "description": "This graph is made for trading purpose mostly.\nSupposing that if a lot of validators are exiting, price is gonna dump.\n\nAlso this can prevent to exit while exiting queue is too long, same for depositing while pending queue is too long.\n\n",
       "fieldConfig": {
         "defaults": {
@@ -3608,7 +3608,7 @@
     },
     {
       "cacheTimeout": null,
-      "datasource": "Prometheus",
+      
       "fieldConfig": {
         "defaults": {
           "custom": {},
@@ -3676,7 +3676,7 @@
     {
       "dashboardFilter": "",
       "dashboardTags": [],
-      "datasource": "Prometheus",
+      
       "fieldConfig": {
         "defaults": {
           "custom": {}
@@ -3704,7 +3704,7 @@
     },
     {
       "cacheTimeout": null,
-      "datasource": "Prometheus",
+      
       "fieldConfig": {
         "defaults": {
           "custom": {},
@@ -3770,7 +3770,7 @@
     },
     {
       "cacheTimeout": null,
-      "datasource": "Prometheus",
+      
       "fieldConfig": {
         "defaults": {
           "custom": {},
@@ -3835,7 +3835,7 @@
       "type": "stat"
     },
     {
-      "datasource": "Prometheus",
+      
       "description": "This panel won't have consistant values during the first hour of the node started process",
       "fieldConfig": {
         "defaults": {
@@ -3973,7 +3973,7 @@
           "text": "All",
           "value": "$__all"
         },
-        "datasource": "Prometheus",
+        
         "definition": "label_values(crypto_currency, pair)",
         "error": null,
         "hide": 0,
@@ -4014,6 +4014,5 @@
   },
   "timezone": "",
   "title": "ETH staking dashboard",
-  "uid": "t2yHaa3Zz3",
   "version": 13
 }
