@@ -51,9 +51,6 @@ function install_essential() {
   sudo apt update && sudo apt upgrade
   sudo apt dist-upgrade
   sudo apt autoremove
-
-  # Docker
-  # install_docker
   
   # Independent packages
   install_package vim
@@ -65,7 +62,7 @@ function install_essential() {
   install_package build-essential
   install_package libssl-dev
   install_package libffi-dev
-  install_package python3-dev
+  #install_package python3-dev
   install_package chrony
   install_package jq
   install_package tmux
@@ -75,9 +72,8 @@ function install_essential() {
   # Populate folders
   populate_folders
 
-  # Prometheus
-  #install_prometheus
-  install_prometheus_latest
+  # Prometheus  
+  install_prometheus
   install_prometheus_node_exporter
   
   # Golang
@@ -100,15 +96,9 @@ function install_essential() {
   
   # Auto Upgrade to the latest version scripts
   install_auto_upgrade
-  
-  # Cryptowatch
-  install_cryptowatch
-  
+    
   # Prysm
   install_prysm
-
-  # Docker-Compose
-  # install_docker_compose
   
   # Validator key generator
   install_validator_key_generator
@@ -131,10 +121,8 @@ function install_essential() {
   systemd_validator  
   systemd_clientstats # (optional)
   systemd_eth2_client_metrics_exporter
-  systemd_geth
-  systemd_cryptowatch # (optional) 
-  #config_prometheus
-  config_prometheus_latest  
+  systemd_geth  
+  config_prometheus
   config_grafana
   config_logrotate
   config_chrony
@@ -150,44 +138,8 @@ function install_essential() {
   config_discord_notify
 }
 
-# Install Docker
-# function install_docker() {
-  # if [ ! -e /usr/bin/docker ]; then
-    # sudo apt-get install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common
-    # curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-
-    # # arch = amd64|arm64|armhf
-    # sudo add-apt-repository "deb [$ARCH] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-	
-    # sudo apt-get install -y docker-ce docker-ce-cli containerd.io
-  
-    # sudo groupadd docker
-    # sudo usermod -aG docker $USER
-    # newgrp docker
-  
-    # sudo systemctl enable docker
-  # fi
-# }
-
-# Install Prometheus
-# function install_prometheus() {
-#   if [ $(dpkg-query -W -f='${Status}' prometheus 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
-#     echo "Installing: Prometheus"
-#     sudo groupadd --system prometheus
-#     #sudo useradd -m prometheus
-#     sudo useradd -s /sbin/nologin --system -g prometheus prometheus
-#     #sudo chown -R prometheus:prometheus /home/prometheus/
-#     install_package prometheus
-#     install_package prometheus-node-exporter
-    
-#     # NOTE prometheus-node-exporter: Bug found with awk . Manual remove a backslash on line 13 of this file
-#     # /usr/share/prometheus-node-exporter-collectors/apt.sh - Should look like this after.
-#     # | awk '{ gsub(/\\\\/, "\\\\", $2); gsub(/"/, "\\\"", $2);
-#   fi
-# }
-
 # Install Prometheus latest
-function install_prometheus_latest() {
+function install_prometheus() {
   # https://computingforgeeks.com/install-prometheus-server-on-debian-ubuntu-linux/
   if [ $(dpkg-query -W -f='${Status}' prometheus 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
     echo "Installing: Prometheus"
@@ -372,33 +324,12 @@ function install_auto_upgrade() {
   fi
 }
 
-# Install Cryptowatch
-function install_cryptowatch() {
-  if [ ! -e /usr/local/bin/cryptowat_exporter ]; then
-    wget -P /tmp https://github.com/nbarrientos/cryptowat_exporter/archive/e4bcf6e16dd2e04c4edc699e795d9450dee486ab.zip
-    unzip /tmp/e4bcf6e16dd2e04c4edc699e795d9450dee486ab.zip -d /tmp
-    cd /tmp/cryptowat_exporter-e4bcf6e16dd2e04c4edc699e795d9450dee486ab
-    go build
-    cd ~
-    sudo cp /tmp/cryptowat_exporter-e4bcf6e16dd2e04c4edc699e795d9450dee486ab/cryptowat_exporter /usr/local/bin
-  fi
-}
-
 # Install Prysm
 function install_prysm() {
   if [ ! -e ~/prysm/prysm.sh ]; then
     curl $PRYSM_SH_URL --output ~/prysm/prysm.sh && chmod +x ~/prysm/prysm.sh
   fi
 }
-
-# Install Docker-Compose
-# function install_docker_compose() {
-  # if [ ! -e /usr/local/bin/docker-compose ]; then
-  
-    # sudo pip3 install cryptography
-    # sudo pip3 install docker-compose
-  # fi  
-# }
 
 # Install Validator Key Generator
 function install_validator_key_generator() {
@@ -635,7 +566,7 @@ attest-timely: true
 block-batch-limit: 128
 
 #p2p-host-ip: $(curl -s v4.ident.me)
-p2p-host-dns: "maxvuong.tplinkdns.com"
+p2p-host-dns: "mvuong.freemyip.com"
 
 p2p-tcp-port: 13000
 p2p-udp-port: 12000
@@ -652,7 +583,7 @@ monitoring-host: 0.0.0.0
 
 update-head-timely: true
 
-suggested-fee-recipient: 0xYOUR_WALLET_ADDRESS
+suggested-fee-recipient: 0x__YOUR_WALLET_ADDRESS__
 
 # Mev Boost
 http-mev-relay: http://localhost:18550
@@ -896,89 +827,9 @@ EOF
   # /usr/local/bin/geth attach http://localhost:8545
   # > eth.syncing
 }  
-  
-# Systemd Cryptowatch
-function systemd_cryptowatch() {
-  if [ ! -e /etc/systemd/system/cryptowatch.service ]; then
-    sudo cat << EOF | sudo tee /etc/systemd/system/cryptowatch.service >/dev/null
-[Unit]
-Description=Cryptowatch Daemon
-After=network.target
-Requires=prometheus.service
-
-[Service]
-EnvironmentFile=/etc/ethereum/cryptowatch.conf
-ExecStart=/usr/local/bin/cryptowat_exporter \$ARGS
-Restart=always
-RestartSec=10
-User=$USER
-
-[Install]
-WantedBy=multi-user.target
-EOF
-  fi
-
-  # EnvironmentFile
-  if [ ! -e /etc/ethereum/cryptowatch.conf ]; then
-    sudo cat << EOF | sudo tee /etc/ethereum/cryptowatch.conf >/dev/null
-ARGS="
- --cryptowat.pairs=etheur,ethusd,ethgbp,ethcad,ethchf,ethjpy,ethbtc
- --cryptowat.exchanges=kraken
-"
-EOF
-  fi   
-}  
-
-# Config Prometheus
-# function config_prometheus() {
-#   if [ ! -e /etc/default/prometheus ]; then
-#     sudo cat << EOF | sudo tee /etc/default/prometheus >/dev/null
-# ARGS="
-#  --web.enable-lifecycle
-#  --storage.tsdb.retention.time=31d
-#  --storage.tsdb.path=/var/lib/prometheus
-# "
-# EOF
-#   fi
-  
-#   if [ ! -e /etc/default/prometheus-node-exporter ]; then
-#     sudo cat << EOF | sudo tee /etc/default/prometheus-node-exporter >/dev/null
-# ARGS="
-#  --collector.textfile.directory=/var/lib/prometheus/node-exporter
-# "
-# EOF
-#     #mkdir -p /home/prometheus/node-exporter
-#   fi
-  
-#   # Concat to existing file
-#   if [ ! -e /etc/prometheus/prometheus.yml ]; then
-#     sudo cat << EOF | sudo tee -a /etc/prometheus/prometheus.yml >/dev/null
-
-#   - job_name: geth
-#     scrape_interval: 15s
-#     scrape_timeout: 10s
-#     metrics_path: /debug/metrics/prometheus
-#     scheme: http
-#     static_configs:
-#       - targets: ['localhost:6060']
-
-#   - job_name: 'validator'
-#     static_configs:
-#       - targets: ['localhost:8081']
-
-#   - job_name: 'beacon node'
-#     static_configs:
-#       - targets: ['localhost:8080']
-
-#   - job_name: 'cryptowat'
-#     static_configs:
-#       - targets: ['localhost:9745']
-# EOF
-#   fi 
-# }
 
 # Config Prometheus lastest
-function config_prometheus_latest() {
+function config_prometheus() {
   if [ ! -e /etc/systemd/system/prometheus.service ]; then
     sudo cat << EOF | sudo tee /etc/systemd/system/prometheus.service >/dev/null
 [Unit]
@@ -1045,9 +896,9 @@ EOF
     static_configs:
       - targets: ['localhost:8080']
 
-  - job_name: 'cryptowat'
-    static_configs:
-      - targets: ['localhost:9745']
+  # - job_name: 'cryptowat'
+  #   static_configs:
+  #     - targets: ['localhost:9745']
 EOF
   fi 
 }
@@ -1135,8 +986,8 @@ function config_ports{
 	sudo ufw allow ssh
 	
 	# Beacon
-	sudo ufw allow 13000:13100/tcp
-	sudo ufw allow 12000:12100/udp
+	sudo ufw allow 13000/tcp
+	sudo ufw allow 12000/udp
 	sudo ufw allow 4000/tcp
 	sudo ufw allow 8080/tcp
 
@@ -1153,20 +1004,14 @@ function config_ports{
 	sudo ufw allow 8545/tcp
   sudo ufw allow 8551/tcp
 	sudo ufw allow 6060/tcp
-	sudo ufw allow 30303:30309/tcp
-	sudo ufw allow 30303:30309/udp
+	sudo ufw allow 30303/tcp
+	sudo ufw allow 30303/udp
 
 	# Prometheus
 	sudo ufw allow 9090/tcp
 
 	# Prometheus-node-exporter
 	sudo ufw allow 9100/tcp
-
-	# Cryptowatch
-	sudo ufw allow 9745/tcp
-
-	# Prysm UI
-	sudo ufw allow 7500/tcp
 	
 	# Enable
 	sudo ufw enable
