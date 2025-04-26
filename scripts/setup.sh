@@ -14,16 +14,6 @@ function install_package() {
   fi
 }
 
-# Uninstall package
-# function uninstall_package() {
-#   local dpkg_name=$1
-
-#   if [ $(dpkg-query -W -f='${Status}' $dpkg_name 2>/dev/null | grep -c "ok installed") -eq 1 ]; then
-#     echo "Uninstalling: $dpkg_name"
-#     sudo apt purge -y $dpkg_name
-#   fi
-# }
-
 #-------------------------------------------------------------------------------------------#
 
 PRYSM_SH_URL=https://raw.githubusercontent.com/prysmaticlabs/prysm/master/prysm.sh
@@ -31,6 +21,8 @@ PRYSM_SH_URL=https://raw.githubusercontent.com/prysmaticlabs/prysm/master/prysm.
 DEPOSIT_CLI_RELEASES_LATEST=https://api.github.com/repos/ethereum/staking-deposit-cli/releases/latest
 
 ETH2_CLIENT_METRICS_EXPORTER_RELEASES_LATEST=https://api.github.com/repos/gobitfly/eth2-client-metrics-exporter/releases/latest
+
+# GETH_RELEASES_LATEST=https://api.github.com/repos/ethereum/go-ethereum/releases/latest
 
 GETH_TAGS_URL=https://api.github.com/repos/ethereum/go-ethereum/tags
 
@@ -42,6 +34,10 @@ GO_LATEST_VERSION_JSON=https://go.dev/dl/?mode=json
 
 GO_BIN_DOWNLOAD_URL=https://go.dev/dl/
 
+PROMETHEUS_RELEASES_LATEST=https://api.github.com/repos/prometheus/prometheus/releases/latest
+
+NODE_EXPORTER_RELEASES_LATEST=https://api.github.com/repos/prometheus/node_exporter/releases/latest
+
 ARCH=$(dpkg --print-architecture)
 
 #-------------------------------------------------------------------------------------------#
@@ -52,7 +48,11 @@ function install_essential() {
   sudo apt dist-upgrade
   sudo apt autoremove
   
-  # Independent packages
+  #---------------------------------------------#
+  #  BASIC REQUIREMENTS
+  #---------------------------------------------#
+  
+  # Independent packages  
   install_package vim
   install_package git-all
   install_package zip
@@ -62,100 +62,118 @@ function install_essential() {
   install_package build-essential
   install_package libssl-dev
   install_package libffi-dev
-  #install_package python3-dev
   install_package chrony
   install_package jq
   install_package tmux
   install_package ccze
-  install_package net-tools
-  
+  install_package net-tools  
+
+  # Chrony  
+  config_chrony
+
   # Populate folders
   populate_folders
 
-  # Prometheus  
-  install_prometheus
+  # Category: Stats | Prometheus Node Exporter
   install_prometheus_node_exporter
-  
-  # Golang
-  install_package golang
+  config_prometheus_node_exporter
+
+  # Category: Stats | Eth2 Client Metrics Exporter
+  install_eth2_client_metrics_exporter
+  config_eth2_client_metrics_exporter
 
   # Go
   install_go
-  
-  # Python
-  # install_python
-  
-  # Grafana
-  install_grafana
-  
-  # Install Eth2 Client Metrics Exporter
-  install_eth2_client_metrics_exporter
-  
+
   # GETH
   install_geth
-  
-  # Auto Upgrade to the latest version scripts
-  install_auto_upgrade
-    
+  config_geth
+
   # Prysm
   install_prysm
-  
+  config_beacon
+  config_validator
+
   # Validator key generator
   install_validator_key_generator
-  
-  # NO-IP (optional installation)
+
+  # Mevboost
+  install_mevboost
+
+  # Auto Upgrade to the latest version scripts
+  install_auto_upgrade
+
+  # Aliases
+  config_aliases
+
+  # JWT for geth and beacon
+  config_auth_jwt
+
+  # Logs
+  config_logrotate
+
+  # Discord
+  config_discord_notify
+
+  # Firewall Ports
+  config_ports
+
+  # Power button disabling
+  config_disable_power_button
+
+  #---------------------------------------------#
+  #  OPTIONAL INSTALLATION
+  #---------------------------------------------#
+
+  # Category: Stats | Prometheus  
+  install_prometheus
+  config_prometheus  
+
+  # Category: Stats | Grafana
+  install_grafana
+  config_grafana
+
+  # Category: DDNS - NO-IP (optional)
   install_noip
+  config_noip
 
-  # ddclient (optional installation)
+  # Category: DDNS - ddclient (optional)
   install_ddclient
+  config_ddclient
 
-  # Google Auth (optional)
+  # Category: Security - Google Auth (optional)
   install_google_authenticator
 
-  # Yubikey (optional)  
+  # Category: Security - Yubikey (optional)  
   install_yubikey
+  config_ssh_yubikey_auth
 
-  # Configs
-  config_auth_jwt
-  systemd_beacon
-  systemd_validator  
-  systemd_clientstats # (optional)
-  systemd_eth2_client_metrics_exporter
-  systemd_geth  
-  config_prometheus
-  config_grafana
-  config_logrotate
-  config_chrony
-  config_ports
-  config_systemd_resolved # (optional)
+  # Category: Stats - Prysm stats (optional)
+  systemd_clientstats
   
-  # Optional configs
-  config_noip # (optional)
-  config_ddclient
-  config_aliases
-  config_disable_power_button
-  config_ssh_yubikey_auth # (optional)
-  config_discord_notify
+  # Category: Network - Resolver (optional)
+  config_systemd_resolved
 }
 
 # Install Prometheus latest
 function install_prometheus() {
   # https://computingforgeeks.com/install-prometheus-server-on-debian-ubuntu-linux/
   if [ $(dpkg-query -W -f='${Status}' prometheus 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
-    echo "Installing: Prometheus"
     sudo groupadd --system prometheus    
     sudo useradd -s /sbin/nologin --system -g prometheus prometheus
     sudo mkdir /etc/prometheus
     sudo mkdir /var/lib/prometheus
 
     for i in rules rules.d files_sd; do sudo mkdir -p /etc/prometheus/${i}; done
+    
+    rm -rf /tmp/prometheus-*
 
-    # Download latest here: https://prometheus.io/download/
-    #wget -P /tmp https://github.com/prometheus/prometheus/releases/download/v2.54.0-rc.0/prometheus-2.54.0-rc.0.linux-amd64.tar.gz
-    wget -P /tmp https://github.com/prometheus/prometheus/releases/download/v3.0.1/prometheus-3.0.1.linux-amd64.tar.gz
+    prometheus_download_url=$(wget -O - -o /dev/null $PROMETHEUS_RELEASES_LATEST | jq '.assets[].browser_download_url' | grep linux-$ARCH | tr -d \")
+    wget -P /tmp $prometheus_download_url
+
     cd /tmp
     tar xvf prometheus*.tar.gz
-    cd prometheus*/
+    cd prometheus*64
     sudo mv prometheus promtool /usr/local/bin/
     prometheus --version
     sudo mv prometheus.yml /etc/prometheus/prometheus.yml
@@ -168,42 +186,18 @@ function install_prometheus() {
 function install_prometheus_node_exporter() {
   # https://ourcodeworld.com/articles/read/1686/how-to-install-prometheus-node-exporter-on-ubuntu-2004
   if [ $(dpkg-query -W -f='${Status}' prometheus-node-exporter 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
-    echo "Installing: Prometheus Node Exporter"
+    node_exporter_download_url=$(wget -O - -o /dev/null $NODE_EXPORTER_RELEASES_LATEST | jq '.assets[].browser_download_url' | grep linux-$ARCH | tr -d \")
     
-    # Download latest here: https://prometheus.io/download/#node_exporter
-    wget -P /tmp https://github.com/prometheus/node_exporter/releases/download/v1.8.2/node_exporter-1.8.2.linux-amd64.tar.gz
+    rm -rf /tmp/node_exporter-*
+    wget -P /tmp $node_exporter_download_url
     
     cd /tmp
-    tar xvf node_exporter-*.linux-amd64.tar.gz
-    cd node_exporter-*.linux-amd64
+    tar xvf node_exporter-*
+    cd node_exporter-*64
     sudo cp node_exporter /usr/local/bin
 
     sudo useradd --no-create-home --shell /bin/false node_exporter
     sudo chown node_exporter:node_exporter /usr/local/bin/node_exporter
-
-    sudo cat << EOF | sudo tee /etc/systemd/system/prometheus-node-exporter.service >/dev/null
-[Unit]
-Description=Node Exporter
-Wants=network-online.target
-After=network-online.target
-
-[Service]
-User=node_exporter
-Group=node_exporter
-Type=simple
-ExecStart=/usr/local/bin/node_exporter
-Restart=always
-RestartSec=3
-
-[Install]
-WantedBy=multi-user.target
-EOF 
-
-    sudo systemctl daemon-reload
-    sudo systemctl enable prometheus-node-exporter
-    sudo systemctl start prometheus-node-exporter
-
-    # Note: open port 9100
   fi
 }
 
@@ -227,28 +221,15 @@ function install_go() {
   sudo sed -i "$!N;/^\n$/{$q;D;};P;D;" ~/.bashrc
 
   sudo cat << EOF | sudo tee -a ~/.bashrc >/dev/null
-  # GoLang
-  export GOROOT=/usr/local/go
-  export GOPATH=~/go
-  export PATH=\$GOPATH/bin:\$GOROOT/bin:\$PATH
+# GoLang
+export GOROOT=/usr/local/go
+export GOPATH=~/go
+export PATH=\$GOPATH/bin:\$GOROOT/bin:\$PATH
 EOF
 
   source ~/.bashrc
   go version
 }
-
-# Install Python
-# function install_python() {
-  # if [ $(dpkg-query -W -f='${Status}' python3 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
-    # echo "Installing: Python"
-    # install_package software-properties-common
-    # sudo add-apt-repository ppa:deadsnakes/ppa
-    # sudo apt-get update
-    # install_package python3.8
-    # install_package python3-venv
-    # install_package python3-pip
-  # fi 
-# }
 
 # Install Grafana
 function install_grafana() {
@@ -294,8 +275,7 @@ function install_grafana() {
 
 # Install Eth2 Client Metrics Exporter
 function install_eth2_client_metrics_exporter() {
-  if [ ! -e /usr/local/bin/eth2-client-metrics-exporter ]; then
-    echo "Installing: Eth2 Client Metrics Exporter"    
+  if [ ! -e /usr/local/bin/eth2-client-metrics-exporter ]; then    
     curl -s $ETH2_CLIENT_METRICS_EXPORTER_RELEASES_LATEST | grep "eth2-client-metrics-exporter-linux-$ARCH" | cut -d : -f 2,3 |  tr -d \" | wget -qi - -O /tmp/eth2-client-metrics-exporter
     chmod +x /tmp/eth2-client-metrics-exporter
     sudo mv /tmp/eth2-client-metrics-exporter /usr/local/bin
@@ -307,7 +287,7 @@ function install_geth() {
   if [ ! -e /usr/local/bin/geth ]; then
     # Download latest GETH info
     geth_latest_version=$(wget -O - -o /dev/null $GETH_TAGS_URL | jq '.[0].name' | tr -d \" | cut -c 2-)
-        
+    
     sha=$(wget -O - -o /dev/null $GETH_TAGS_URL | jq '.[0].commit.sha' | cut -c 2-9)
     download_version=$ARCH-$geth_latest_version-$sha
     
@@ -316,6 +296,12 @@ function install_geth() {
     tar -C /tmp -xvf /tmp/geth-linux-$download_version.tar.gz
     sudo cp /tmp/geth-linux-$download_version/geth /usr/local/bin
   fi
+}
+
+# Install Mevboost
+function install_mevboost() {
+  /usr/local/go/bin/go install github.com/flashbots/mev-boost@latest
+  sudo cp ~/go/bin/mev-boost /usr/local/bin
 }
 
 function install_auto_upgrade() {
@@ -333,12 +319,13 @@ function install_prysm() {
 
 # Install Validator Key Generator
 function install_validator_key_generator() {
-  if [ ! -e ~/staking_deposit-cli-948d3fc-linux-amd64/deposit ]; then    
-    deposit_cli_filename=$(wget -O - -o /dev/null $DEPOSIT_CLI_RELEASES_LATEST | jq '.assets[].name' | grep linux-$ARCH | tr -d \")
-    browser_download_url=$(wget -O - -o /dev/null $DEPOSIT_CLI_RELEASES_LATEST | jq '.assets[].browser_download_url' | grep linux-$ARCH | tr -d \")
+  if [ ! -e ~/staking_deposit-cli-*-linux-amd64/deposit ]; then    
+    rm -rf /tmp/staking_deposit-cli-*
 
+    browser_download_url=$(wget -O - -o /dev/null $DEPOSIT_CLI_RELEASES_LATEST | jq '.assets[].browser_download_url' | grep linux-$ARCH | tr -d \")
     wget -P /tmp $browser_download_url
-    tar -C ~ -xzvf /tmp/$deposit_cli_filename
+    
+    tar -C ~ -xzvf /tmp/staking_deposit-cli-*.tar.gz
   fi
 
   # Download via Github GUI
@@ -511,7 +498,7 @@ function config_auth_jwt() {
 }
 
 # Systemd Beacon Service
-function systemd_beacon() {
+function config_beacon() {
   if [ ! -e /etc/systemd/system/prysm-beacon.service ]; then
     sudo cat << EOF | sudo tee /etc/systemd/system/prysm-beacon.service >/dev/null
 [Unit]
@@ -522,7 +509,7 @@ Requires=network.target
 [Service]
 EnvironmentFile=/etc/ethereum/prysm-beacon.conf
 Environment=USE_PRYSM_MODERN=$(if [ $(lscpu | grep -wc adx) -eq 1 ]; then echo "true"; else echo "false"; fi)
-ExecStart=~/prysm/prysm.sh \$ARGS
+ExecStart=$HOME/prysm/prysm.sh \$ARGS
 Restart=always
 RestartSec=10
 User=$USER
@@ -539,7 +526,7 @@ EOF
 ARGS="beacon-chain
  --mainnet
  --accept-terms-of-use
- --config-file=~/prysm/configs/beacon.yaml
+ --config-file=$HOME/prysm/configs/beacon.yaml
 "
 EOF
   fi
@@ -547,8 +534,8 @@ EOF
   # YAML
   if [ ! -e ~/prysm/configs/beacon.yaml ]; then
     sudo cat << EOF | tee ~/prysm/configs/beacon.yaml >/dev/null
-datadir: "~/.eth2"
-log-file: "~/logs/beacon.log"
+datadir: "/mnt/ssdxxxx/beacon"
+log-file: "$HOME/logs/beacon.log"
 
 # Mainnet Contract
 deposit-contract: 0x00000000219ab540356cbb839cbe05303d7705fa
@@ -556,7 +543,7 @@ contract-deployment-block: 11052984
 
 verbosity: info
 
-execution-endpoint: "http://localhost:8551"
+execution-endpoint: http://localhost:8551
 
 jwt-secret: /etc/ethereum/jwt.hex
 
@@ -592,15 +579,6 @@ http-mev-relay: http://localhost:18550
 checkpoint-sync-url: https://sync-mainnet.beaconcha.in
 genesis-beacon-api-url: https://sync-mainnet.beaconcha.in
 
-# **** CHECK THIS FLAG WHEN RESYNC ****
-# save-full-execution-payloads: true
-
-# BAD - corrupted db
-#enable-experimental-state: true
-
-# BAD - corrupted db
-#enable-eip-4881: true
-
 rpc-max-page-size: 200000
 grpc-max-msg-size: 268435456
 
@@ -611,15 +589,12 @@ aggregate-first-interval: 7500ms
 aggregate-second-interval: 9800ms
 aggregate-third-interval: 11900ms
 
-#aggregate-parallel: true
-
 blob-save-fsync: true
 enable-minimal-slashing-protection: true
 save-invalid-block-temp: true
 
 # Optional
 local-block-value-boost: 5
-#backfill-oldest-slot: 0
 
 suggested-gas-limit: 36000000
 EOF
@@ -630,7 +605,7 @@ EOF
 }
 
 # Systemd Validator Service
-function systemd_validator() {
+function config_validator() {
   if [ ! -e /etc/systemd/system/prysm-validator.service ]; then
     sudo cat << EOF | sudo tee /etc/systemd/system/prysm-validator.service >/dev/null    
 [Unit]
@@ -640,7 +615,7 @@ Requires=network.target
 
 [Service]
 EnvironmentFile=/etc/ethereum/prysm-validator.conf
-ExecStart=~/prysm/prysm.sh \$ARGS
+ExecStart=$HOME/prysm/prysm.sh \$ARGS
 Restart=always
 RestartSec=10
 User=$USER
@@ -657,7 +632,7 @@ EOF
 ARGS="validator
  --mainnet
  --accept-terms-of-use
- --config-file=~/prysm/configs/validator.yaml
+ --config-file=$HOME/prysm/configs/validator.yaml
 "
 EOF
   fi
@@ -665,13 +640,13 @@ EOF
   # YAML
   if [ ! -e ~/prysm/configs/validator.yaml ]; then
     sudo cat << EOF | tee ~/prysm/configs/validator.yaml >/dev/null
-datadir: "~/.eth2"
-log-file: "~/logs/validator.log"
+datadir: "/mnt/ssdxxxx/validator"
+log-file: "$HOME/logs/validator.log"
 
 verbosity: info
 
-wallet-dir: "~/.wallet/prysm-wallet-v2"
-wallet-password-file: "~/.password/password.txt"
+wallet-dir: "$HOME/.wallet/prysm-wallet-v2"
+wallet-password-file: "$HOME/.password/password.txt"
 
 beacon-rpc-provider: localhost:4000,host1:port,host2:port
 
@@ -684,10 +659,84 @@ enable-doppelganger: true
 monitoring-port: 8081
 monitoring-host: 0.0.0.0
 
-# Mainnet
-graffiti: "poapaa2VsI8722DeHPPwjXbJooGadtMA"
-
 suggested-fee-recipient: ______0xYOUR_WALLET_ADDRESS______
+
+enable-builder: true
+EOF
+  fi
+}
+
+# Config Prometheus Node Exporter
+function config_prometheus_node_exporter() {
+  if [ ! -e /etc/systemd/system/prometheus-node-exporter.service ]; then
+    sudo cat << EOF | sudo tee /etc/systemd/system/prometheus-node-exporter.service >/dev/null
+[Unit]
+Description=Node Exporter
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=node_exporter
+Group=node_exporter
+Type=simple
+ExecStart=/usr/local/bin/node_exporter
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
+EOF 
+
+    sudo systemctl daemon-reload
+    sudo systemctl enable prometheus-node-exporter
+    sudo systemctl start prometheus-node-exporter
+
+    # Note: open port 9100
+  fi
+}
+
+# Config Mevboost
+function config_mevboost() {
+  if [ ! -e /etc/systemd/system/mevboost.service ]; then
+    sudo cat << EOF | sudo tee /etc/systemd/system/mevboost.service >/dev/null
+[Unit]
+Description=Mev-Boost Daemon
+After=network.target auditd.service
+Requires=network.target
+
+[Service]
+EnvironmentFile=/etc/ethereum/mevboost.conf
+ExecStart=mev-boost \$ARGS
+Restart=always
+RestartSec=3
+User=$USER
+
+[Install]
+WantedBy=multi-user.target
+Alias=mevboost.service
+EOF
+  fi
+
+  if [ ! -e /etc/systemd/system/mevboost.service ]; then
+    sudo cat << EOF | sudo tee /etc/ethereum/mevboost.conf >/dev/null
+ARGS="
+ -mainnet
+ -relay-check
+ -loglevel debug
+ -request-timeout-getheader 1000
+ -request-timeout-getpayload 4000
+ -request-timeout-regval 4000
+ -min-bid 0.02
+ -relay https://0xa15b52576bcbf1072f4a011c0f99f9fb6c66f3e1ff321f11f461d15e31b1cb359caa092c71bbded0bae5b5ea401aab7e@aestus.live
+ -relay https://0xa7ab7a996c8584251c8f925da3170bdfd6ebc75d50f5ddc4050a6fdc77f2a3b5fce2cc750d0865e05d7228af97d69561@agnostic-relay.net
+ -relay https://0x8b5d2e73e2a3a55c6c87b8b6eb92e0149a125c852751db1422fa951e42a09b82c142c3ea98d0d9930b056a3bc9896b8f@bloxroute.max-profit.blxrbdn.com
+ -relay https://0xb0b07cd0abef743db4260b0ed50619cf6ad4d82064cb4fbec9d3ec530f7c5e6793d9f286c4e082c0244ffb9f2658fe88@bloxroute.regulated.blxrbdn.com
+ -relay https://0xb3ee7afcf27f1f1259ac1787876318c6584ee353097a50ed84f51a1f21a323b3736f271a895c7ce918c038e4265918be@relay.edennetwork.io
+ -relay https://0xac6e77dfe25ecd6110b8e780608cce0dab71fdd5ebea22a16c0205200f2f8e2e3ad3b71d3499c54ad14d6c21b41a37ae@boost-relay.flashbots.net
+ -relay https://0x98650451ba02064f7b000f5768cf0cf4d4e492317d82871bdc87ef841a0743f69f0f1eea11168503240ac35d101c9135@mainnet-relay.securerpc.com
+ -relay https://0xa1559ace749633b997cb3fdacffb890aeebdb0f5a3b6aaa7eeeaf1a38af0a8fe88b9e4b1f61f236d2e64d95733327a62@relay.ultrasound.money
+ -relay https://0x8c7d33605ecef85403f8b7289c8058f440cbb6bf72b055dfe2f3e2c6695b6a1ea5a9cd0eb3a7982927a463feb4c3dae2@relay.wenmerge.com
+"
 EOF
   fi
 }
@@ -703,7 +752,7 @@ Requires=network.target
 
 [Service]
 EnvironmentFile=/etc/ethereum/prysm-clientstats.conf
-ExecStart=~/prysm/prysm.sh \$ARGS
+ExecStart=$HOME/prysm/prysm.sh \$ARGS
 Restart=always
 RestartSec=10
 User=$USER
@@ -718,7 +767,7 @@ EOF
   if [ ! -e /etc/ethereum/prysm-clientstats.conf ]; then
     sudo cat << EOF | sudo tee /etc/ethereum/prysm-clientstats.conf >/dev/null
 ARGS="client-stats
- --config-file=~/prysm/configs/clientstats.yaml
+ --config-file=$HOME/prysm/configs/clientstats.yaml
  --validator-metrics-url=http://localhost:8081/metrics
  --beacon-node-metrics-url=http://localhost:8080/metrics
  --scrape-interval=1m0s
@@ -727,9 +776,9 @@ EOF
   fi
 }
 
-# Systemd Eth2 Client Metrics Exporter Service
-function systemd_eth2_client_metrics_exporter() {
-  if [ ! -e /etc/systemd/system/prysm-clientstats.service ]; then
+# Config Eth2 Client Metrics Exporter Service
+function config_eth2_client_metrics_exporter() {
+  if [ ! -e /etc/systemd/system/eth2-client-metrics-exporter.service ]; then
     sudo cat << EOF | sudo tee /etc/systemd/system/eth2-client-metrics-exporter.service >/dev/null
 [Unit]
 Description=Eth2 Client Metrics Exporter Daemon
@@ -750,7 +799,7 @@ EOF
   fi
   
   # EnvironmentFile
-  if [ ! -e /etc/ethereum/prysm-clientstats.conf ]; then
+  if [ ! -e /etc/ethereum/eth2-client-metrics-exporter.conf ]; then
     sudo cat << EOF | sudo tee /etc/ethereum/eth2-client-metrics-exporter.conf >/dev/null
 ARGS=" 
  --server.address='https://beaconcha.in/api/v1/client/metrics?apikey=BEACONCHAIN_API_KEY&machine=MACHINE_NAME'
@@ -764,7 +813,7 @@ EOF
 }
   
 # Systemd GETH Service
-function systemd_geth() {
+function config_geth() {
   if [ ! -e /etc/systemd/system/geth.service ]; then
     sudo cat << EOF | sudo tee /etc/systemd/system/geth.service >/dev/null
 [Unit]
@@ -791,35 +840,31 @@ EOF
 ARGS="
  --port 30303 
  --http 
- --http.api eth,net,engine,admin
+ --http.api eth,net,engine,admin,debug,web3
  --http.port 8545 
  --http.addr 0.0.0.0 
  --authrpc.jwtsecret /etc/ethereum/jwt.hex
- --authrpc.addr 0.0.0.0
- --rpc.batch-response-max-size 50000000
- --authrpc.port 8551
+ --authrpc.addr 0.0.0.0 
+ --authrpc.port 8551 
  --authrpc.vhosts * 
+ --rpc.batch-response-max-size 50000000
  --syncmode snap 
  --db.engine pebble
  --state.scheme path
- --datadir __DEFINE_CHAINDATA_PATH_HERE__
- --datadir.ancient __DEFINE_ANCIENT_PATH_HERE__
+ --datadir /mnt/ssdxxxx/chaindata
+ --datadir.ancient /mnt/ssdxxxx/ancientdb
  --metrics 
  --metrics.expensive 
  --pprof 
  --pprof.port 6060 
  --pprof.addr 0.0.0.0 
  --maxpeers 100 
- --identity Maximus 
- --ethstats Maximus:a38e1e50b1b82fa@ethstats.net
+ --identity Maximus
  --miner.gaslimit 36000000
 "
 EOF
   fi
 
-  # Use ancient db dir with this flag:  
-  #--datadir.ancient _ANCIENT_PATH_
-  
   # Prune geth with tmux
   # /usr/local/bin/geth snapshot prune-state --datadir _CHAINDATA_PATH_
 
@@ -921,7 +966,7 @@ function config_grafana() {
 function config_logrotate() {
   if [ ! -e /etc/logrotate.d/prysm-logs ]; then
     sudo cat << EOF | sudo tee /etc/logrotate.d/prysm-logs >/dev/null
-~/logs/*.log
+$HOME/logs/*.log
 {
     rotate 7
     daily
@@ -997,7 +1042,7 @@ function config_ports{
 	# Validator
 	sudo ufw allow 8081/tcp
 
-	# Grafana
+	# Grafana (optional)
 	sudo ufw allow 3000:3100/tcp
 
 	# Geth
@@ -1007,7 +1052,7 @@ function config_ports{
 	sudo ufw allow 30303/tcp
 	sudo ufw allow 30303/udp
 
-	# Prometheus
+	# Prometheus (optional)
 	sudo ufw allow 9090/tcp
 
 	# Prometheus-node-exporter

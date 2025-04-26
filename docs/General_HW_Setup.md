@@ -6,6 +6,21 @@
 
 [Using Rufus to flash the microSD card]
 
+---
+## 2.5G NIC card setup
+Ref: 
+1.  https://installati.one/install-r8125-dkms-ubuntu-22-04/?expand_article=1
+1.  https://bbs.archlinux.org/viewtopic.php?id=264742
+
+```bash
+sudo apt update
+sudo apt -y install r8125-dkms
+ip a
+# Change ethxxxx to whatever NIC card
+sudo ethtool -s ethxxxx autoneg on advertise 0x80000000002f
+# Check for "2500baseT/full" and "Speed: 2500Mb/s"
+sudo ethtool ethxxxx
+```
 
 ---
 ## Create User 
@@ -122,29 +137,4 @@ sudo vi /etc/sysctl.conf
 # vm.swappiness=10
 sudo shutdown -r now
 ```
---- 
-
-## Certificate
-
-### SSL / TLS for Beacon, Validator
-```bash
-mkdir ~/.ssl && cd .ssl
-
-openssl genrsa -aes128 -out server.key 2048
-
-openssl rsa -in server.key -out server.key
-
-openssl req -new -days 3650 -key server.key -out beacon.csr
-
-openssl req -new -days 3650 -key server.key -out validator.csr
-
-# Leave empty when prompt except Common Name: 'localhost'
-
-openssl x509 -in beacon.csr -out beacon.crt -req -signkey server.key -days 3650 
-
-openssl x509 -in validator.csr -out validator.crt -req -signkey server.key -days 3650
-
-# Additional Checks:
-# SSL/TLS certificates
-# https://websiteforstudents.com/create-ssl-tls-self-signed-certificates-on-ubuntu-16-04-18-04-18-10/
-```
+---
