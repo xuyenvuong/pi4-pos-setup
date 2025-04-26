@@ -1034,6 +1034,7 @@ function config_ports{
 	sudo ufw allow 13000/tcp
 	sudo ufw allow 12000/udp
 	sudo ufw allow 4000/tcp
+  # http://192.168.x.x:8080/metrics
 	sudo ufw allow 8080/tcp
 
   # Beacon QUIC
@@ -1048,6 +1049,7 @@ function config_ports{
 	# Geth
 	sudo ufw allow 8545/tcp
   sudo ufw allow 8551/tcp
+  # http://192.168.x.x:6060/debug/metrics/prometheus
 	sudo ufw allow 6060/tcp
 	sudo ufw allow 30303/tcp
 	sudo ufw allow 30303/udp
@@ -1056,6 +1058,7 @@ function config_ports{
 	sudo ufw allow 9090/tcp
 
 	# Prometheus-node-exporter
+  # http://192.168.x.x:9100/metrics
 	sudo ufw allow 9100/tcp
 	
 	# Enable
