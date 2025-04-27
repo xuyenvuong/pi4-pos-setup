@@ -159,7 +159,7 @@ function install_essential() {
 function install_prometheus() {
   # https://computingforgeeks.com/install-prometheus-server-on-debian-ubuntu-linux/
   if [ $(dpkg-query -W -f='${Status}' prometheus 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
-    sudo groupadd --system prometheus    
+    sudo groupadd --system prometheus
     sudo useradd -s /sbin/nologin --system -g prometheus prometheus
     sudo mkdir /etc/prometheus
     sudo mkdir /var/lib/prometheus
@@ -234,7 +234,6 @@ EOF
 # Install Grafana
 function install_grafana() {
   if [ $(dpkg-query -W -f='${Status}' grafana-enterprise 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
-    echo "Installing: Grafana"
     install_package apt-transport-https
     install_package software-properties-common
     
