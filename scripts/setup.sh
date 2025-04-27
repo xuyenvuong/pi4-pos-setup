@@ -959,6 +959,8 @@ function config_grafana() {
   # https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/sources/EthereumOnArmAmdNode.json
   # Eth Staking Dashboard
   # https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/sources/EthStakingDashboard.json  
+
+  # Open port 3000/tcp
 }
 
 # Config Logrotate
