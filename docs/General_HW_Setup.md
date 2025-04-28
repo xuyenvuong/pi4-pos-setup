@@ -22,6 +22,13 @@ sudo ethtool -s ethxxxx autoneg on advertise 0x80000000002f
 sudo ethtool ethxxxx
 ```
 
+## Firmware Upgrades
+```bash
+sudo fwupdmgr get-upgrades
+sudo fwupdmgr refresh --force
+sudo fwupdmgr update
+```
+
 ---
 ## Create User 
 ### Login with default ubuntu/ubuntu
