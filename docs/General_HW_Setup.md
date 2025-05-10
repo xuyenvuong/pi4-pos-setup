@@ -142,6 +142,92 @@ sudo vi /etc/sysctl.conf
 
 # Add permanent line at the end
 # vm.swappiness=10
+# net.core.rmem_max = 7500000
+# net.core.wmem_max = 7500000
 sudo shutdown -r now
+```
+
+## Pi-KVM
+# Samba fstab mount
+```bash
+# PiKVM and OS update
+pikvm-update
+rw
+pacman -Syy
+pacman -S pikvm-os-updater
+pikvm-update
+
+# Tailscale
+rw
+pacman -S tailscale-pikvm
+systemctl enable --now tailscaled
+tailscale up --ssh
+reboot
+
+# Samba setup
+rw
+pacman -S cifs-utils
+kvmd-helper-otgmsd-remount rw
+mkdir -p /var/lib/kvmd/msd/isos
+kvmd-helper-otgmsd-remount ro
+
+# Samba automount via fstab, or by systemd (look below)
+vi /etc/fstab
+#//192.168.1.167/contents/software/isos /var/lib/kvmd/msd/isos cifs ro,vers=3.1.1,noauto,x-systemd.automount,x-systemd.device-timeout=10,credentials=/root/.smbcredentials 0 0
+ro
+reboot
+
+# Or, Samba as systemd
+# https://anteru.net/blog/2019/automatic-mounts-using-systemd/
+rw
+
+# Disable any unused interface to speed up boot.
+systemctl edit systemd-networkd-wait-online.service
+# Add these below lines in the top section (between the editable lines)
+# [Service]
+# Type=oneshot
+# ExecStart=
+# ExecStart=/usr/lib/systemd/systemd-networkd-wait-online --ignore=eth0
+# RemainAfterExit=yes
+
+cat << EOF | sudo tee /root/.smbcredentials
+username=<username>
+password=<password>
+EOF
+# Put username/password
+
+# Must use local IP e.g. 192.168.1.167 instead of Tailscale DNS
+cat << EOF | sudo tee /etc/systemd/system/var-lib-kvmd-msd-isos.mount >/dev/null
+[Unit]
+Description=isos mount
+
+[Mount]
+What=//192.168.1.167/contents/software/isos
+Where=/var/lib/kvmd/msd/isos
+Type=cifs
+Options=ro,vers=3.1.1,noauto,credentials=/root/.smbcredentials
+DirectoryMode=0700
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+cat << EOF | sudo tee /etc/systemd/system/var-lib-kvmd-msd-isos.automount >/dev/null
+[Unit]
+Description=isos automount
+
+[Automount]
+Where=/var/lib/kvmd/msd/isos
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl daemon-reload
+systemctl enable var-lib-kvmd-msd-isos.mount
+systemctl enable var-lib-kvmd-msd-isos.automount
+
+ro
+reboot
 ```
 ---
