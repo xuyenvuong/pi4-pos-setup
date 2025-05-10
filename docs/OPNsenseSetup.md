@@ -100,6 +100,7 @@ https://firebog.net/
 # Github Setup - 
 * Generate SSH key pairs - Note: DO NOT add any passphrase
 ssh-keygen -t ed25519 -C "xuyenvuong@yahoo.com"
+(Note to backup the key pair somewhere)
 
 * Github config
 Create a blank private repo on Github name "opnsense_config"
