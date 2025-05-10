@@ -95,3 +95,28 @@ https://firebog.net/
 # TROUBLESHOOT
 # NOTE: If GUI doesn't start, try to run this command, then resolve any Permission Denied issue:
 * `sudo /usr/local/sbin/lighttpd -f /var/etc/lighty-webConfigurator.conf`
+
+
+# Github Setup - 
+* Generate SSH key pairs - Note: DO NOT add any passphrase
+ssh-keygen -t ed25519 -C "xuyenvuong@yahoo.com"
+
+* Github config
+Create a blank repo on Github name "opnsense_config"
+Open the "opnsense_config" project, goto Settings -> Deploy keys -> Add deploy key
+Title: OPNSense Pub Key
+Key: Open the .pub key and copy the content to here.
+Check: Allow write access
+
+* OPNSense config
+install plugin - os-git-backup
+Goto: System -> Configuration -> Backups
+Fill:
+Enable: checked
+URL: ssh://github.com/xuyenvuong/opnsense_config.git
+Branch: master
+SSH private key: Open the private key and copy the content to here.
+User Name: git
+Password: (empty)
+
+Setup/Test
