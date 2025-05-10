@@ -102,7 +102,7 @@ https://firebog.net/
 ssh-keygen -t ed25519 -C "xuyenvuong@yahoo.com"
 
 * Github config
-Create a blank repo on Github name "opnsense_config"
+Create a blank private repo on Github name "opnsense_config"
 Open the "opnsense_config" project, goto Settings -> Deploy keys -> Add deploy key
 Title: OPNSense Pub Key
 Key: Open the .pub key and copy the content to here.
