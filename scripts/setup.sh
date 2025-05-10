@@ -121,6 +121,9 @@ function install_essential() {
   # Power button disabling
   config_disable_power_button
 
+  # Install Tailscale
+  install_tailscale
+
   #---------------------------------------------#
   #  OPTIONAL INSTALLATION
   #---------------------------------------------#
@@ -988,6 +991,18 @@ EOF
   fi
 }
 
+# Install Tailscale
+function install_tailscale() {
+  curl -fsSL https://tailscale.com/install.sh | sh
+  sudo tailscale up
+
+  # Optional
+  sudo tailscale set --ssh
+
+  # Add cert for <MACHINE_NAME>
+  sudo tailscale cert <MACHINE_NAME>.fin-arowana.ts.net
+}
+
 # Config Chrony
 function config_chrony() {
 
@@ -1045,7 +1060,7 @@ function config_ports{
 	sudo ufw allow 8081/tcp
 
 	# Grafana (optional)
-	sudo ufw allow 3000:3100/tcp
+	sudo ufw allow 3000/tcp
 
 	# Geth
 	sudo ufw allow 8545/tcp
