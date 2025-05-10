@@ -66,7 +66,7 @@ function install_essential() {
   install_package jq
   install_package tmux
   install_package ccze
-  install_package net-tools  
+  install_package net-tools
 
   # Chrony  
   config_chrony
@@ -127,6 +127,9 @@ function install_essential() {
   #---------------------------------------------#
   #  OPTIONAL INSTALLATION
   #---------------------------------------------#
+
+  # Samba
+  install cifs-utils
 
   # Category: Stats | Prometheus  
   install_prometheus
