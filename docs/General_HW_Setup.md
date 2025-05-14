@@ -61,13 +61,11 @@ sudo EDITOR=vim visudo
 ### SSH only for matched user
 ```bash
 # Add this block at the end of /etc/ssh/sshd_config file
-# PubkeyAcceptedAlgorithms +ssh-rsa
 #
-# Match User username Address 192.168.0.0/24,10.8.0.0/24
+# Match User username
 #        PubkeyAuthentication yes
 #        AuthorizedKeysFile %h/.ssh/authorized_keys
 #        AuthenticationMethods publickey
-#        PubkeyAcceptedKeyTypes +ssh-rsa
 
 # Next set 
 # PasswordAuthentication no

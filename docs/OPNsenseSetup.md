@@ -121,3 +121,7 @@ User Name: git
 Password: (empty)
 
 Setup/Test
+
+# Install tailscale
+# https://www.youtube.com/watch?v=VD2oMin_V3M
+# https://forum.opnsense.org/index.php?topic=46938.0
