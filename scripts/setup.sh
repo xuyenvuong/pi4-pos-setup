@@ -237,7 +237,7 @@ export PATH=\$GOPATH/bin:\$GOROOT/bin:\$PATH
 EOF
 
   source ~/.bashrc
-  go version
+  #go version
 }
 
 # Install Grafana
