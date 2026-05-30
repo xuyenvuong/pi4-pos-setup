@@ -76,7 +76,7 @@ alias node-exporter-stop='sudo systemctl stop eth2-client-metrics-exporter.servi
 alias geth-stop='sudo systemctl stop geth.service'
 alias prometheus-stop='sudo systemctl stop prometheus'
 alias prometheus-node-exporter-stop='sudo systemctl stop prometheus-node-exporter'
-alias grafana-stop='sudo systemctl stop grafana-server'sudo
+alias grafana-stop='sudo systemctl stop grafana-server'
 alias mevboost-stop='sudo systemctl stop mevboost.service'
 
 alias beacon-restart='sudo systemctl restart prysm-beacon.service'
