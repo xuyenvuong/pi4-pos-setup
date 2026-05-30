@@ -1,13 +1,3 @@
-# UBUNTU OS SETUP (Pi)
-
-## Install Ubuntu
-
-[Download latest Ubuntu 64-bit](https://ubuntu.com/download/raspberry-pi)
-
-[Using Rufus to flash the microSD card]
-
----
-
 ## 2.5G NIC card setup
 
 Ref:
@@ -39,83 +29,33 @@ sudo fwupdmgr update
 
 ---
 
-## Create User
-
-### Login with default ubuntu/ubuntu
-
-```bash
-ssh ubuntu@local_ip_address
-# Change default password
-passwd
-```
-
----
-
-### Add new user (other than default user 'ubuntu')
+# Add new user (other than default user 'ubuntu')
 
 ```bash
 sudo useradd -m -s /bin/bash username
-```
 
----
-
-### Delete default user (default 'ubuntu')
-
-```bash
-sudo userdel -r username
-```
-
----
-
-### Give ubuntu user sudo access
-
-```bash
-# Add user to sudoer group
 sudo usermod -aG sudo username
 
-sudo EDITOR=vim visudo
-# Add this line at the bottom of the file
-# username  ALL=(ALL) NOPASSWD:ALL
-```
+# Set sudo no password
+sudo cat << EOF | sudo tee -a /etc/sudoers >/dev/null
+$USER  ALL=(ALL) NOPASSWD:ALL
+EOF
 
----
+# SSH
+#PasswordAuthentication no
+sudo sed -i 's|^#PasswordAuthentication.*$|PasswordAuthentication no|' /etc/ssh/sshd_config
 
-### SSH only for matched user
-
-````bash
-# Add this block at the end of /etc/ssh/sshd_config
-#
-```bash
-Match User username
+sudo cat << EOF | sudo tee -a /etc/ssh/sshd_config >/dev/null
+Match User $USER
        PubkeyAuthentication yes
        AuthorizedKeysFile %h/.ssh/authorized_keys
        AuthenticationMethods publickey
-````
+EOF
 
-# Next set
-
-# PasswordAuthentication no
+sudo systemctl restart ssh
 
 # Copy the public key to ~/.ssh/authorized_keys file
-
-# Restart SSH
-
-```bash
-sudo systemctl restart ssh
 ```
-
-# Open another console to check. If not working, revert
-
-````
-
----
-
-### Change hostname
-
-```bash
-sudo vi /etc/hostname
-sudo vi /etc/hosts
-````
 
 ---
 
@@ -357,7 +297,7 @@ sudo lxc-attach -n $CONTAINER_NAME --clear-env # Open shell then exit
 exit
 
 # Setup SSH
-sudo lxc-attach -n $CONTAINER_NAME -- su - mvuong
+sudo lxc-attach -n $CONTAINER_NAME -- su - $USER
 sudo apt install openssh-server
 # Note: Need to setup public key
 
