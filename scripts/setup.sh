@@ -1,6 +1,7 @@
 #!/bin/bash
 # setup.sh - A script to quickly setup ETH PoS node
 # Author: Max Vuong
+# Last update: 20260530
 
 : <<'COMMENT_BLOCK'
 Instructions to run the setup script:
