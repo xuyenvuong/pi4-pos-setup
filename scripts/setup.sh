@@ -536,8 +536,9 @@ function __config_auth_jwt() {
 
 # Common system config
 function __common_system_config () {
-  # Require: ccze, ssh port, chrony, /etc/ethereum, auto upgrade, aliases, prometheus node exporter
+  # Require: ccze, bash-completion, ssh port, chrony, /etc/ethereum, auto upgrade, aliases, prometheus node exporter
   install_package ccze
+  install_package bash-completion
   __config_ufw_port_ssh
   __config_chrony  
   __mkdir_etc_ethereum
@@ -598,7 +599,7 @@ EOF
   # YAML
   if [ ! -e ~/prysm/configs/beacon.yaml ]; then
     sudo cat << EOF | tee ~/prysm/configs/beacon.yaml >/dev/null
-datadir: "/mnt/ssdxxxx/beacon"            # Change later
+datadir: "/mnt/ssdxxxx/beacon"
 log-file: "$HOME/logs/beacon.log"
 
 # Mainnet Contract
@@ -615,7 +616,7 @@ jwt-secret: /etc/ethereum/jwt.hex
 block-batch-limit: 128
 
 #p2p-host-ip: $(curl -s v4.ident.me)
-p2p-host-dns: "mvuong.freemyip.com"       # Change later
+p2p-host-dns: "mvuong.freemyip.com"
 
 p2p-tcp-port: 13000
 p2p-udp-port: 12000
@@ -632,7 +633,7 @@ monitoring-host: 0.0.0.0
 
 update-head-timely: true
 
-suggested-fee-recipient: 0x__YOUR_WALLET_ADDRESS__      # Change later
+suggested-fee-recipient: 0x__YOUR_WALLET_ADDRESS__
 
 # Mev Boost
 #http-mev-relay: http://localhost:18550
@@ -725,7 +726,7 @@ enable-doppelganger: true
 monitoring-port: 8081
 monitoring-host: 0.0.0.0
 
-suggested-fee-recipient: ______0xYOUR_WALLET_ADDRESS______   # Change
+suggested-fee-recipient: ______0xYOUR_WALLET_ADDRESS______
 
 enable-builder: true
 EOF
@@ -941,8 +942,8 @@ ARGS="
  --syncmode snap 
  --db.engine pebble
  --state.scheme path
- --datadir /mnt/ssdxxxx/chaindata                     # Change
- --datadir.ancient /mnt/ssdxxxx/ancientdb             # Change
+ --datadir /mnt/ssdxxxx/chaindata
+ --datadir.ancient /mnt/ssdxxxx/ancientdb
  --metrics 
  --metrics.expensive 
  --pprof 
@@ -1036,6 +1037,8 @@ EOF
       - targets: ['localhost:8080']
 EOF
   fi 
+
+  # Note: use http://stats-host:9090/targets to check data scrapping status
 }
 
 # Stats

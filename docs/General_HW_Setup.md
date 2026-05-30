@@ -286,6 +286,8 @@ sudo lxc-create -n $CONTAINER_NAME -t download -- --dist ubuntu --release noble 
 sudo sed -i 's|lxcbr0|br0|' /var/lib/lxc/$CONTAINER_NAME/config # change lxcbr0 to br0
 echo "lxc.net.0.hwaddr = $HWADDR" | sudo tee -a /var/lib/lxc/$CONTAINER_NAME/config # change xx:xx:xx
 echo "lxc.start.auto = 1" | sudo tee -a /var/lib/lxc/$CONTAINER_NAME/config # auto start
+echo "lxc.mount.entry = /mnt/external/ssd2tb0 mnt/ssd2tb0 none bind,create=dir 0 0" | sudo tee -a /var/lib/lxc/$CONTAINER_NAME/config     # volume 1
+echo "lxc.mount.entry = /mnt/external/ssd2tb1 mnt/ssd2tb1 none bind,create=dir 0 0" | sudo tee -a /var/lib/lxc/$CONTAINER_NAME/config     # volume 2
 sudo systemctl restart lxc-net
 
 # Start and add non-root user
