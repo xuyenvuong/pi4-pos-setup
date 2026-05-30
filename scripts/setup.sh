@@ -7,7 +7,7 @@
 Instructions to run the setup script:
 
 Run:
-> wget https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/refs/heads/master/scripts/setup.sh && chmod +x discord_notify.sh
+> curl -L https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/refs/heads/master/scripts/setup.sh | bash
 
 COMMENT_BLOCK
 
