@@ -542,8 +542,9 @@ function __config_auth_jwt() {
 
 # Common system config
 function __common_system_config () {
-  # Require: ccze, chrony, /etc/ethereum, auto upgrade, aliases, prometheus node exporter
+  # Require: ccze, ssh port, chrony, /etc/ethereum, auto upgrade, aliases, prometheus node exporter
   install_package ccze
+  __config_ufw_port_ssh
   __config_chrony  
   __mkdir_etc_ethereum
   __install_auto_upgrade
@@ -1165,20 +1166,6 @@ EOF
 
 # Config Ports
 # function __config_ports() {
-# 	# SSH
-# 	sudo ufw allow ssh
-	
-#   __config_ufw_port_beacon
-#   __config_ufw_port_validator
-#   __config_ufw_port_mevboost
-#   __config_ufw_port_geth
-#   __config_ufw_port_grafana
-#   __config_ufw_port_prometheus
-#   __config_ufw_port_prometheus_node_exporter
-	
-# 	# Enable
-# 	sudo ufw enable
-
 #   # Check ports forwarding tool
 #   # https://www.yougetsignal.com/tools/open-ports/
 #   # https://mxtoolbox.com/SuperTool.aspx?action=tcp%3a%7Bnode-IP-address%7D%3a13000&run=toolpage
