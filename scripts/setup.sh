@@ -7,7 +7,7 @@
 Instructions to run the setup script:
 
 Run:
-> curl -L https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/refs/heads/master/scripts/setup.sh | bash
+> bash <(curl -s https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/refs/heads/master/scripts/setup.sh)
 
 COMMENT_BLOCK
 
