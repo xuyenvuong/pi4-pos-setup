@@ -62,7 +62,6 @@ PRYSM_SH_URL=https://raw.githubusercontent.com/prysmaticlabs/prysm/master/prysm.
 
 GETH_TAGS_URL=https://api.github.com/repos/ethereum/go-ethereum/tags
 GETH_RELEASES_LATEST=https://api.github.com/repos/ethereum/go-ethereum/releases/latest
-GETH_LAST_PRUNE_FILE=/tmp/geth_last_prune
 
 MEVBOOST_RELEASES_LATEST=https://api.github.com/repos/flashbots/mev-boost/releases/latest
 
