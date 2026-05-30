@@ -95,8 +95,7 @@ https://firebog.net/
 # TROUBLESHOOT
 # NOTE: If GUI doesn't start, try to run this command, then resolve any Permission Denied issue:
 * `sudo /usr/local/sbin/lighttpd -f /var/etc/lighty-webConfigurator.conf`
-
-
+-------------------------------------
 # Github Setup - 
 * Generate SSH key pairs - Note: DO NOT add any passphrase
 ssh-keygen -t ed25519 -C "xuyenvuong@yahoo.com"
@@ -121,7 +120,17 @@ User Name: git
 Password: (empty)
 
 Setup/Test
-
+-------------------------------------
 # Install tailscale
 # https://www.youtube.com/watch?v=VD2oMin_V3M
 # https://forum.opnsense.org/index.php?topic=46938.0
+
+-------------------------------------
+# Setup Cloudflare Tunnel on OPNSense
+# https://vlaicu.io/posts/cloudflare-tunnel-opnsense/
+# https://www.jackpearce.co.uk/posts/cloudflared-opnsense/
+
+Note: Using --protocol http2 for now until HTTP3/QUIC is supported by Opnsense. (https://github.com/cloudflare/cloudflared/issues/688)
+
+sudo /usr/sbin/daemon -o /var/log/cloudflared.log -p /var/run/cloudflared.pid -f /usr/local/bin/cloudflared tunnel --protocol http2 --no-autoupdate run --token _TOKEN_HERE_
+-------------------------------------
