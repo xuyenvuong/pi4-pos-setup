@@ -1154,7 +1154,7 @@ EOF
     sudo systemctl force-reload chrony
 
     sudo chronyd -Q
-    sudo chronyd -q
+    # sudo chronyd -q
     
     # Note: Set local time
     sudo timedatectl set-timezone America/Los_Angeles
