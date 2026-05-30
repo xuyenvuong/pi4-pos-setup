@@ -113,12 +113,6 @@ function __install_essential() {
   # Category Stats
   setup_stats
 
-  # Category: Stats | Prometheus
-  #__config_prometheus  
-
-  # Category: Stats | Grafana  
-  #__config_grafana
-
   # Category: DDNS - NO-IP (optional)  
   # __config_noip
 
@@ -1016,7 +1010,7 @@ EOF
   # sudo systemctl enable prometheus
   
   # Concat to existing file
-  if [ ! -e /etc/prometheus/prometheus.yml ]; then
+  if [ -e /etc/prometheus/prometheus.yml ]; then
     sudo cat << EOF | sudo tee -a /etc/prometheus/prometheus.yml >/dev/null
 
   - job_name: node
