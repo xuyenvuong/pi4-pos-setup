@@ -2,6 +2,16 @@
 # setup.sh - A script to quickly setup ETH PoS node
 # Author: Max Vuong
 
+: <<'COMMENT_BLOCK'
+Instructions to run the setup script:
+
+Run:
+> wget -P https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/refs/heads/master/scripts/setup.sh && chmod +x discord_notify.sh
+
+COMMENT_BLOCK
+
+#-------------------------------------------------------------------------------------------#
+
 set -eu
 
 # Install package
@@ -41,8 +51,9 @@ NODE_EXPORTER_RELEASES_LATEST=https://api.github.com/repos/prometheus/node_expor
 ARCH=$(dpkg --print-architecture)
 
 #-------------------------------------------------------------------------------------------#
+
 # Main function to install all necessary package to support the node
-function install_essential() {
+function __install_essential() {
   # Update & Upgrade to latest
   sudo apt update && sudo apt upgrade
   sudo apt dist-upgrade
@@ -52,119 +63,92 @@ function install_essential() {
   #  BASIC REQUIREMENTS
   #---------------------------------------------#
   
-  # Independent packages  
-  install_package vim
-  install_package git-all
-  install_package zip
-  install_package unzip
-  install_package make
-  install_package gcc
-  install_package build-essential
-  install_package libssl-dev
-  install_package libffi-dev
-  install_package chrony
-  install_package jq
-  install_package tmux
-  install_package ccze
-  install_package net-tools
+  # Independent packages
+  #install_package git-all                 # optional
+  #install_package zip                     # optional
+  #install_package unzip                   # optional
+  #install_package make                    # optional
+  #install_package gcc                     # optional
+  #install_package build-essential         # optional
+  #install_package libssl-dev              # optional
+  #install_package libffi-dev              # optional
+  #install_package chrony      # system
+  #install_package jq
+  #install_package tmux                    # optional
+  #install_package ccze        # system
+  #install_package net-tools               # optional  
+  # Samba
+  #install_package cifs-utils              # optional
 
-  # Chrony  
-  config_chrony
+  # GETH  
+  setup_geth
 
-  # Populate folders
-  populate_folders
+  # Prysm  
+  setup_beacon
+  setup_validator
 
-  # Category: Stats | Prometheus Node Exporter
-  install_prometheus_node_exporter
-  config_prometheus_node_exporter
-
-  # Category: Stats | Eth2 Client Metrics Exporter
-  install_eth2_client_metrics_exporter
-  config_eth2_client_metrics_exporter
-
-  # Go
-  install_go
-
-  # GETH
-  install_geth
-  config_geth
-
-  # Prysm
-  install_prysm
-  config_beacon
-  config_validator
+  # Mevboost  
+  setup_mevboost
 
   # Validator key generator
-  install_validator_key_generator
+  __install_validator_key_generator
 
-  # Mevboost
-  install_mevboost
-
-  # Auto Upgrade to the latest version scripts
-  install_auto_upgrade
-
-  # Aliases
-  config_aliases
-
-  # JWT for geth and beacon
-  config_auth_jwt
-
-  # Logs
-  config_logrotate
-
-  # Discord
-  config_discord_notify
+  # Category: Stats | Eth2 Client Metrics Exporter  
+  setup_eth2_client_metrics_exporter
 
   # Firewall Ports
-  config_ports
-
-  # Power button disabling
-  config_disable_power_button
-
-  # Install Tailscale
-  install_tailscale
+  __config_ports
 
   #---------------------------------------------#
   #  OPTIONAL INSTALLATION
   #---------------------------------------------#
 
-  # Samba
-  install cifs-utils
+  # Category: System | Power button disabling
+  __config_disable_power_button
 
-  # Category: Stats | Prometheus  
-  install_prometheus
-  config_prometheus  
+  # Category: System | Setup network check and auto reboot (optional)
+  # __config_auto_reboot
 
-  # Category: Stats | Grafana
-  install_grafana
-  config_grafana
+  # Category Stats
+  setup_stats
 
-  # Category: DDNS - NO-IP (optional)
-  install_noip
-  config_noip
+  # Category: Stats | Prometheus
+  #__config_prometheus  
 
-  # Category: DDNS - ddclient (optional)
-  install_ddclient
-  config_ddclient
+  # Category: Stats | Grafana  
+  #__config_grafana
+
+  # Category: DDNS - NO-IP (optional)  
+  # __config_noip
+
+  # Category: DDNS - ddclient (optional)  
+  # __config_ddclient
 
   # Category: Security - Google Auth (optional)
-  install_google_authenticator
+  # __install_google_authenticator
 
   # Category: Security - Yubikey (optional)  
-  install_yubikey
-  config_ssh_yubikey_auth
+  # __install_yubikey
 
   # Category: Stats - Prysm stats (optional)
-  systemd_clientstats
+  # __config_clientstats
   
   # Category: Network - Resolver (optional)
-  config_systemd_resolved
+  # __config_systemd_resolved
+
+  # Install Tailscale
+  # __install_tailscale
 }
 
 # Install Prometheus latest
-function install_prometheus() {
+function __install_prometheus() {
+  # Require: jq, port
+  install_package jq  
+
   # https://computingforgeeks.com/install-prometheus-server-on-debian-ubuntu-linux/
-  if [ $(dpkg-query -W -f='${Status}' prometheus 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
+  # if [ $(dpkg-query -W -f='${Status}' prometheus 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
+
+  if [ ! -e /etc/prometheus/prometheus.yml ]; then
     sudo groupadd --system prometheus
     sudo useradd -s /sbin/nologin --system -g prometheus prometheus
     sudo mkdir /etc/prometheus
@@ -185,13 +169,20 @@ function install_prometheus() {
     sudo mv prometheus.yml /etc/prometheus/prometheus.yml
     sudo mv consoles/ console_libraries/ /etc/prometheus/
     cd
+  else
+    echo "Skipping prometheus"
   fi
 }
 
 # Install Prometheus Node Exporter
-function install_prometheus_node_exporter() {
+function __install_prometheus_node_exporter() {
+  # Require: jq, require $ARCH
+  install_package jq  
+
   # https://ourcodeworld.com/articles/read/1686/how-to-install-prometheus-node-exporter-on-ubuntu-2004
-  if [ $(dpkg-query -W -f='${Status}' prometheus-node-exporter 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
+  #if [ $(dpkg-query -W -f='${Status}' prometheus-node-exporter 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
+
+  if [ ! -e /usr/local/bin/node_exporter ]; then
     node_exporter_download_url=$(wget -O - -o /dev/null $NODE_EXPORTER_RELEASES_LATEST | jq '.assets[].browser_download_url' | grep linux-$ARCH | tr -d \")
     
     rm -rf /tmp/node_exporter-*
@@ -202,13 +193,21 @@ function install_prometheus_node_exporter() {
     cd node_exporter-*64
     sudo cp node_exporter /usr/local/bin
 
-    sudo useradd --no-create-home --shell /bin/false node_exporter
+    if id node_exporter &>/dev/null; then
+      echo "User node_exporter exists."
+    else
+      sudo useradd --no-create-home --shell /bin/false node_exporter
+    fi
+
     sudo chown node_exporter:node_exporter /usr/local/bin/node_exporter
   fi
 }
 
 # Install Go
-function install_go() {
+function __install_go() {
+  # Require packages: jq
+  install_package jq
+
   go_latest_version=$(wget -O - -o /dev/null $GO_LATEST_VERSION_JSON | jq '.[0].files | .[] | select(.os=="linux" and .arch=="'$ARCH'") | .filename'  | tr -d \")
 
   go_bin_tar_url="$GO_BIN_DOWNLOAD_URL$go_latest_version"
@@ -218,13 +217,16 @@ function install_go() {
   sudo tar -xvf /tmp/$go_latest_version -C /usr/local
 
   rm -rf /tmp/$go_latest_version
+}
 
+# Set Go environment variables
+function __config_go_env_vars() {  
   sudo sed -i "/GoLang/d" ~/.bashrc
   sudo sed -i "/GOROOT/d" ~/.bashrc
   sudo sed -i "/GOPATH/d" ~/.bashrc
 
   # Replace multiples blank lines with one blank line
-  sudo sed -i "$!N;/^\n$/{$q;D;};P;D;" ~/.bashrc
+  sudo sed -i "\$!N;/^\n\$/{\$q;D;};P;D;" ~/.bashrc
 
   sudo cat << EOF | sudo tee -a ~/.bashrc >/dev/null
 # GoLang
@@ -238,7 +240,7 @@ EOF
 }
 
 # Install Grafana
-function install_grafana() {
+function __install_grafana() {  
   if [ $(dpkg-query -W -f='${Status}' grafana-enterprise 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
     install_package apt-transport-https
     install_package software-properties-common
@@ -251,35 +253,10 @@ function install_grafana() {
     
     install_package grafana-enterprise
   fi
-
-  # Next steps are optional, use nginx to override the local domain name instead.
-  sudo openssl genrsa -out /etc/grafana/grafana.key 2048  
-  sudo openssl req -new -key /etc/grafana/grafana.key -out /etc/grafana/grafana.csr
-  
-  # Leave empty when prompt except Common Name: 'localhost' 
-
-  sudo openssl x509 -req -days 365 -in /etc/grafana/grafana.csr -signkey /etc/grafana/grafana.key -out /etc/grafana/grafana.crt
-  
-  sudo chown grafana:grafana /etc/grafana/grafana.crt
-  sudo chown grafana:grafana /etc/grafana/grafana.key
-  sudo chmod 400 /etc/grafana/grafana.key /etc/grafana/grafana.crt
-
-  sudo vi /etc/grafana/grafana.ini
-  # Edit:
-  # http_addr =
-  # http_port = 3000
-  # domain = mysite.com
-  # root_url = https://subdomain.mysite.com:3000
-  # cert_key = /etc/grafana/grafana.key
-  # cert_file = /etc/grafana/grafana.crt
-  # enforce_domain = False
-  # protocol = https
-
-  grafana-restart
 }
 
 # Install Eth2 Client Metrics Exporter
-function install_eth2_client_metrics_exporter() {
+function __install_eth2_client_metrics_exporter() {
   if [ ! -e /usr/local/bin/eth2-client-metrics-exporter ]; then    
     curl -s $ETH2_CLIENT_METRICS_EXPORTER_RELEASES_LATEST | grep "eth2-client-metrics-exporter-linux-$ARCH" | cut -d : -f 2,3 |  tr -d \" | wget -qi - -O /tmp/eth2-client-metrics-exporter
     chmod +x /tmp/eth2-client-metrics-exporter
@@ -288,7 +265,10 @@ function install_eth2_client_metrics_exporter() {
 }
 
 # Install GETH
-function install_geth() {  
+function __install_geth() {
+  # Require: jq
+  install_package jq
+
   if [ ! -e /usr/local/bin/geth ]; then
     # Download latest GETH info
     geth_latest_version=$(wget -O - -o /dev/null $GETH_TAGS_URL | jq '.[0].name' | tr -d \" | cut -c 2-)
@@ -304,26 +284,45 @@ function install_geth() {
 }
 
 # Install Mevboost
-function install_mevboost() {
+function __install_mevboost() {
+  # Require: go
+  __install_go
+
   /usr/local/go/bin/go install github.com/flashbots/mev-boost@latest
+    
   sudo cp ~/go/bin/mev-boost /usr/local/bin
+
+  # Note: Set the env vars after, otherwise it will mess up the env var
+  __config_go_env_vars
 }
 
-function install_auto_upgrade() {
+# Install auto upgrade
+function __install_auto_upgrade() {
+  # Require: Discord notification
+  __config_discord_notify
+
   if [ ! -e ~/auto_upgrade.sh ]; then
     curl -L $AUTO_UPGRADE_URL | bash
+  else
+    echo "Skip auto upgrade"  
   fi
 }
 
 # Install Prysm
-function install_prysm() {
+function __install_prysm() {
+  # Require: ~/prysm dir
+  __mkdir_home_prysm
+
   if [ ! -e ~/prysm/prysm.sh ]; then
     curl $PRYSM_SH_URL --output ~/prysm/prysm.sh && chmod +x ~/prysm/prysm.sh
   fi
 }
 
 # Install Validator Key Generator
-function install_validator_key_generator() {
+function __install_validator_key_generator() {
+  # Require: jq
+  install_package jq
+
   if [ ! -e ~/staking_deposit-cli-*-linux-amd64/deposit ]; then    
     rm -rf /tmp/staking_deposit-cli-*
 
@@ -370,7 +369,7 @@ function install_validator_key_generator() {
 }
 
 # Install NOIP Service
-function install_noip() {
+function __install_noip() {
   if [ ! -e /usr/local/bin/noip2 ]; then
     wget -P /tmp $NOIP_URL
     tar -C /tmp -xvf /tmp/noip-duc-linux.tar.gz
@@ -386,7 +385,7 @@ function install_noip() {
 }
 
 # Install ddclient Service
-function install_ddclient() {
+function __install_ddclient() {
   if [ ! -e /usr/sbin/ddclient ]; then
     sudo apt install ddclient
 
@@ -401,7 +400,7 @@ function install_ddclient() {
 }
 
 # Install Google Authenticator
-function install_google_authenticator() {
+function __install_google_authenticator() {
   if [ $(dpkg-query -W -f='${Status}' libpam-google-authenticator 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
     echo "Installing: libpam-google-authenticator"
 
@@ -422,14 +421,14 @@ function install_google_authenticator() {
 
     sudo vi /etc/pam.d/sshd
     # (Add new line after @include common-auth)
-    >>> auth required pam_google_authenticator.so
+    # >>> auth required pam_google_authenticator.so
 
     sudo systemctl restart ssh
   fi
 }
 
 # Install Yubikey
-function install_yubikey() {
+function __install_yubikey() {
   # https://monicalent.com/blog/2017/12/16/ssh-via-yubikeys-ubuntu/
 
   if [ $(dpkg-query -W -f='${Status}' libpam-yubico 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
@@ -445,12 +444,12 @@ function install_yubikey() {
 
     sudo vi /etc/pam.d/sshd
 
-    >>> auth required pam_yubico.so id=[Your Client ID] key=[Your Secret Key] debug authfile=/etc/yubikey_mappings mode=client
+    # >>> auth required pam_yubico.so id=[Your Client ID] key=[Your Secret Key] debug authfile=/etc/yubikey_mappings mode=client
 
     # Disable @include common-auth and Google Authenticator
 
     sudo vi /etc/yubikey_mappings
-    >>> username:first12digitofkey1:first12digitofkey2
+    # >>> username:first12digitofkey1:first12digitofkey2
     # username e.g. ubuntu
 
     sudo vi /etc/ssh/sshd_config
@@ -460,7 +459,7 @@ function install_yubikey() {
       PubkeyAcceptedKeyTypes +ssh-rsa
       PasswordAuthentication no
       ChallengeResponseAuthentication yes
-      >>> AuthenticationMethods publickey,keyboard-interactive:pam
+      # >>> AuthenticationMethods publickey,keyboard-interactive:pam
 
     vi .ssh/authorized_keys
     # Add publickeys (for PC and Android)
@@ -479,16 +478,51 @@ function install_yubikey() {
 }
 
 #-------------------------------------------------------------------------------------------#
-# Initialize folders setup: important files/directories in order to run the PoS node
-function populate_folders() {   
-  # Define setup directories
-  mkdir -p ~/{.eth2,.wallet,.password,logs,prysm,prysm/configs}
-  sudo mkdir -p /etc/ethereum
-  sudo mkdir -p /home/prometheus/node-exporter
-  
-  # Create files
-  touch ~/.password/password.txt
-  touch ~/logs/{beacon,validator}.log
+# Make directories
+#-------------------------------------------------------------------------------------------#
+
+# /etc/ethereum
+function __mkdir_etc_ethereum() {
+  if [ ! -d "/etc/ethereum" ]; then
+    sudo mkdir -p /etc/ethereum  
+  fi
+}
+
+# ~/prysm
+function __mkdir_home_prysm() {
+  if [ ! -d "~/prysm" ]; then
+    mkdir -p ~/{prysm,prysm/configs}
+  fi
+}
+
+# ~/.wallet
+function __mkdir_home_prysm_wallet() {
+  if [ ! -d "~/.wallet" ]; then
+    mkdir -p ~/.wallet}
+  fi
+}
+
+# ~/.password  
+function __mkdir_home_password() {
+  if [ ! -d "~/.password" ]; then
+    mkdir -p ~/.password
+    touch ~/.password/password.txt
+  fi
+}
+
+# ~/logs
+function __mkdir_home_logs() {
+  if [ ! -d "~/logs" ]; then
+    mkdir -p ~/logs
+    touch ~/logs/{beacon,validator}.log
+  fi  
+}
+
+# /home/prometheus/node-exporter
+function __mkdir_home_prometheus_node_exporter() {
+  if [ ! -d "/home/prometheus/node-exporter" ]; then
+    sudo mkdir -p /home/prometheus/node-exporter
+  fi
 }
 
 #-------------------------------------------------------------------------------------------#
@@ -496,14 +530,42 @@ function populate_folders() {
 #-------------------------------------------------------------------------------------------#
 
 # Config auth JWT
-function config_auth_jwt() {
+function __config_auth_jwt() {
+  # Require: /etc/ethereum dir
+  __mkdir_etc_ethereum
+
   if [ ! -e /etc/ethereum/jwt.hex ]; then
     openssl rand -hex 32 | tr -d "\n" | sudo tee /etc/ethereum/jwt.hex >/dev/null
   fi
 }
 
+# Common system config
+function __common_system_config () {
+  # Require: ccze, chrony, /etc/ethereum, auto upgrade, aliases, prometheus node exporter
+  install_package ccze
+  __config_chrony  
+  __mkdir_etc_ethereum
+  __install_auto_upgrade
+  __config_aliases
+  __config_prometheus_node_exporter
+}
+
+# Common requirements for beacon and validator
+function __common_prysm_config() {
+  # Require: prysm.sh, logrotate
+  __common_system_config
+  __install_prysm
+  __mkdir_home_logs
+  __config_logrotate
+}
+
 # Systemd Beacon Service
-function config_beacon() {
+function setup_beacon() {
+  # Require: jwt, beacon port  
+  __common_prysm_config
+  __config_auth_jwt
+  __config_ufw_port_beacon
+
   if [ ! -e /etc/systemd/system/prysm-beacon.service ]; then
     sudo cat << EOF | sudo tee /etc/systemd/system/prysm-beacon.service >/dev/null
 [Unit]
@@ -532,6 +594,7 @@ ARGS="beacon-chain
  --mainnet
  --accept-terms-of-use
  --config-file=$HOME/prysm/configs/beacon.yaml
+ --pprof
 "
 EOF
   fi
@@ -539,7 +602,7 @@ EOF
   # YAML
   if [ ! -e ~/prysm/configs/beacon.yaml ]; then
     sudo cat << EOF | tee ~/prysm/configs/beacon.yaml >/dev/null
-datadir: "/mnt/ssdxxxx/beacon"
+datadir: "/mnt/ssdxxxx/beacon"            # Change later
 log-file: "$HOME/logs/beacon.log"
 
 # Mainnet Contract
@@ -552,13 +615,11 @@ execution-endpoint: http://localhost:8551
 
 jwt-secret: /etc/ethereum/jwt.hex
 
-attest-timely: true
-
 # Sync faster (default 64)
 block-batch-limit: 128
 
 #p2p-host-ip: $(curl -s v4.ident.me)
-p2p-host-dns: "mvuong.freemyip.com"
+p2p-host-dns: "mvuong.freemyip.com"       # Change later
 
 p2p-tcp-port: 13000
 p2p-udp-port: 12000
@@ -575,10 +636,11 @@ monitoring-host: 0.0.0.0
 
 update-head-timely: true
 
-suggested-fee-recipient: 0x__YOUR_WALLET_ADDRESS__
+suggested-fee-recipient: 0x__YOUR_WALLET_ADDRESS__      # Change later
 
 # Mev Boost
-http-mev-relay: http://localhost:18550
+#http-mev-relay: http://localhost:18550
+http-mev-relay: lxc-mevboost:18550
 
 # Faster sync
 checkpoint-sync-url: https://sync-mainnet.beaconcha.in
@@ -601,16 +663,19 @@ save-invalid-block-temp: true
 # Optional
 local-block-value-boost: 5
 
-suggested-gas-limit: 36000000
+suggested-gas-limit: 60000000
 EOF
   fi
-
-  # Check beacon sync status
-  # curl http://localhost:3500/eth/v1/node/syncing
 }
 
 # Systemd Validator Service
-function config_validator() {
+function setup_validator() {
+  # Require: .wallet, .password, validator port
+  __common_prysm_config
+  __mkdir_home_prysm_wallet
+  __mkdir_home_password
+  __config_ufw_port_validator  
+
   if [ ! -e /etc/systemd/system/prysm-validator.service ]; then
     sudo cat << EOF | sudo tee /etc/systemd/system/prysm-validator.service >/dev/null    
 [Unit]
@@ -664,7 +729,7 @@ enable-doppelganger: true
 monitoring-port: 8081
 monitoring-host: 0.0.0.0
 
-suggested-fee-recipient: ______0xYOUR_WALLET_ADDRESS______
+suggested-fee-recipient: ______0xYOUR_WALLET_ADDRESS______   # Change
 
 enable-builder: true
 EOF
@@ -672,7 +737,12 @@ EOF
 }
 
 # Config Prometheus Node Exporter
-function config_prometheus_node_exporter() {
+function __config_prometheus_node_exporter() {
+  # Require: /home/prometheus/node-exporter, port, prometheus node exporter
+  __mkdir_home_prometheus_node_exporter
+  __config_ufw_port_prometheus_node_exporter
+  __install_prometheus_node_exporter
+
   if [ ! -e /etc/systemd/system/prometheus-node-exporter.service ]; then
     sudo cat << EOF | sudo tee /etc/systemd/system/prometheus-node-exporter.service >/dev/null
 [Unit]
@@ -690,18 +760,20 @@ RestartSec=3
 
 [Install]
 WantedBy=multi-user.target
-EOF 
+EOF
 
     sudo systemctl daemon-reload
-    sudo systemctl enable prometheus-node-exporter
-    sudo systemctl start prometheus-node-exporter
-
-    # Note: open port 9100
+    sudo systemctl enable --now prometheus-node-exporter
   fi
 }
 
 # Config Mevboost
-function config_mevboost() {
+function setup_mevboost() {
+  # Require: mevboost, mevboost port,
+  __common_system_config
+  __install_mevboost
+  __config_ufw_port_mevboost  
+
   if [ ! -e /etc/systemd/system/mevboost.service ]; then
     sudo cat << EOF | sudo tee /etc/systemd/system/mevboost.service >/dev/null
 [Unit]
@@ -722,10 +794,11 @@ Alias=mevboost.service
 EOF
   fi
 
-  if [ ! -e /etc/systemd/system/mevboost.service ]; then
+  if [ ! -e /etc/ethereum/mevboost.conf ]; then
     sudo cat << EOF | sudo tee /etc/ethereum/mevboost.conf >/dev/null
 ARGS="
  -mainnet
+ -addr $(hostname -I | sed 's/ //g'):18550
  -relay-check
  -loglevel debug
  -request-timeout-getheader 1000
@@ -736,18 +809,23 @@ ARGS="
  -relay https://0xa7ab7a996c8584251c8f925da3170bdfd6ebc75d50f5ddc4050a6fdc77f2a3b5fce2cc750d0865e05d7228af97d69561@agnostic-relay.net
  -relay https://0x8b5d2e73e2a3a55c6c87b8b6eb92e0149a125c852751db1422fa951e42a09b82c142c3ea98d0d9930b056a3bc9896b8f@bloxroute.max-profit.blxrbdn.com
  -relay https://0xb0b07cd0abef743db4260b0ed50619cf6ad4d82064cb4fbec9d3ec530f7c5e6793d9f286c4e082c0244ffb9f2658fe88@bloxroute.regulated.blxrbdn.com
- -relay https://0xb3ee7afcf27f1f1259ac1787876318c6584ee353097a50ed84f51a1f21a323b3736f271a895c7ce918c038e4265918be@relay.edennetwork.io
+ -relay https://0x8c4ed5e24fe5c6ae21018437bde147693f68cda427cd1122cf20819c30eda7ed74f72dece09bb313f2a1855595ab677d@global.titanrelay.xyz
+ -relay https://0x8c4ed5e24fe5c6ae21018437bde147693f68cda427cd1122cf20819c30eda7ed74f72dece09bb313f2a1855595ab677d@regional.titanrelay.xyz
  -relay https://0xac6e77dfe25ecd6110b8e780608cce0dab71fdd5ebea22a16c0205200f2f8e2e3ad3b71d3499c54ad14d6c21b41a37ae@boost-relay.flashbots.net
- -relay https://0x98650451ba02064f7b000f5768cf0cf4d4e492317d82871bdc87ef841a0743f69f0f1eea11168503240ac35d101c9135@mainnet-relay.securerpc.com
+ #-relay https://0x98650451ba02064f7b000f5768cf0cf4d4e492317d82871bdc87ef841a0743f69f0f1eea11168503240ac35d101c9135@mainnet-relay.securerpc.com
  -relay https://0xa1559ace749633b997cb3fdacffb890aeebdb0f5a3b6aaa7eeeaf1a38af0a8fe88b9e4b1f61f236d2e64d95733327a62@relay.ultrasound.money
  -relay https://0x8c7d33605ecef85403f8b7289c8058f440cbb6bf72b055dfe2f3e2c6695b6a1ea5a9cd0eb3a7982927a463feb4c3dae2@relay.wenmerge.com
+ #-relay https://0xa44f64faca0209764461b2abfe3533f9f6ed1d51844974e22d79d4cfd06eff858bb434d063e512ce55a1841e66977bfd@proof-relay.ponrelay.com
 "
 EOF
   fi
 }
 
 # Systemd Client Stats Service
-function systemd_clientstats() {
+function __config_clientstats() {
+  # Require: common system config
+  __common_system_config
+
   if [ ! -e /etc/systemd/system/prysm-clientstats.service ]; then
     sudo cat << EOF | sudo tee /etc/systemd/system/prysm-clientstats.service >/dev/null
 [Unit]
@@ -764,7 +842,7 @@ User=$USER
 
 [Install]
 WantedBy=multi-user.target
-Alias=prysm-validator.service
+Alias=prysm-clientstats.service
 EOF
   fi
   
@@ -782,7 +860,10 @@ EOF
 }
 
 # Config Eth2 Client Metrics Exporter Service
-function config_eth2_client_metrics_exporter() {
+function setup_eth2_client_metrics_exporter() {
+  # Require: eth2 client metrics exporter
+  __install_eth2_client_metrics_exporter
+
   if [ ! -e /etc/systemd/system/eth2-client-metrics-exporter.service ]; then
     sudo cat << EOF | sudo tee /etc/systemd/system/eth2-client-metrics-exporter.service >/dev/null
 [Unit]
@@ -799,7 +880,7 @@ User=$USER
 
 [Install]
 WantedBy=multi-user.target
-Alias=prysm-validator.service
+Alias=eth2-client-metrics-exporter.service
 EOF
   fi
   
@@ -818,7 +899,13 @@ EOF
 }
   
 # Systemd GETH Service
-function config_geth() {
+function setup_geth() {
+  # Require: /etc/ethereum, geth, jwt, port
+  __common_system_config
+  __install_geth
+  __config_auth_jwt
+  __config_ufw_port_geth
+
   if [ ! -e /etc/systemd/system/geth.service ]; then
     sudo cat << EOF | sudo tee /etc/systemd/system/geth.service >/dev/null
 [Unit]
@@ -831,6 +918,8 @@ EnvironmentFile=/etc/ethereum/geth.conf
 ExecStart=/usr/local/bin/geth \$ARGS
 Restart=always
 RestartSec=10
+Type=simple
+TimeoutStopSec=300
 User=$USER
 
 [Install]
@@ -856,8 +945,8 @@ ARGS="
  --syncmode snap 
  --db.engine pebble
  --state.scheme path
- --datadir /mnt/ssdxxxx/chaindata
- --datadir.ancient /mnt/ssdxxxx/ancientdb
+ --datadir /mnt/ssdxxxx/chaindata                     # Change
+ --datadir.ancient /mnt/ssdxxxx/ancientdb             # Change
  --metrics 
  --metrics.expensive 
  --pprof 
@@ -865,13 +954,13 @@ ARGS="
  --pprof.addr 0.0.0.0 
  --maxpeers 100 
  --identity Maximus
- --miner.gaslimit 36000000
+ --miner.gaslimit 60000000
 "
 EOF
   fi
 
-  # Prune geth with tmux
-  # /usr/local/bin/geth snapshot prune-state --datadir _CHAINDATA_PATH_
+  # Prune geth  
+  # /usr/local/bin/geth prune-history --history.chain postmerge --datadir /mnt/ssd2tb/chaindata --datadir.ancient /mnt/ssd4tb/ancientdb
 
   # Check Geth syncing status
   # /usr/local/bin/geth attach http://localhost:8545
@@ -879,7 +968,11 @@ EOF
 }  
 
 # Config Prometheus lastest
-function config_prometheus() {
+function __config_prometheus() {
+  # Require: prometheus
+  __install_prometheus
+  __config_ufw_port_prometheus
+
   if [ ! -e /etc/systemd/system/prometheus.service ]; then
     sudo cat << EOF | sudo tee /etc/systemd/system/prometheus.service >/dev/null
 [Unit]
@@ -916,9 +1009,9 @@ EOF
   for i in rules rules.d files_sd; do sudo chmod -R 775 /etc/prometheus/${i}; done
   sudo chown -R prometheus:prometheus /var/lib/prometheus/
 
-  sudo systemctl daemon-reload
-  sudo systemctl start prometheus
-  sudo systemctl enable prometheus
+  # sudo systemctl daemon-reload
+  # sudo systemctl start prometheus
+  # sudo systemctl enable prometheus
   
   # Concat to existing file
   if [ ! -e /etc/prometheus/prometheus.yml ]; then
@@ -945,16 +1038,22 @@ EOF
   - job_name: 'beacon node'
     static_configs:
       - targets: ['localhost:8080']
-
-  # - job_name: 'cryptowat'
-  #   static_configs:
-  #     - targets: ['localhost:9745']
 EOF
   fi 
 }
 
+# Stats
+function setup_stats() {
+  __config_grafana
+  __config_prometheus
+}
+
 # Config Grafana DB
-function config_grafana() {
+function __config_grafana() {
+  # Require: grafana, port
+  __install_grafana
+  __config_ufw_port_grafana
+
   # Newest Dashboard: https://docs.stakelocal.io/
 
   # Geth1.0 - Single node
@@ -965,12 +1064,38 @@ function config_grafana() {
   # https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/sources/EthereumOnArmAmdNode.json
   # Eth Staking Dashboard
   # https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/sources/EthStakingDashboard.json  
+  
+  # # Next steps are optional, use nginx to override the local domain name instead.
+  # sudo openssl genrsa -out /etc/grafana/grafana.key 2048  
+  # sudo openssl req -new -key /etc/grafana/grafana.key -out /etc/grafana/grafana.csr
+  
+  # # Leave empty when prompt except Common Name: 'localhost' 
 
-  # Open port 3000/tcp
+  # sudo openssl x509 -req -days 365 -in /etc/grafana/grafana.csr -signkey /etc/grafana/grafana.key -out /etc/grafana/grafana.crt
+  
+  # sudo chown grafana:grafana /etc/grafana/grafana.crt
+  # sudo chown grafana:grafana /etc/grafana/grafana.key
+  # sudo chmod 400 /etc/grafana/grafana.key /etc/grafana/grafana.crt
+
+  # sudo vi /etc/grafana/grafana.ini
+  # # Edit:
+  # # http_addr =
+  # # http_port = 3000
+  # # domain = mysite.com
+  # # root_url = https://subdomain.mysite.com:3000
+  # # cert_key = /etc/grafana/grafana.key
+  # # cert_file = /etc/grafana/grafana.crt
+  # # enforce_domain = False
+  # # protocol = https
+
+  # grafana-restart
 }
 
 # Config Logrotate
-function config_logrotate() {
+function __config_logrotate() {
+  # Require: ~/logs
+  __mkdir_home_logs
+
   if [ ! -e /etc/logrotate.d/prysm-logs ]; then
     sudo cat << EOF | sudo tee /etc/logrotate.d/prysm-logs >/dev/null
 $HOME/logs/*.log
@@ -995,7 +1120,7 @@ EOF
 }
 
 # Install Tailscale
-function install_tailscale() {
+function __install_tailscale() {
   curl -fsSL https://tailscale.com/install.sh | sh
   sudo tailscale up
 
@@ -1007,151 +1132,212 @@ function install_tailscale() {
 }
 
 # Config Chrony
-function config_chrony() {
+function __config_chrony() {
+  if [ ! -e /etc/chrony/chrony.conf ]; then
+    # Require: chrony
+    install_package chrony
+    
+    # Removing original ubuntu servers
+    sudo sed -i 's/^pool/#pool/g' /etc/chrony/chrony.conf
 
-  sudo vi /etc/chrony/chrony.conf
+    # Adding new google servers  
+    sudo cat << EOF | sudo tee -a /etc/chrony/chrony.conf >/dev/null
 
-  /** 
-  # Replacing original ubuntu servers by Google servers
-  # pool ntp.ubuntu.com        iburst maxsources 4
-  # pool 0.ubuntu.pool.ntp.org iburst maxsources 1
-  # pool 1.ubuntu.pool.ntp.org iburst maxsources 1
-  # pool 2.ubuntu.pool.ntp.org iburst maxsources 2
+# Adding google servers
+server time1.google.com iburst minpoll 4 maxpoll 6 polltarget 16
+server time2.google.com iburst minpoll 4 maxpoll 6 polltarget 16
+server time3.google.com iburst minpoll 4 maxpoll 6 polltarget 16
+server time4.google.com iburst minpoll 4 maxpoll 6 polltarget 16
+EOF
 
-  # Add these 4 lines
-  server time1.google.com iburst minpoll 4 maxpoll 6 polltarget 16
-  server time2.google.com iburst minpoll 4 maxpoll 6 polltarget 16
-  server time3.google.com iburst minpoll 4 maxpoll 6 polltarget 16
-  server time4.google.com iburst minpoll 4 maxpoll 6 polltarget 16
-  
-  # Update these 
-  #log tracking measurements statistics
-  maxupdateskew 100.0
-  #maxupdateskew 5.0
+    sudo systemctl force-reload chrony
 
-  makestep 1 3
-  #makestep 0.1 -1
-
-  # rest of the doc ...
-  # leapsectz right/UTC
-  
-  sudo systemctl force-reload chrony
-
-  sudo chronyd -Q
-  sudo chronyd -q
-  
-  # Set local time
-  timedatectl set-timezone America/Los_Angeles
+    sudo chronyd -Q
+    sudo chronyd -q
+    
+    # Note: Set local time
+    sudo timedatectl set-timezone America/Los_Angeles
+  else
+    echo "Skip installing chrony."
+  fi
 }
 
 # Config Ports
-function config_ports{
-	# SSH
-	sudo ufw allow ssh
+# function __config_ports() {
+# 	# SSH
+# 	sudo ufw allow ssh
 	
-	# Beacon
-	sudo ufw allow 13000/tcp
+#   __config_ufw_port_beacon
+#   __config_ufw_port_validator
+#   __config_ufw_port_mevboost
+#   __config_ufw_port_geth
+#   __config_ufw_port_grafana
+#   __config_ufw_port_prometheus
+#   __config_ufw_port_prometheus_node_exporter
+	
+# 	# Enable
+# 	sudo ufw enable
+
+#   # Check ports forwarding tool
+#   # https://www.yougetsignal.com/tools/open-ports/
+#   # https://mxtoolbox.com/SuperTool.aspx?action=tcp%3a%7Bnode-IP-address%7D%3a13000&run=toolpage
+#   # curl --http0.9 localhost:13000
+  
+#   # Check local port
+#   # sudo lsof -n | grep TCP | grep LISTEN | grep 8545
+# }
+
+function __config_ufw_port_ssh() {
+  # Require: ufw
+  install_package ufw
+
+  sudo ufw allow ssh
+  sudo ufw --force enable
+}
+
+# Config beacon port
+function __config_ufw_port_beacon() {
+  # Require: ufw
+  install_package ufw
+
+  sudo ufw allow 13000/tcp
 	sudo ufw allow 12000/udp
-	sudo ufw allow 4000/tcp
-  # http://192.168.x.x:8080/metrics
+	sudo ufw allow 4000/tcp  
 	sudo ufw allow 8080/tcp
 
   # Beacon QUIC
   sudo ufw allow 13001/udp
+}
 
-	# Validator
-	sudo ufw allow 8081/tcp
+# Config validator port
+function __config_ufw_port_validator() {
+  # Require: ufw
+  install_package ufw
 
-	# Grafana (optional)
-	sudo ufw allow 3000/tcp
+  sudo ufw allow 8081/tcp
+}
 
-	# Geth
-	sudo ufw allow 8545/tcp
-  sudo ufw allow 8551/tcp
-  # http://192.168.x.x:6060/debug/metrics/prometheus
+# Config mevboost port
+function __config_ufw_port_mevboost() {
+  # Require: ufw
+  install_package ufw
+
+  sudo ufw allow 18550/tcp
+}
+
+# Config geth ports
+function __config_ufw_port_geth() {
+  # Require: ufw
+  install_package ufw
+
+  sudo ufw allow 8545/tcp
+  sudo ufw allow 8551/tcp  
 	sudo ufw allow 6060/tcp
 	sudo ufw allow 30303/tcp
 	sudo ufw allow 30303/udp
-
-	# Prometheus (optional)
-	sudo ufw allow 9090/tcp
-
-	# Prometheus-node-exporter
-  # http://192.168.x.x:9100/metrics
-	sudo ufw allow 9100/tcp
-	
-	# Enable
-	sudo ufw enable
-
-  # Check ports forwarding tool
-  # https://www.yougetsignal.com/tools/open-ports/
-  # https://mxtoolbox.com/SuperTool.aspx?action=tcp%3a%7Bnode-IP-address%7D%3a13000&run=toolpage
-  # curl --http0.9 localhost:13000
-  
-  # Check local port
-  # sudo lsof -n | grep TCP | grep LISTEN | grep 8545
 }
 
-# Config Systemd-Resolved
-function config_systemd_resolved() {
-  if [ ! -e /etc/systemd/resolved.conf.d/dns_servers.conf ]; then
-    sudo mkdir /etc/systemd/resolved.conf.d
-    
-    sudo cat << EOF | sudo tee /etc/systemd/resolved.conf.d/dns_servers.conf >/dev/null
-[Resolve]
-DNS=8.8.8.8 1.1.1.1
-EOF
+# Config grafana port
+function __config_ufw_port_grafana() {
+  # Require: ufw
+  install_package ufw
 
-    sudo systemctl restart systemd-resolved
-    # resolvectl status
-    # systemd-resolve --status
-    # resolvectl query www.google.com
-  fi
+  sudo ufw allow 3000/tcp
 }
 
-# Config NO-IP
-function config_noip() {
-  if [ ! -e /etc/systemd/system/noip2.service ]; then
-    sudo cat << EOF | sudo tee /etc/systemd/system/noip2.service >/dev/null
-[Unit]
-Description=NO-IP2 Daemon
-After=network.target auditd.service
-Wants=network.target
+# Config mevboost port
+function __config_ufw_port_prometheus() {
+  # Require: ufw
+  install_package ufw
 
-[Service]
-Type=forking
-ExecStart=/usr/local/bin/noip2
-Restart=always
-RestartSec=10
-User=$USER
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-  fi
+  sudo ufw allow 9090/tcp
 }
 
-# Config ddclient
-function config_ddclient() {
-  if [ -e /etc/ddclient.conf ]; then
-    sudo vi /etc/ddclient.conf
+# Config prometheus node exporter port
+function __config_ufw_port_prometheus_node_exporter() {
+  # Require: ufw
+  install_package ufw
 
-    # replace the whole file with ddclient config preset from
-    # https://freemyip.com/help?domain=mvuong.freemyip.com&token=5b29...7520
+  sudo ufw allow 9100/tcp
+}
 
-    sudo systemctl restart ddclient.service
-    sudo systemctl enable ddclient.service    
+# Config Discord Notification
+function __config_discord_notify() {
+  if [ ! -e /srv/discord_notify.sh ]; then
+    curl -L https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/auto_upgrade_migration.sh | bash
+  else
+    echo "Skip discord notify."
   fi
+
+  # Edit DISCORD_WEBHOOK_URL in /srv/discord_notify.sh 
 }
 
 # Config Aliases for long commands
-function config_aliases() {
+function __config_aliases() {
   curl -L https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/alias.sh | bash && source ~/.bashrc
 }
 
+# Config Systemd-Resolved
+# function __config_systemd_resolved() {
+#   if [ ! -e /etc/systemd/resolved.conf.d/dns_servers.conf ]; then
+#     sudo mkdir /etc/systemd/resolved.conf.d
+    
+#     sudo cat << EOF | sudo tee /etc/systemd/resolved.conf.d/dns_servers.conf >/dev/null
+# [Resolve]
+# DNS=8.8.8.8 1.1.1.1
+# EOF
+
+#     sudo systemctl restart systemd-resolved
+#     # resolvectl status
+#     # systemd-resolve --status
+#     # resolvectl query www.google.com
+#   fi
+# }
+
+# Config NO-IP
+# function __config_noip() {
+#   # Require: noip
+#   __install_noip
+
+#   if [ ! -e /etc/systemd/system/noip2.service ]; then
+#     sudo cat << EOF | sudo tee /etc/systemd/system/noip2.service >/dev/null
+# [Unit]
+# Description=NO-IP2 Daemon
+# After=network.target auditd.service
+# Wants=network.target
+
+# [Service]
+# Type=forking
+# ExecStart=/usr/local/bin/noip2
+# Restart=always
+# RestartSec=10
+# User=$USER
+
+# [Install]
+# WantedBy=multi-user.target
+# EOF
+
+#   fi
+# }
+
+# Config ddclient
+# function __config_ddclient() {
+#   # Require: ddclient
+#   __install_ddclient
+
+#   if [ -e /etc/ddclient.conf ]; then
+#     sudo vi /etc/ddclient.conf
+
+#     # replace the whole file with ddclient config preset from
+#     # https://freemyip.com/help?domain=mvuong.freemyip.com&token=5b29...7520
+
+#     sudo systemctl restart ddclient.service
+#     sudo systemctl enable ddclient.service    
+#   fi
+# }
+
 # Config disable power button
-function config_disable_power_button() {
+function __config_disable_power_button() {
   sudo cat << EOF | sudo tee -a /etc/systemd/logind.conf >/dev/null
 HandlePowerKey=ignore
 EOF
@@ -1159,17 +1345,59 @@ EOF
   sudo systemctl restart systemd-logind.service
 }
 
-# Config Discord Notification
-function config_discord_notify() {
-  curl -L https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/auto_upgrade_migration.sh | bash
+# Setup auto reboot if loss network connection
+# function __config_auto_reboot() {
+#   sudo cat << EOF | sudo tee /srv/autoreboot.sh >/dev/null
+# #!/bin/sh
 
-  # Edit DISCORD_WEBHOOK_URL in /svr/discord_notify.sh 
-}
+# ping -c5 192.168.1.1
 
-#-------------------------------------------------------------------------------------------#
-
-install_essential
-
-#-------------------------------------------------------------------------------------------#
-
+# if [ $? -eq 0 ]; then
+#     echo "ok"
+# else
+#     sudo reboot
+# fi
 # EOF
+
+# sudo chmod +x /srv/autoreboot.sh
+
+#   # EDITOR=vim cronjob -e
+#   # */5 * * * * /srv/autoreboot.sh
+# }
+
+#-------------------------------------------------------------------------------------------#
+# Setup prompt
+#-------------------------------------------------------------------------------------------#
+
+PS3='Please enter your setup choice: '
+options=("Geth" "Beacon" "Validator" "Mevboost" "Stats" "Quit")
+select opt in "${options[@]}"
+do
+    case $opt in
+        "Geth")            
+            echo "Installing $opt"
+            setup_geth
+            ;;
+        "Beacon")
+            echo "Installing $opt"
+            setup_beacon
+            ;;
+        "Validator")
+            echo "Installing $opt"
+            setup_validator
+            ;;
+        "Mevboost")
+            echo "Installing $opt"
+            setup_mevboost
+            ;;
+        "Stats")
+            echo "Installing $opt"
+            setup_stats
+            ;;
+        "Quit")
+            echo "Good bye!"
+            break
+            ;;
+        *) echo "Invalid option $REPLY";;
+    esac
+done
