@@ -167,8 +167,8 @@ function __install_prometheus() {
     cd prometheus*64
     sudo mv prometheus promtool /usr/local/bin/
     prometheus --version
-    sudo mv prometheus.yml /etc/prometheus/prometheus.yml
-    sudo mv consoles/ console_libraries/ /etc/prometheus/
+    sudo mv prometheus.yml /etc/prometheus/prometheus.yml    
+    sudo mkdir -p /etc/prometheus/{consoles,console_libraries}
     cd
   else
     echo "Skipping prometheus"
@@ -1046,6 +1046,7 @@ EOF
 
 # Stats
 function setup_stats() {
+  __common_system_config
   __config_grafana
   __config_prometheus
 }
@@ -1389,3 +1390,5 @@ do
         *) echo "Invalid option $REPLY";;
     esac
 done
+
+source ~/.bashrc
