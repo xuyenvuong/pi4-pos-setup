@@ -86,6 +86,10 @@ sudo blkid
 
 ```bash
 sudo vi /etc/fstab
+
+sudo systemctl daemon-reload
+
+sudo mount -a
 ```
 
 #### Add this line at the end with the above UUID

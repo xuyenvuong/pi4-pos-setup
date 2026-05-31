@@ -549,8 +549,9 @@ function __common_system_config () {
 
 # Common requirements for beacon and validator
 function __common_prysm_config() {
-  # Require: prysm.sh, logrotate
+  # Require: gnupg, prysm.sh, logrotate
   __common_system_config
+  install_package gnupg
   __install_prysm
   __mkdir_home_logs
   __config_logrotate
