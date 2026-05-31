@@ -73,10 +73,7 @@ function __install_essential() {
   #install_package build-essential         # optional
   #install_package libssl-dev              # optional
   #install_package libffi-dev              # optional
-  #install_package chrony      # system
-  #install_package jq
   #install_package tmux                    # optional
-  #install_package ccze        # system
   #install_package net-tools               # optional  
   # Samba
   #install_package cifs-utils              # optional
@@ -90,6 +87,9 @@ function __install_essential() {
 
   # Mevboost  
   setup_mevboost
+  
+  # Category Stats
+  setup_stats
 
   # Validator key generator
   __install_validator_key_generator
@@ -97,21 +97,15 @@ function __install_essential() {
   # Category: Stats | Eth2 Client Metrics Exporter  
   setup_eth2_client_metrics_exporter
 
-  # Firewall Ports
-  __config_ports
-
   #---------------------------------------------#
   #  OPTIONAL INSTALLATION
   #---------------------------------------------#
 
   # Category: System | Power button disabling
-  __config_disable_power_button
+  disable_power_button  
 
   # Category: System | Setup network check and auto reboot (optional)
   # __config_auto_reboot
-
-  # Category Stats
-  setup_stats
 
   # Category: DDNS - NO-IP (optional)  
   # __config_noip
@@ -1323,6 +1317,11 @@ function __config_aliases() {
 #   fi
 # }
 
+# Power button
+function disable_power_button() {
+  __config_disable_power_button
+}
+
 # Config disable power button
 function __config_disable_power_button() {
   sudo cat << EOF | sudo tee -a /etc/systemd/logind.conf >/dev/null
@@ -1357,7 +1356,7 @@ EOF
 #-------------------------------------------------------------------------------------------#
 
 PS3='Please enter your setup choice: '
-options=("Geth" "Beacon" "Validator" "Mevboost" "Stats" "Quit")
+options=("Geth" "Beacon" "Validator" "Mevboost" "Stats" "Disable Power Button" "Quit")
 select opt in "${options[@]}"
 do
     case $opt in
@@ -1380,6 +1379,10 @@ do
         "Stats")
             echo "Installing $opt"
             setup_stats
+            ;;
+        "Disable Power Button")
+            echo "Disable power button now!"
+            disable_power_button
             ;;
         "Quit")
             echo "Good bye!"
