@@ -45,8 +45,10 @@ function perform_prune_history() {
       /usr/local/bin/geth prune-history --history.chain postmerge $data_dir  $data_dir_ancient
     fi
 
-    #sudo systemctl start prysm-beacon.service
-    #sudo systemctl start geth.service
+    sudo systemctl start prysm-beacon.service
+    sudo systemctl start geth.service
+    
+    echo "Done: Prunning history is completed."
   fi
 }
 
