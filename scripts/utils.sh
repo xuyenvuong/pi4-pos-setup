@@ -32,17 +32,22 @@ function perform_prune_history() {
   # Prune geth  
   # /usr/local/bin/geth prune-history --history.chain postmerge --datadir /mnt/ssd2tb/chaindata --datadir.ancient /mnt/ssd4tb/ancientdb
 
-  data_dir=$(cat /etc/ethereum/geth.conf | grep '--datadir ')
-  data_dir_ancient=$(cat /etc/ethereum/geth.conf | grep '----datadir.ancient ')
+  data_dir=$(cat /etc/ethereum/geth.conf | grep 'datadir ')
+  data_dir_ancient=$(cat /etc/ethereum/geth.conf | grep 'datadir.ancient ')
 
-  echo "data_dir: $data_dir"
-  echo "data_dir_ancient: $data_dir_ancient"
+  if [ -e /usr/local/bin/geth ]; then
+    sudo systemctl stop prysm-beacon.service
+    sudo systemctl stop geth.service
 
+    if [ -z "$data_dir_ancient" ]; then
+      /usr/local/bin/geth prune-history --history.chain postmerge $data_dir
+    else
+      /usr/local/bin/geth prune-history --history.chain postmerge $data_dir  $data_dir_ancient
+    fi
 
-  #sudo systemctl stop prysm-beacon.service
-  #sudo systemctl stop geth.service
-
-  
+    #sudo systemctl start prysm-beacon.service
+    #sudo systemctl start geth.service
+  fi
 }
 
 #-------------------------------------------------------------------------------------------#
