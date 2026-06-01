@@ -32,8 +32,8 @@ function perform_prune_history() {
   # Prune geth  
   # /usr/local/bin/geth prune-history --history.chain postmerge --datadir /mnt/ssd2tb/chaindata --datadir.ancient /mnt/ssd4tb/ancientdb
 
-  data_dir=$(cat /etc/ethereum/geth.conf | grep "--datadir ")
-  data_dir_ancient=$(cat /etc/ethereum/geth.conf | grep "----datadir.ancient ")
+  data_dir=$(cat /etc/ethereum/geth.conf | grep '--datadir ')
+  data_dir_ancient=$(cat /etc/ethereum/geth.conf | grep '----datadir.ancient ')
 
   echo "data_dir: $data_dir"
   echo "data_dir_ancient: $data_dir_ancient"
