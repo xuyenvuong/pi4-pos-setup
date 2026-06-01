@@ -15,20 +15,23 @@ COMMENT_BLOCK
 
 set -eu
 
-# Install package
-function install_package() {
-  local dpkg_name=$1
+# # Install package
+# function install_package() {
+#   local dpkg_name=$1
 
-  if [ $(dpkg-query -W -f='${Status}' $dpkg_name 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
-    echo "Installing: $dpkg_name"
-    sudo apt install -y $dpkg_name
-  fi
-}
+#   if [ $(dpkg-query -W -f='${Status}' $dpkg_name 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
+#     echo "Installing: $dpkg_name"
+#     sudo apt install -y $dpkg_name
+#   fi
+# }
+
+source <(curl -s https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/refs/heads/master/scripts/lib.sh)
 
 #-------------------------------------------------------------------------------------------#
 
 # Perform prune history
 function perform_prune_history() {
+  install_package jq
   # Prune geth  
   # /usr/local/bin/geth prune-history --history.chain postmerge --datadir /mnt/ssd2tb/chaindata --datadir.ancient /mnt/ssd4tb/ancientdb
 
@@ -47,7 +50,7 @@ function perform_prune_history() {
 
     sudo systemctl start prysm-beacon.service
     sudo systemctl start geth.service
-    
+
     echo "Done: Prunning history is completed."
   fi
 }
