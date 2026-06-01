@@ -50,7 +50,7 @@ function perform_prune_history() {
 #-------------------------------------------------------------------------------------------#
 
 PS3='Please enter your command choice: '
-options=("Prune History""Quit")
+options=("Prune History" "Quit")
 select opt in "${options[@]}"
 do
     case $opt in
