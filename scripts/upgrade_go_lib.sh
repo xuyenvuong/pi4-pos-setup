@@ -5,7 +5,7 @@
 
 : <<'COMMENT_BLOCK'
 Run this command to upgrade GO library to the latest version.
-> curl -L https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/upgrade_go_lib.sh | bash && source ~/.bashrc
+> bash <(curl -s https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/upgrade_go_lib.sh)
 
 COMMENT_BLOCK
 
@@ -15,7 +15,7 @@ cd ~
 GO_LATEST_VERSION_JSON=https://go.dev/dl/?mode=json
 GO_BIN_DOWNLOAD_URL=https://go.dev/dl/
 
-ARCH=$(dpkg --print-architecture)
+
 
 # ---------------------------------------------------------------
 
@@ -58,12 +58,12 @@ sudo sed -i "/GOPATH/d" ~/.bashrc
 # Replace multiples blank lines with one blank line
 sudo sed -i "$!N;/^\n$/{$q;D;};P;D;" ~/.bashrc
 
-sudo cat << EOF | sudo tee -a $HOME/.bashrc >/dev/null
-# GoLang
-export GOROOT=/usr/local/go
-export GOPATH=$HOME/go
-export PATH=\$GOPATH/bin:\$GOROOT/bin:\$PATH
-EOF
+# sudo cat << EOF | sudo tee -a $HOME/.bashrc >/dev/null
+# # GoLang
+# export GOROOT=/usr/local/go
+# export GOPATH=$HOME/go
+# export PATH=\$GOPATH/bin:\$GOROOT/bin:\$PATH
+# EOF
 
 source ~/.bashrc
 

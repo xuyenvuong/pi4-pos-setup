@@ -14,6 +14,10 @@ COMMENT_BLOCK
 
 set -eu
 
+ARCH=$(dpkg --print-architecture)
+
+#-------------------------------------------------------------------------------------------#
+
 # Install package
 function install_package() {
   local dpkg_name=$1

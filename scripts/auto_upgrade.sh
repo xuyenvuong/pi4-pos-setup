@@ -71,8 +71,6 @@ GETH_RELEASES_LATEST=https://api.github.com/repos/ethereum/go-ethereum/releases/
 
 MEVBOOST_RELEASES_LATEST=https://api.github.com/repos/flashbots/mev-boost/releases/latest
 
-ARCH=$(dpkg --print-architecture)
-
 # ---------------------------------------------------------------
 
 # Install jq

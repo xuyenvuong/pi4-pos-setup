@@ -19,19 +19,18 @@ source <(curl -s https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/refs
 
 #-------------------------------------------------------------------------------------------#
 
-# Perform prune history
-function perform_prune_history() {  
+# Perform geth prune history
+function perform_geth_prune_history() {  
   # Prune geth  
   # /usr/local/bin/geth prune-history --history.chain postmerge --datadir /mnt/ssd2tb/chaindata --datadir.ancient /mnt/ssd4tb/ancientdb
 
-  data_dir=$(cat /etc/ethereum/geth.conf | grep 'datadir ')
-  data_dir_ancient=$(cat /etc/ethereum/geth.conf | grep 'datadir.ancient ')
+  data_dir=$(cat /etc/ethereum/geth.conf | grep 'datadir ')  
 
   if [ -e /usr/local/bin/geth ]; then
     sudo systemctl stop prysm-beacon.service
     sudo systemctl stop geth.service
 
-    if [ -z "$data_dir_ancient" ]; then
+    if [ -z "$(cat /etc/ethereum/geth.conf | grep 'datadir.ancient ')" ]; then
       /usr/local/bin/geth prune-history --history.chain postmerge $data_dir
     else
       /usr/local/bin/geth prune-history --history.chain postmerge $data_dir  $data_dir_ancient
@@ -49,13 +48,13 @@ function perform_prune_history() {
 #-------------------------------------------------------------------------------------------#
 
 PS3='Please enter your command choice: '
-options=("Prune History" "Quit")
+options=("Geth Prune History" "Quit")
 select opt in "${options[@]}"
 do
     case $opt in
-        "Prune History")            
+        "Geth Prune History")            
             echo "Installing $opt"
-            perform_prune_history
+            perform_geth_prune_history
             ;;
         "Quit")
             echo "Good bye!"

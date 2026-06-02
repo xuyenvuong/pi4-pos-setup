@@ -41,8 +41,6 @@ PROMETHEUS_RELEASES_LATEST=https://api.github.com/repos/prometheus/prometheus/re
 
 NODE_EXPORTER_RELEASES_LATEST=https://api.github.com/repos/prometheus/node_exporter/releases/latest
 
-ARCH=$(dpkg --print-architecture)
-
 #-------------------------------------------------------------------------------------------#
 
 # Main function to install all necessary package to support the node
@@ -209,15 +207,15 @@ function __config_go_env_vars() {
   # Replace multiples blank lines with one blank line
   sudo sed -i "\$!N;/^\n\$/{\$q;D;};P;D;" ~/.bashrc
 
-  sudo cat << EOF | sudo tee -a ~/.bashrc >/dev/null
-# GoLang
-export GOROOT=/usr/local/go
-export GOPATH=~/go
-export PATH=\$GOPATH/bin:\$GOROOT/bin:\$PATH
-EOF
+#   sudo cat << EOF | sudo tee -a ~/.bashrc >/dev/null
+# # GoLang
+# export GOROOT=/usr/local/go
+# export GOPATH=~/go
+# export PATH=\$GOPATH/bin:\$GOROOT/bin:\$PATH
+# EOF
 
-  source ~/.bashrc
-  #go version
+  # source ~/.bashrc
+  # go version
 }
 
 # Install Grafana
