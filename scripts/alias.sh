@@ -33,23 +33,27 @@ install_package ccze
 
 # echo "Clean up .bashrc aliases"
 
-# sudo sed -i "/Aliases/d" ~/.bashrc
-# sudo sed -i "/beacon/d" ~/.bashrc
-# sudo sed -i "/validator/d" ~/.bashrc
-# sudo sed -i "/eth2/d" ~/.bashrc
-# sudo sed -i "/geth/d" ~/.bashrc
-# sudo sed -i "/prometheus/d" ~/.bashrc
-# sudo sed -i "/grafana/d" ~/.bashrc
-# sudo sed -i "/mevboost/d" ~/.bashrc
-# sudo sed -i "/node-/d" ~/.bashrc
-# # Replace multiples blank lines with one blank line
-# sudo sed -i "\$!N;/^\n\$/{\$q;D;};P;D;" ~/.bashrc
+$legacy_aliases=$(cat .bashrc | grep "Aliases for Node");
+
+if [ ! -z $legacy_aliases ]; then
+  sudo sed -i "/Aliases/d" ~/.bashrc
+  sudo sed -i "/beacon/d" ~/.bashrc
+  sudo sed -i "/validator/d" ~/.bashrc
+  sudo sed -i "/eth2/d" ~/.bashrc
+  sudo sed -i "/geth/d" ~/.bashrc
+  sudo sed -i "/prometheus/d" ~/.bashrc
+  sudo sed -i "/grafana/d" ~/.bashrc
+  sudo sed -i "/mevboost/d" ~/.bashrc
+  sudo sed -i "/node-/d" ~/.bashrc
+  sudo sed -i "/^#\ Aliases/d" ~/.bashrc
+  # Replace multiples blank lines with one blank line
+  sudo sed -i "\$!N;/^\n\$/{\$q;D;};P;D;" ~/.bashrc
+fi
 
 # ---------------------------------------------------------------
 
 echo "Adding aliases to .bash_aliases file"
 
-# sudo cat << EOF | sudo tee -a $HOME/.bashrc >/dev/null
 sudo cat << EOF | sudo tee -a ~/.bash_aliases >/dev/null
 # Aliases for Node
 alias beacon-log='journalctl -f -u prysm-beacon.service -n 200 | ccze -A'
@@ -124,6 +128,7 @@ alias node-aliases-latest='bash <(curl -s https://raw.githubusercontent.com/xuye
 alias node-go-lib-latest='bash <(curl -s https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/upgrade_go_lib.sh)'
 alias node-health='curl http://localhost:8080/healthz'
 alias node-utils='bash <(curl -s https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/refs/heads/master/scripts/utils.sh)'
+# End Aliases for Node
 EOF
 
 source ~/.bashrc
