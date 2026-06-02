@@ -44,7 +44,7 @@ sudo sed -i "/mevboost/d" ~/.bashrc
 sudo sed -i "/node-/d" ~/.bashrc
 sudo sed -i "/utils/d" ~/.bashrc
 # Replace multiples blank lines with one blank line
-sudo sed -i "$!N;/^\n$/{$q;D;};P;D;" ~/.bashrc
+sudo sed -i "$!N;/^\n$/{\$q;D;};P;D;" ~/.bashrc
 
 # ---------------------------------------------------------------
 
