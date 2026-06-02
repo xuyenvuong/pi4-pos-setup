@@ -18,16 +18,8 @@ GO_BIN_DOWNLOAD_URL=https://go.dev/dl/
 ARCH=$(dpkg --print-architecture)
 
 # ---------------------------------------------------------------
-# Check and install package
 
-function install_package() {
-  local dpkg_name=$1
-
-  if [ $(dpkg-query -W -f='${Status}' $dpkg_name 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
-    logger "Installing: $dpkg_name"
-    sudo apt install -y $dpkg_name
-  fi
-}
+source <(curl -s https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/refs/heads/master/scripts/lib.sh)
 
 # ---------------------------------------------------------------
 
