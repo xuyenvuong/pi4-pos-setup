@@ -49,7 +49,7 @@ sudo sed -i "\$!N;/^\n\$/{\$q;D;};P;D;" ~/.bashrc
 
 echo "Adding aliases to .bashrc file"
 
-sudo cat << EOF | sudo tee -a \$HOME/.bashrc >/dev/null
+sudo cat << EOF | sudo tee -a $HOME/.bashrc >/dev/null
 # Aliases for Node
 alias beacon-log='journalctl -f -u prysm-beacon.service -n 200 | ccze -A'
 alias validator-log='journalctl -f -u prysm-validator.service -n 200 | ccze -A'
