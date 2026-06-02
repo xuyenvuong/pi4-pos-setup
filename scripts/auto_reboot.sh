@@ -5,8 +5,10 @@
 # Author: Max Vuong
 # Date: 01/21/2023
 
-# Restart only if uncommunicative
-if ! ping -c5 www.google.com ; then
-  logger "Auto rebooting due to internet connection."
-  sudo shutdown -r now  
-fi
+# Legacy script. No longer relevant
+
+# # Restart only if uncommunicative
+# if ! ping -c5 www.google.com ; then
+#   logger "Auto rebooting due to internet connection."
+#   sudo shutdown -r now  
+# fi
