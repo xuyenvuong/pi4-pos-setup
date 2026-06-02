@@ -25,3 +25,14 @@ function install_package() {
 }
 
 #---------------------------------------------------------------------------------------
+
+# To send a simple notification to Discord via webhook. This function only send when DISCORD_WEBHOOK_URL variable is not null
+# discord_notify $msg_content
+
+function discord_notify() {
+  if [ -e /srv/discord_notify.sh ]; then
+    /srv/discord_notify.sh "$*"
+  fi
+}
+
+# ---------------------------------------------------------------

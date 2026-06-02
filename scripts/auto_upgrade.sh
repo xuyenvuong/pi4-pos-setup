@@ -49,6 +49,12 @@ COMMENT_BLOCK
 echo "Auto Upgrade is in progress..."
 
 # ---------------------------------------------------------------
+
+source <(curl -s https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/refs/heads/master/scripts/lib.sh)
+
+# ---------------------------------------------------------------
+
+# ---------------------------------------------------------------
 # Other configs
 # ---------------------------------------------------------------
 
@@ -66,28 +72,6 @@ GETH_RELEASES_LATEST=https://api.github.com/repos/ethereum/go-ethereum/releases/
 MEVBOOST_RELEASES_LATEST=https://api.github.com/repos/flashbots/mev-boost/releases/latest
 
 ARCH=$(dpkg --print-architecture)
-
-# ---------------------------------------------------------------
-# To send a simple notification to Discord via webhook. This function only send when DISCORD_WEBHOOK_URL variable is not null
-# discord_notify $msg_content
-
-function discord_notify() {
-  if [ -e /srv/discord_notify.sh ]; then
-    /srv/discord_notify.sh "$*"
-  fi
-}
-
-# ---------------------------------------------------------------
-# Check and install package
-
-function install_package() {
-  local dpkg_name=$1
-
-  if [ $(dpkg-query -W -f='${Status}' $dpkg_name 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
-    logger "Installing: $dpkg_name"
-    sudo apt install -y $dpkg_name
-  fi
-}
 
 # ---------------------------------------------------------------
 

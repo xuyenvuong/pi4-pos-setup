@@ -5,7 +5,7 @@
 
 : <<'COMMENT_BLOCK'
 Run this command to add aliases to your .bashrc
-> curl -L https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/alias.sh | bash && source ~/.bashrc
+> bash <(curl -s https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/alias.sh)
 
 Description:
 Supporting services [mevboost, beacon, validator, eth2-stats, geth, prometheus, prometheus-node-exporter, grafana]
@@ -22,13 +22,12 @@ Test, view beacon log by typing at the command prompt:
 COMMENT_BLOCK
 
 # ---------------------------------------------------------------
-# Check and install ccze (log with colors)
-dpkg_name=ccze
 
-if [ $(dpkg-query -W -f='${Status}' $dpkg_name 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
-  logger "Installing: $dpkg_name"
-  sudo apt install -y $dpkg_name
-fi
+source <(curl -s https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/refs/heads/master/scripts/lib.sh)
+
+#-------------------------------------------------------------------------------------------#
+
+install_package ccze
 
 # ---------------------------------------------------------------
 
@@ -97,6 +96,15 @@ alias prometheus-node-exporter-enable='sudo systemctl enable prometheus-node-exp
 alias grafana-enable='sudo systemctl enable grafana-server'
 alias mevboost-enable='sudo systemctl enable mevboost.service'
 
+alias beacon-disable='sudo systemctl disable prysm-beacon.service'
+alias validator-disable='sudo systemctl enadisableble prysm-validator.service'
+alias eth2-stats-disable='sudo systemctl disable eth2-client-metrics-exporter.service'
+alias geth-disable='sudo systemctl disable geth.service'
+alias prometheus-disable='sudo systemctl disable prometheus'
+alias prometheus-node-exporter-disable='sudo systemctl disable prometheus-node-exporter'
+alias grafana-disable='sudo systemctl disable grafana-server'
+alias mevboost-disable='sudo systemctl disable mevboost.service'
+
 alias beacon-config="vi prysm/configs/beacon.yaml"
 alias validator-config="vi prysm/configs/validator.yaml"
 alias geth-config="sudo vi /etc/ethereum/geth.conf"
@@ -111,9 +119,11 @@ alias geth-peers="printf 'net.peerCount' | /usr/local/bin/geth attach http://loc
 
 alias node-upgrade='./auto_upgrade.sh'
 alias node-auto-upgrade-latest='rm auto_upgrade.sh && wget https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/auto_upgrade.sh && chmod +x auto_upgrade.sh'
-alias node-aliases-latest='curl -L https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/alias.sh | bash && source ~/.bashrc'
-alias node-go-lib-latest='curl -L https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/upgrade_go_lib.sh | bash && source ~/.bashrc'
+alias node-aliases-latest='bash <(curl -s https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/alias.sh)'
+alias node-go-lib-latest='bash <(curl -s https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/upgrade_go_lib.sh)'
 alias node-health='curl http://localhost:8080/healthz'
+
+alias utils=bash <(curl -s https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/refs/heads/master/scripts/utils.sh)
 EOF
 
 source ~/.bashrc

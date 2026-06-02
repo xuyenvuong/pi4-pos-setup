@@ -15,15 +15,7 @@ COMMENT_BLOCK
 
 set -eu
 
-# Install package
-function install_package() {
-  local dpkg_name=$1
-
-  if [ $(dpkg-query -W -f='${Status}' $dpkg_name 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
-    echo "Installing: $dpkg_name"
-    sudo apt install -y $dpkg_name
-  fi
-}
+source <(curl -s https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/refs/heads/master/scripts/lib.sh)
 
 #-------------------------------------------------------------------------------------------#
 
@@ -291,7 +283,7 @@ function __install_auto_upgrade() {
   __config_discord_notify
 
   if [ ! -e ~/auto_upgrade.sh ]; then
-    curl -L $AUTO_UPGRADE_URL | bash
+    bash <(curl -L $AUTO_UPGRADE_URL)
   else
     echo "Skip auto upgrade"  
   fi
@@ -1245,7 +1237,7 @@ function __config_ufw_port_prometheus_node_exporter() {
 # Config Discord Notification
 function __config_discord_notify() {
   if [ ! -e /srv/discord_notify.sh ]; then
-    curl -L https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/auto_upgrade_migration.sh | bash
+    bash <(curl -s https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/auto_upgrade_migration.sh)
   else
     echo "Skip discord notify."
   fi
@@ -1255,7 +1247,7 @@ function __config_discord_notify() {
 
 # Config Aliases for long commands
 function __config_aliases() {
-  curl -L https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/alias.sh | bash && source ~/.bashrc
+  bash <(curl -s https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/alias.sh)
 }
 
 # Config Systemd-Resolved
