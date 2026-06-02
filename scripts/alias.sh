@@ -31,25 +31,26 @@ install_package ccze
 
 # ---------------------------------------------------------------
 
-echo "Clean up .bashrc aliases"
+# echo "Clean up .bashrc aliases"
 
-sudo sed -i "/Aliases/d" ~/.bashrc
-sudo sed -i "/beacon/d" ~/.bashrc
-sudo sed -i "/validator/d" ~/.bashrc
-sudo sed -i "/eth2/d" ~/.bashrc
-sudo sed -i "/geth/d" ~/.bashrc
-sudo sed -i "/prometheus/d" ~/.bashrc
-sudo sed -i "/grafana/d" ~/.bashrc
-sudo sed -i "/mevboost/d" ~/.bashrc
-sudo sed -i "/node-/d" ~/.bashrc
-# Replace multiples blank lines with one blank line
-sudo sed -i "\$!N;/^\n\$/{\$q;D;};P;D;" ~/.bashrc
+# sudo sed -i "/Aliases/d" ~/.bashrc
+# sudo sed -i "/beacon/d" ~/.bashrc
+# sudo sed -i "/validator/d" ~/.bashrc
+# sudo sed -i "/eth2/d" ~/.bashrc
+# sudo sed -i "/geth/d" ~/.bashrc
+# sudo sed -i "/prometheus/d" ~/.bashrc
+# sudo sed -i "/grafana/d" ~/.bashrc
+# sudo sed -i "/mevboost/d" ~/.bashrc
+# sudo sed -i "/node-/d" ~/.bashrc
+# # Replace multiples blank lines with one blank line
+# sudo sed -i "\$!N;/^\n\$/{\$q;D;};P;D;" ~/.bashrc
 
 # ---------------------------------------------------------------
 
-echo "Adding aliases to .bashrc file"
+echo "Adding aliases to .bash_aliases file"
 
-sudo cat << EOF | sudo tee -a $HOME/.bashrc >/dev/null
+# sudo cat << EOF | sudo tee -a $HOME/.bashrc >/dev/null
+sudo cat << EOF | sudo tee -a ~/.bash_aliases >/dev/null
 # Aliases for Node
 alias beacon-log='journalctl -f -u prysm-beacon.service -n 200 | ccze -A'
 alias validator-log='journalctl -f -u prysm-validator.service -n 200 | ccze -A'
