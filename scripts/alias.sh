@@ -123,7 +123,7 @@ alias node-auto-upgrade-latest='rm auto_upgrade.sh && wget https://raw.githubuse
 alias node-aliases-latest='bash <(curl -s https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/alias.sh)'
 alias node-go-lib-latest='bash <(curl -s https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/upgrade_go_lib.sh)'
 alias node-health='curl http://localhost:8080/healthz'
-alias node-utils=bash <(curl -s https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/refs/heads/master/scripts/utils.sh)
+alias node-utils='bash <(curl -s https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/refs/heads/master/scripts/utils.sh)'
 EOF
 
 source ~/.bashrc
