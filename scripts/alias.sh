@@ -33,7 +33,7 @@ install_package ccze
 
 # echo "Clean up .bashrc aliases"
 
-$legacy_aliases=$(cat .bashrc | grep "Aliases for Node");
+legacy_aliases=$(cat .bashrc | grep "Aliases for Node");
 
 if [ ! -z $legacy_aliases ]; then
   sudo sed -i "/Aliases/d" ~/.bashrc
