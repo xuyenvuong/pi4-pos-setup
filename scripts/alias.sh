@@ -45,7 +45,7 @@ if [ ! -z $legacy_aliases ]; then
   sudo sed -i "/grafana/d" ~/.bashrc
   sudo sed -i "/mevboost/d" ~/.bashrc
   sudo sed -i "/node-/d" ~/.bashrc
-  sudo sed -i "/^#\ Aliases/d" ~/.bashrc
+  sudo sed -i "/^#\sAliases/d" ~/.bashrc
   # Replace multiples blank lines with one blank line
   sudo sed -i "\$!N;/^\n\$/{\$q;D;};P;D;" ~/.bashrc
 fi
