@@ -33,9 +33,13 @@ install_package ccze
 
 # echo "Clean up .bashrc aliases"
 
-legacy_aliases=$(cat .bashrc | grep "Aliases for Node");
+# Debug
+# export PS4='$0.$LINENO+ '
+# set -x
 
-if [ ! -z $legacy_aliases ]; then
+if test -z "$(cat .bashrc | grep 'Aliases for Node')"; then
+  echo "No legacy aliases to clean"
+else
   sudo sed -i "/Aliases/d" ~/.bashrc
   sudo sed -i "/beacon/d" ~/.bashrc
   sudo sed -i "/validator/d" ~/.bashrc
@@ -54,7 +58,7 @@ fi
 
 echo "Adding aliases to .bash_aliases file"
 
-sudo cat << EOF | sudo tee -a ~/.bash_aliases >/dev/null
+sudo cat << EOF | sudo tee ~/.bash_aliases >/dev/null
 # Aliases for Node
 alias beacon-log='journalctl -f -u prysm-beacon.service -n 200 | ccze -A'
 alias validator-log='journalctl -f -u prysm-validator.service -n 200 | ccze -A'
