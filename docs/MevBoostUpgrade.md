@@ -1,4 +1,6 @@
-# Upgrade MEV Boost to Latest Version
+<!-- # Upgrade MEV Boost to Latest Version
+
+Legacy doc, no longer relevant.
 
 Anytime you want to upgrade your MEV Boost to the lastest version, please follow this instructions below:
 
@@ -14,4 +16,4 @@ Then check mevboost-log for error
 $ mevboost-log
 ```
 
-If you don't see any error after a while, then you can stop the log.
+If you don't see any error after a while, then you can stop the log. -->

@@ -1,3 +1,6 @@
+<!--
+
+Legacy doc, no longer relevant.
 
 # This guide is obsoleted since this feature is done.
 
@@ -11,15 +14,15 @@ _(Note: The upgrade won't work if you are at lower version)_
 
 How to upgrade GETH to `v1.10.22`, run these commands:
 > `wget -P /tmp https://gethstore.blob.core.windows.net/builds/geth-linux-amd64-1.10.22-2de49b04.tar.gz`
-> 
+>
 > `tar -xvzf /tmp/geth-linux-amd64-1.10.22-2de49b04.tar.gz -C /tmp`
-> 
+>
 > `sudo systemctl stop geth.service`
-> 
+>
 > `sudo mv /usr/local/bin/geth /usr/local/bin/geth.20220822`
-> 
+>
 > `sudo cp /tmp/geth-linux-amd64-1.10.22-2de49b04/geth /usr/local/bin`
-> 
+>
 > `sudo systemctl start geth.service`
 
 ## Step 2: Generate JWT (Java Web Token), run these commands:
@@ -36,9 +39,9 @@ Then add these parameters:
 >  `--authrpc.port 8551`
 >  `--authrpc.vhosts localhost`
 
-Save and exit. 
+Save and exit.
 
-Then, 
+Then,
 
 > `sudo systemctl restart geth.service`
 
@@ -60,7 +63,7 @@ Then add these parameters:
 
 Then remove these parameters:
 
-> `fallback-web3provider` 
+> `fallback-web3provider`
 
 > `- https://mainnet.infura.io/v3/INFURA_API_KEY`
 
@@ -88,4 +91,4 @@ Check logs - if you encounter any error, let me know asap
 
 > `journalctl -f -u prysm-validator.service`
 
-Done.
+Done. -->

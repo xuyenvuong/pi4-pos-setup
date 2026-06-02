@@ -1,4 +1,8 @@
-# <span style="color:red">**WARNING: Only submit to MAINNET after the Shanghai fork on April 12th.**</span>
+<!-- #
+
+Legacy doc, no longer relevant.
+
+<span style="color:red">**WARNING: Only submit to MAINNET after the Shanghai fork on April 12th.**</span>
 
 <span style="color:orange">Note: This guide doesn't cover `Validator Exiting`. Regardless, you still need to do this step for `Validator Existing`</span>
 
@@ -9,7 +13,7 @@ _Reference => [Ethdo Github](https://github.com/wealdtech/ethdo/releases)_
 
 * SSH into your `Staking Machine`.
 
-* Change Prysm config. 
+* Change Prysm config.
 ```bash
 vi prysm/configs/beacon.yaml
 ```
@@ -49,7 +53,7 @@ tar -C ~/ethdo_withdrawal -xvzf /tmp/ethdo-1.29.2-linux-amd64.tar.gz
 ```bash
 vi withdrawal_address.txt
 ```
---- 
+---
 
 # Step II - BASIC OPERATION
 There are 3 different ways to perform `Withdrawal Process`. It depends on how much risk you want to take.
@@ -64,7 +68,7 @@ There are 3 different ways to perform `Withdrawal Process`. It depends on how mu
 
 <div id="onlineUnsafe"></div>
 
-## 1. Online Process on Staking Machine 
+## 1. Online Process on Staking Machine
 <span style="color:red">WARNING</span>: <span style="color:orange">_This is the quickest method, but it's the most `UNSAFE` method since you won't be able to review the `submitted BLS data` and your machine will log the `mnemonic key` in the history/system-log. Error will be irreversable.</span> <span style="color:red">`You've been WARNED!!!`_</span>
 
 ![Online Method](https://raw.githubusercontent.com/wealdtech/ethdo/master/docs/images/credentials-change-online.png)
@@ -107,7 +111,7 @@ Congrats! You are DONE.
 
 ### Part 2 - Generate BLS Data
 
-* Run this command after replacing the `--mnemonic` with your validator's `mnemonic key`, and `--withdrawal-address` with your wallet's public address (aka Metamask). 
+* Run this command after replacing the `--mnemonic` with your validator's `mnemonic key`, and `--withdrawal-address` with your wallet's public address (aka Metamask).
 * Any validator which associated with the `mnemonic key` will be subject for BLS changes and be submitted.
 * Tripple check your `wallet-address` before execute the command
 
@@ -231,7 +235,7 @@ cd ~/ethdo_withdrawal
 vi withdrawal_address.txt
 ```
 
-* Run this command after replacing the `--mnemonic` with your validator's `mnemonic key`, and `--withdrawal-address` with your wallet's public address (aka Metamask). 
+* Run this command after replacing the `--mnemonic` with your validator's `mnemonic key`, and `--withdrawal-address` with your wallet's public address (aka Metamask).
 * Any validator which associated with the `mnemonic key` will be subject for BLS changes and be submitted.
 * Tripple check your `wallet-address` before execute the command
 
@@ -254,7 +258,7 @@ vi withdrawal_address.txt
 scp -r -P 2222 username@XXX.XXX.XXX.XXX:~/ethdo_withdrawal/change-operations.json ~/ethdo_withdrawal
 ```
 
-* Shutdown your `Virtual Machine` (No longer need it. You can also remove the VM from VirtualBox)       
+* Shutdown your `Virtual Machine` (No longer need it. You can also remove the VM from VirtualBox)
 ![Power Off](https://ubuntuhandbook.org/wp-content/uploads/2020/05/bring-out-submenu.png)
 
 ### Part 7 - Submit BLS Data to Local Consensus Mainnet Nodes
@@ -274,4 +278,4 @@ You can visually check on [Beaconchain Web](https://beaconcha.in/)
 
 Congrats! You are DONE.
 
----
+--- -->

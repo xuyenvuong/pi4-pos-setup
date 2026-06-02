@@ -1,4 +1,6 @@
-# Auto Upgrade Script - Update and Migration
+<!-- # Auto Upgrade Script - Update and Migration
+
+Legacy doc, no longer relevant
 
 Run this command will auto download the new script, and migrate all your old settings for `DISCORD_WEBHOOK_URL` & `GETH_PRUNE_AT_PERCENTAGE` to the newly updated script.
 
@@ -15,4 +17,4 @@ $ vi ~/auto_upgrade.sh
 
 If you wish to change anything, feel free to do so.
 
----
+--- -->
