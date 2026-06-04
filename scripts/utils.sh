@@ -24,16 +24,17 @@ function perform_geth_prune_history() {
   # Prune geth  
   # /usr/local/bin/geth prune-history --history.chain postmerge --datadir /mnt/ssd2tb/chaindata --datadir.ancient /mnt/ssd4tb/ancientdb
 
-  data_dir=$(cat /etc/ethereum/geth.conf | grep 'datadir ')  
+  data_dir=$(cat /etc/ethereum/geth.conf | grep 'datadir ')
+  data_dir_ancient=$(cat /etc/ethereum/geth.conf | grep 'datadir.ancient ')
 
   if [ -e /usr/local/bin/geth ]; then
     sudo systemctl stop prysm-beacon.service
     sudo systemctl stop geth.service
 
-    if [ -z "$(cat /etc/ethereum/geth.conf | grep 'datadir.ancient ')" ]; then
+    if [ -z "$data_dir_ancient" ]; then
       /usr/local/bin/geth prune-history --history.chain postmerge $data_dir
     else
-      /usr/local/bin/geth prune-history --history.chain postmerge $data_dir  $data_dir_ancient
+      /usr/local/bin/geth prune-history --history.chain postmerge $data_dir $data_dir_ancient
     fi
 
     sudo systemctl start prysm-beacon.service
@@ -53,7 +54,7 @@ select opt in "${options[@]}"
 do
     case $opt in
         "Geth Prune History")            
-            echo "Installing $opt"
+            echo "Start $opt"
             perform_geth_prune_history
             ;;
         "Quit")
