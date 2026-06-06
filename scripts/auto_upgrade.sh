@@ -46,8 +46,6 @@ COMMENT_BLOCK
 # END README
 # ---------------------------------------------------------------
 
-echo "Auto Upgrade is in progress..."
-
 # ---------------------------------------------------------------
 
 source <(curl -s https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/refs/heads/master/scripts/lib.sh)
