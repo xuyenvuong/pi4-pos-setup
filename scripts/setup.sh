@@ -25,11 +25,7 @@ DEPOSIT_CLI_RELEASES_LATEST=https://api.github.com/repos/ethereum/staking-deposi
 
 ETH2_CLIENT_METRICS_EXPORTER_RELEASES_LATEST=https://api.github.com/repos/gobitfly/eth2-client-metrics-exporter/releases/latest
 
-# GETH_RELEASES_LATEST=https://api.github.com/repos/ethereum/go-ethereum/releases/latest
-
 GETH_TAGS_URL=https://api.github.com/repos/ethereum/go-ethereum/tags
-
-AUTO_UPGRADE_URL=https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/auto_upgrade_migration.sh
 
 NOIP_URL=https://www.noip.com/client/linux/noip-duc-linux.tar.gz
 
@@ -46,9 +42,9 @@ NODE_EXPORTER_RELEASES_LATEST=https://api.github.com/repos/prometheus/node_expor
 # Main function to install all necessary package to support the node
 function __install_essential() {
   # Update & Upgrade to latest
-  sudo apt update && sudo apt upgrade
-  sudo apt dist-upgrade
-  sudo apt autoremove
+  # sudo apt update && sudo apt upgrade
+  # sudo apt dist-upgrade
+  # sudo apt autoremove
   
   #---------------------------------------------#
   #  BASIC REQUIREMENTS
@@ -281,7 +277,7 @@ function __install_auto_upgrade() {
   __config_discord_notify
 
   if [ ! -e ~/auto_upgrade.sh ]; then
-    bash <(curl -L $AUTO_UPGRADE_URL)
+    wget $GITHUB_REPO_URI/auto_upgrade.sh && chmod +x ~/auto_upgrade.sh
   else
     echo "Skip auto upgrade"  
   fi
@@ -1235,17 +1231,15 @@ function __config_ufw_port_prometheus_node_exporter() {
 # Config Discord Notification
 function __config_discord_notify() {
   if [ ! -e /srv/discord_notify.sh ]; then
-    bash <(curl -s https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/auto_upgrade_migration.sh)
+    sudo wget -P /srv $GITHUB_REPO_URI/discord_notify.sh && sudo chmod +x /srv/discord_notify.sh
   else
     echo "Skip discord notify."
   fi
-
-  # Edit DISCORD_WEBHOOK_URL in /srv/discord_notify.sh 
 }
 
 # Config Aliases for long commands
 function __config_aliases() {
-  bash <(curl -s https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts/alias.sh)
+  bash <(curl -s $GITHUB_REPO_URI/alias.sh)
 }
 
 # Config Systemd-Resolved

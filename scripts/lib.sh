@@ -14,6 +14,8 @@ COMMENT_BLOCK
 
 set -eu
 
+GITHUB_REPO_URI=https://raw.githubusercontent.com/xuyenvuong/pi4-pos-setup/master/scripts
+
 ARCH=$(dpkg --print-architecture)
 
 #-------------------------------------------------------------------------------------------#
