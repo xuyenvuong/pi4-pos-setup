@@ -44,13 +44,68 @@ function perform_geth_prune_history() {
   fi
 }
 
-# Config Discord URL
-function config_discord_url() {  
+# Set Beacon data path
+function set_beacon_data_path() {
+  if [ -e ~/prysm/configs/beacon.yaml ]; then
+    read -p "Enter beacon data path (e.g. /mnt/ssdxxxx/beacon): " beacon_data_path
+    
+    sudo sed -i "s|^datadir.*$|datadir: \"$beacon_data_path\"|" ~/prysm/configs/beacon.yaml
+  else
+    echo "Error. Please setup Beacon first."
+  fi
+}
+
+# Set Geth data path
+function set_geth_data_path() {
+  if [ -e /etc/ethereum/geth.conf ]; then
+    read -p "Enter geth data path (e.g. /mnt/ssdxxxx/chaindata): " geth_data_path
+    
+    sudo sed -i "s|^\s--datadir\s.*$| --datadir $geth_data_path|" /etc/ethereum/geth.conf
+  else
+    echo "Error. Please setup Geth first."
+  fi
+}
+
+# Set Geth ancient data path
+function set_geth_ancient_data_path() {
+  if [ -e /etc/ethereum/geth.conf ]; then
+    read -p "Enter geth ancient data path (e.g. /mnt/ssdxxxx/ancientdb): " geth_ancient_data_path
+    
+    sudo sed -i "s|^\s--datadir\.ancient.*$| --datadir.ancient $geth_ancient_data_path|" /etc/ethereum/geth.conf
+  else
+    echo "Error. Please setup Geth first."
+  fi
+}
+
+# Set Wallet
+function set_wallet() {
+  if [ -e ~/prysm/configs/beacon.yaml ]; then
+    read -p "Enter walled address: " wallet_address
+    
+    sudo sed -i "s|^suggested-fee-recipient.*$|suggested-fee-recipient: $wallet_address|" ~/prysm/configs/beacon.yaml
+  else
+    echo "Error. Please setup Beacon first."
+  fi
+}
+
+# Set Wallet
+function set_host_dns() {
+  if [ -e ~/prysm/configs/beacon.yaml ]; then
+    read -p "Enter host DNS: " host_dns
+    
+    sudo sed -i "s|^p2p-host-dns.*$|p2p-host-dns: \"$host_dns\"|" ~/prysm/configs/beacon.yaml
+  else
+    echo "Error. Please setup Beacon first."
+  fi
+
+}
+
+# Set Discord URL
+function set_discord_url() {  
   if [ -e /srv/discord_notify.sh ]; then
     read -p "Enter full Discord URL: " discord_url
     
-    sudo sed -i "s|^DISCORD_WEBHOOK_URL.*$|DISCORD_WEBHOOK_URL=\'$discord_url\'|" /srv/discord_notify.sh
-    
+    sudo sed -i "s|^DISCORD_WEBHOOK_URL.*$|DISCORD_WEBHOOK_URL=\'$discord_url\'|" /srv/discord_notify.sh    
   else
     echo "Error. Please setup discord_notify.sh first."
   fi
@@ -61,7 +116,7 @@ function config_discord_url() {
 #-------------------------------------------------------------------------------------------#
 
 PS3='Please enter your command choice: '
-options=("Geth Prune History" "Config Discord URL" "Quit")
+options=("Geth Prune History" "Set Beacon Data Path" "Set Geth Data Path" "Set Geth Ancient Data Path" "Set Wallet" "Set Host DNS" "Set Discord URL" "Quit")
 select opt in "${options[@]}"
 do
     case $opt in
@@ -69,9 +124,24 @@ do
             echo "Start $opt"
             perform_geth_prune_history
             ;;
-        "Config Discord URL")
-            config_discord_url
+        "Set Beacon Data Path")
+            set_beacon_data_path
             ;;
+        "Set Geth Data Path")
+            set_geth_data_path
+            ;;
+        "Set Geth Ancient Data Path")
+            set_geth_ancient_data_path
+            ;;
+        "Set Wallet")
+            set_wallet
+            ;;
+        "Set Host DNS")
+            set_host_dns
+            ;;
+        "Set Discord URL")
+            Set_discord_url
+            ;;        
         "Quit")
             echo "Good bye!"
             break
