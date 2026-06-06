@@ -46,7 +46,7 @@ function perform_geth_prune_history() {
 
 # Config Discord URL
 function config_discord_url() {  
-  if [ ! -e /srv/discord_notify.sh ]; then
+  if [ -e /srv/discord_notify.sh ]; then
     read -p "Enter full Discord URL: " discord_url
     
     sudo sed -i "s|^DISCORD_WEBHOOK_URL.*$|DISCORD_WEBHOOK_URL=\'$discord_url\'|" /srv/discord_notify.sh
