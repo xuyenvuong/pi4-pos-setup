@@ -594,7 +594,7 @@ execution-endpoint: http://localhost:8551
 jwt-secret: /etc/ethereum/jwt.hex
 
 # Sync faster (default 64)
-block-batch-limit: 128
+block-batch-limit: 64
 
 #p2p-host-ip: $(curl -s v4.ident.me)
 p2p-host-dns: "mvuong.freemyip.com"
@@ -617,8 +617,8 @@ update-head-timely: true
 suggested-fee-recipient: 0x__YOUR_WALLET_ADDRESS__
 
 # Mev Boost
-#http-mev-relay: http://localhost:18550
-http-mev-relay: lxc-mevboost:18550
+http-mev-relay: http://localhost:18550
+#http-mev-relay: lxc-mevboost:18550
 
 # Faster sync
 checkpoint-sync-url: https://sync-mainnet.beaconcha.in
