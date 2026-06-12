@@ -140,7 +140,7 @@ do
             set_host_dns
             ;;
         "Set Discord URL")
-            Set_discord_url
+            set_discord_url
             ;;        
         "Quit")
             echo "Good bye!"
