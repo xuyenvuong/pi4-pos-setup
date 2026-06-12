@@ -714,6 +714,11 @@ EOF
   fi
 }
 
+# Setup auto upgrade script manually
+function setup_auto_upgrade() {
+  __install_auto_upgrade
+}
+
 # Config Prometheus Node Exporter
 function __config_prometheus_node_exporter() {
   # Require: /home/prometheus/node-exporter, port, prometheus node exporter
@@ -1340,7 +1345,7 @@ EOF
 #-------------------------------------------------------------------------------------------#
 
 PS3='Please enter your setup choice: '
-options=("Geth" "Beacon" "Validator" "Mevboost" "Stats" "Disable Power Button" "Quit")
+options=("Geth" "Beacon" "Validator" "Auto Upgrade" "Mevboost" "Stats" "Disable Power Button" "Quit")
 select opt in "${options[@]}"
 do
     case $opt in
@@ -1355,6 +1360,10 @@ do
         "Validator")
             echo "Installing $opt"
             setup_validator
+            ;;
+        "Auto Upgrade")
+            echo "Installing $opt"
+            setup_auto_upgrade
             ;;
         "Mevboost")
             echo "Installing $opt"
