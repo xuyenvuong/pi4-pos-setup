@@ -35,12 +35,13 @@ function install_package() {
 # Check if daemon is running
 function is_service_running() {  
   local service_name=$1
+  local is_running = 0
 
   if [ -n "$(systemctl list-units --type=service --state=active | grep $service_name | grep running)" ]; then
-    return 1
+    is_running = 1
   fi
 
-  return 0  
+  echo $(is_running)
 }
 
 #---------------------------------------------------------------------------------------
