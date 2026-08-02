@@ -50,16 +50,16 @@ MEVBOOST_RELEASES_LATEST=https://api.github.com/repos/flashbots/mev-boost/releas
 install_package jq
 
 # Check for beacon service
-declare -i beacon_is_running=$(is_service_running prysm-beacon)
+declare beacon_is_running=$(is_service_running prysm-beacon)
 
 # Check for validator service
-declare -i validator_is_running=$(is_service_running prysm-validator)
+declare validator_is_running=$(is_service_running prysm-validator)
 
 # Check for mevboost service
-declare -i mevboost_is_running=$(is_service_running mevboost)
+declare mevboost_is_running=$(is_service_running mevboost)
 
 # Check for geth service
-declare -i geth_is_running=$(is_service_running geth)
+declare geth_is_running=$(is_service_running geth)
 
 # ---------------------------------------------------------------
 
