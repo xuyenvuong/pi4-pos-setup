@@ -120,6 +120,7 @@ alias geth-config="sudo vi /etc/ethereum/geth.conf"
 alias mevboost-config="sudo vi /etc/ethereum/mevboost.conf"
 
 alias geth-version="geth version"
+alias beacon-version="curl -s http://localhost:3500/eth/v1/node/version | jq '.data.version'"
 alias mevboost-version='mev-boost -version'
 
 alias beacon-syncing='curl http://localhost:3500/eth/v1/node/syncing'
