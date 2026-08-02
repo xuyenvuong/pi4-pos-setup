@@ -41,7 +41,7 @@ function is_service_running() {
     is_running = 1
   fi
 
-  echo ${is_running}
+  echo "${is_running}"
 }
 
 #---------------------------------------------------------------------------------------
