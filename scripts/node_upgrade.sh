@@ -50,16 +50,28 @@ MEVBOOST_RELEASES_LATEST=https://api.github.com/repos/flashbots/mev-boost/releas
 install_package jq
 
 # Check for beacon service
-beacon_is_running=$(is_service_running prysm-beacon)
+beacon_is_running = 0
+if [ -n "$(systemctl list-units --type=service --state=active | grep prysm-beacon | grep running)" ]; then
+    beacon_is_running = 1
+fi
 
 # Check for validator service
-validator_is_running=$(is_service_running prysm-validator)
+validator_is_running= = 0
+if [ -n "$(systemctl list-units --type=service --state=active | grep prysm-validator | grep running)" ]; then
+    validator_is_running = 1
+fi
 
 # Check for mevboost service
-mevboost_is_running=$(is_service_running mevboost)
+mevboost_is_running = 0
+if [ -n "$(systemctl list-units --type=service --state=active | grep mevboost | grep running)" ]; then
+    mevboost_is_running = 1
+fi
 
 # Check for geth service
-geth_is_running=$(is_service_running geth)
+geth_is_running = 0
+if [ -n "$(systemctl list-units --type=service --state=active | grep geth | grep running)" ]; then
+    geth_is_running = 1
+fi
 
 # ---------------------------------------------------------------
 
