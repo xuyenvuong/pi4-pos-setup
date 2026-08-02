@@ -38,7 +38,7 @@ function is_service_running() {
   local is_running=0
 
   if [ -n "$(systemctl list-units --type=service --state=active | grep $service_name | grep running)" ]; then
-    is_running = 1
+    is_running=1
   fi
 
   echo "${is_running}"
