@@ -30,20 +30,6 @@ function install_package() {
   fi
 }
 
-#-------------------------------------------------------------------------------------------#
-
-# Check if daemon is running
-function is_service_running() {  
-  local service_name=$1
-  local is_running=0
-
-  if [ -n "$(systemctl list-units --type=service --state=active | grep $service_name | grep running)" ]; then
-    is_running=1
-  fi
-
-  echo "${is_running}"
-}
-
 #---------------------------------------------------------------------------------------
 
 # To send a simple notification to Discord via webhook. This function only send when DISCORD_WEBHOOK_URL variable is not null
