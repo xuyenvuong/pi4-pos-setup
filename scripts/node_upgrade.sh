@@ -104,29 +104,26 @@ fi
 
 # Check for mevboost service
 if [ -n "$(systemctl list-units --type=service --state=active | grep mevboost | grep running)" ]; then  
-  mevboost_latest_version=$(wget -O - -o /dev/null $MEVBOOST_RELEASES_LATEST | jq '.tag_name' | tr -d \")
-  mevboost_curr_version=$(/usr/local/bin/mev-boost -version | awk '{print $2}')
+  mevboost_latest_version=$(wget -O - -o /dev/null $MEVBOOST_RELEASES_LATEST | jq '.tag_name' | tr -d \")  
 
   # Deciding to upgrade MEV-Boost
-  if [[ $mevboost_curr_version != $mevboost_latest_version ]]; then
-    CGO_CFLAGS="-O -D__BLST_PORTABLE__" /usr/local/go/bin/go install github.com/flashbots/mev-boost@latest
+  CGO_CFLAGS="-O -D__BLST_PORTABLE__" /usr/local/go/bin/go install github.com/flashbots/mev-boost@latest
 
-    md5sum_curr_bin=$(md5sum /usr/local/bin/mev-boost | awk '{print $1}')
-    md5sum_new_bin=$(md5sum go/bin/mev-boost | awk '{print $1}')
+  md5sum_curr_bin=$(md5sum /usr/local/bin/mev-boost | awk '{print $1}')
+  md5sum_new_bin=$(md5sum go/bin/mev-boost | awk '{print $1}')
 
-    if [[ $md5sum_curr_bin != $md5sum_new_bin ]]; then
-      # Move old mevboost file
-      mevboost_backup_filename=/usr/local/bin/mev-boost.$(date "+%Y%m%d-%H%M%S")
-      
-      sudo systemctl stop mevboost.service
+  if [[ $md5sum_curr_bin != $md5sum_new_bin ]]; then
+    # Move old mevboost file
+    mevboost_backup_filename=/usr/local/bin/mev-boost.$(date "+%Y%m%d-%H%M%S")
+    
+    sudo systemctl stop mevboost.service
 
-      sudo mv /usr/local/bin/mev-boost $mevboost_backup_filename
-      sudo cp ~/go/bin/mev-boost /usr/local/bin
+    sudo mv /usr/local/bin/mev-boost $mevboost_backup_filename
+    sudo cp ~/go/bin/mev-boost /usr/local/bin
 
-      sudo systemctl start mevboost.service
+    sudo systemctl start mevboost.service
 
-      discord_notify "$PROCESS_NAME Upgraded MEV-Boost to version $mevboost_latest_version"
-    fi
+    discord_notify "$PROCESS_NAME Upgraded MEV-Boost to version $mevboost_latest_version"
   fi
 fi
 
